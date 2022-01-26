@@ -4,7 +4,7 @@
   "description": "hr and assets management system",
   "main": "index.js",
   "scripts": {
-    "start": "node server.js",
+    "start": "nodemon server.js",
     "dev": "nodemon server.js"
   },
   "author": "Team BlackBugs",
@@ -18,3 +18,4 @@
     "validator": "^13.7.0"
   }
 }
+
