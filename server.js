@@ -1,27 +1,24 @@
 const express = require("express");
-const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
 const cors = require("cors");
+
 const app = express();
 require("dotenv").config();
 
-const PORT = process.env.PORT || 8070;
+const dbConnection = require("./src/Config/connectDataBase");
+const recruitmentRoutes = require("./src/routes/recruitmentRoutes");
 
 app.use(cors());
 app.use(bodyParser.json());
+const PORT = process.env.PORT || 8070;
 
-const URL = process.env.MONGODB_URL;
+dbConnection();
 
-mongoose.connect(URL,{
-    useNewUrlParser : true,
-    useUnifiedTopology : true
-});
-const connection = mongoose.connection;
-connection.once("open", ()=>{
-    console.log("MongoDB connection is success!");
-})
-
-app.listen(PORT, ()=>{
+app.listen(PORT, () => {
     console.log(`Server is running on ${PORT} port`);
-})
+});
+
+app.use("/recruitment", recruitmentRoutes);
+
+
 
