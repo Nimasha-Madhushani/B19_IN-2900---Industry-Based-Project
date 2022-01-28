@@ -6,8 +6,9 @@ const app = express();
 require("dotenv").config();
 
 const dbConnection = require("./src/Config/connectDataBase");
-const recruitmentRoutes = require("./src/routes/recruitmentRoutes");
-const employeeRouter = require("./src/routes/employeeRoutes");
+
+const employeeRouter = require("./src/routes/ReportersManagementModule/employeeRoutes");
+const recruitmentRoutes = require("./src/routes/RecruitmentModule/recruitmentRoutes");
 
 
 app.use(cors());
