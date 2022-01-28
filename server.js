@@ -7,6 +7,7 @@ require("dotenv").config();
 
 const dbConnection = require("./src/Config/connectDataBase");
 const recruitmentRoutes = require("./src/routes/RecruitmentModule/recruitmentRoutes");
+const assetRoutes = require("./src/routes/AssetsManagementModule/assetRoutes");
 
 
 app.use(cors());
@@ -20,6 +21,7 @@ app.listen(PORT, () => {
 });
 
 app.use("/recruitment", recruitmentRoutes);
+app.use("/assets",assetRoutes);
 
 
 
