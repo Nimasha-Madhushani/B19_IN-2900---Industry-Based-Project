@@ -44,7 +44,7 @@ module.exports.cancelInterview = async (req, res) => {
       return res.status(400).send("ID invalid : " + id);
   try {
     const interview = await InterviewSchema.findOne({ id });
-    console.log(interview);
+    //console.log(interview);
     if (interview) {
       const hour = interview.InterviewTime.slice(0, 2);
       const minute = interview.InterviewTime.slice(3);
