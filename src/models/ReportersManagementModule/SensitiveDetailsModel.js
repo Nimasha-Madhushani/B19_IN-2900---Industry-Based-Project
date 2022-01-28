@@ -3,19 +3,19 @@ const mongoose = require("mongoose");
 const sensitiveDetailsSchema = new mongoose.Schema({
   userName: {
     type: String,
-    required: [true, "Please enter the user name"],
+    required: true
   },
   accessLevel: {
     type: String,
-    required: [true, "Please enter the access level"],
+    required: true
   },
   password: {
     type: String,
-    required: [true, "Please enter the  team password"],
+    required: true
   },
   employeeID: {
     type: String,
-    required: [true, "Please enter the employee ID"],
+    required: true
   },
 });
 

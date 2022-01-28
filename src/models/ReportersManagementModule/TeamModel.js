@@ -3,15 +3,15 @@ const mongoose = require("mongoose");
 const teamSchema = new mongoose.Schema({
   teamID: {
     type: String,
-    required: [true, "Please enter the team ID"],
+    required: true, 
   },
   teamName: {
     type: String,
-    required: [true, "Please enter the team name"],
+    required: true
   },
   teamLeadID: {
     type: String,
-    required: [true, "Please enter the  team lead ID"],
+    required: true
   },
 });
 

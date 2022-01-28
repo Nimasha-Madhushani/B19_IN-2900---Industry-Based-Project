@@ -3,25 +3,25 @@ const mongoose = require("mongoose");
 const academicQualificaationSchema = new mongoose.Schema({
   academicQualificationID: {
     type: String,
-    required: [true, "Please enter the academic qualification ID"],
+    required:true
   },
   employeeID: {
     type: String,
-    required: [true, "Please enter the  employee ID"],
+    required: true
   },
 
   ordinaryLevelResult: {
     type: String,
-    required: [true, "Please enter the O/L Result"],
+    required: true
   },
   advancedLevelResults: {
     type: String,
-    required: [true, "Please enter the A/L Results"],
+    required: true
   },
 
   achievements: {
     type: String,
-    required: [true, "Please enter the acheivement"],
+    required: true
   },
 });
 

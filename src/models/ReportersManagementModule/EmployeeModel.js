@@ -1,79 +1,73 @@
 const mongoose = require("mongoose");
-const validator = require("validator");
+//const validator = require("validator");
 
 const employeeSchema = new mongoose.Schema({
   employeeID: {
     type: String,
-    required: [true, "Please enter the employee ID"],
+    required: true,
   },
   employeeFirstName: {
     type: String,
-    required: [true, "Please enter the first name"],
+    required: true
   },
   employeeLastName: {
     type: String,
-    required: [true, "Please enter the last name"],
-  },
+    required: true
+    },
   birthday: {
     type: String,
-    required: [true, "Please enter the birthday"],
-  },
+    required: true,
+ },
   streetNo: {
     type: String,
-    required: [true, "Please enter the street number"],
+    required: true
   },
   city: {
     type: String,
-    required: [true, "Please enter the city"],
+    required: true
   },
-  phoneNumber: {
+   phoneNumber: {
     type: String,
-    required: [true, "Please enter the phone number"],
-    unique: true,
-  },
+    required: true},
+
   jobRole: {
     type: String,
-    required: [true, "Please enter the job role"],
-  },
+    required: true
+ },
   NIC: {
     type: String,
-    required: [true, "Please enter the NIC"],
+    required: true
   },
-
   companyEmail: {
     type: String,
-    required: [true, "Please enter the phone number"],
-    unique: true,
-    validate: [validator.isEmail, "please enter a valid email"],
+    required: true
   },
   status: {
     type: String,
-    required: [true, "Please enter the status"],
-  },
-  lastLogin: {
-    type: String,
-    required: [true, "Please enter the last login"],
+    required: true
   },
   joinDate: {
-    type: String,
-    required: [true, "Please enter the join date"],
-  },
+    type: Date,
+    required: true
+    },
   resignDate: {
-    type: String,
-    required: [true, "Please enter the resign date"],
+    type: Date,
+    required: true,
+    
   },
   jobType: {
     type: String,
-    required: [true, "Please enter the job type"],
-  },
+    required: true,
+ },
   candidateID: {
     type: String,
-    required: [true, "Please enter the candidtae ID"],
+    required: true
   },
   teamID: {
     type: String,
-    required: [true, "Please enter the team ID"],
-  },
-});
+    required: true
+  }
+}
+);
 
 module.exports = mongoose.model("employee", employeeSchema);
