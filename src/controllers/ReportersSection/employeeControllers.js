@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 const employeeSchema = require("../../models/ReportersManagementModule/EmployeeModel");
-const router = require("../../routes/employeeRoutes");
+const router = require("../../routes/ReportersManagementModule/employeeRoutes");
 
 
 //-------Create Employee Profile--------------------
