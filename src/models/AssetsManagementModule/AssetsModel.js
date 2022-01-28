@@ -3,7 +3,8 @@ const Schema = mongoose.Schema;
 const assetsSchema = new Schema({
     assetID :{
         type : String,
-        required : true
+        required : true,
+        unique:true
     },
     assetCategory :{
         type : String,

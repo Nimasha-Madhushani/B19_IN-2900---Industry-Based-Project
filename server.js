@@ -9,6 +9,7 @@ const dbConnection = require("./src/Config/connectDataBase");
 
 const employeeRouter = require("./src/routes/ReportersManagementModule/employeeRoutes");
 const recruitmentRoutes = require("./src/routes/RecruitmentModule/recruitmentRoutes");
+const assetRoutes = require("./src/routes/AssetsManagementModule/assetRoutes");
 
 
 app.use(cors());
@@ -22,5 +23,6 @@ app.listen(PORT, () => {
 });
 
 app.use("/recruitment", recruitmentRoutes);
+app.use("/assets",assetRoutes);
 
 app.use("/employeeRoutes", employeeRouter);
