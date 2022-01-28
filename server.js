@@ -6,7 +6,8 @@ const app = express();
 require("dotenv").config();
 
 const dbConnection = require("./src/Config/connectDataBase");
-const recruitmentRoutes = require("./src/routes/recruitmentRoutes");
+const recruitmentRoutes = require("./src/routes/RecruitmentModule/recruitmentRoutes");
+
 
 app.use(cors());
 app.use(bodyParser.json());

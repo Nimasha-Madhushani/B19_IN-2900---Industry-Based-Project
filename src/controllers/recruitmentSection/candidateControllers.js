@@ -1,11 +1,11 @@
 const mongoose = require("mongoose");
-const candidateSchema = require("../../models/recruitmentSection/CandidateModel");
-
+const candidateSchema = require('../../models/RecruitmentModule/CandidateModel');
 // create a new candidate
 
 module.exports.createCandidate = async (req, res) => {
   const { candidateName, NIC, email, phoneNumber, cv } = req.body;
 
+  
   try {
     const existsCandidate = await candidateSchema.findOne({ NIC });
     if (existsCandidate) {
