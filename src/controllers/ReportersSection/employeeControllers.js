@@ -1,11 +1,13 @@
 const mongoose = require("mongoose");
+const bcrypt=require("bcrypt");
 const employeeSchema = require("../../models/ReportersManagementModule/EmployeeModel");
 const academicQualificaationSchema = require("../../models/ReportersManagementModule/AcademicQualificaationModel");
 const ProffesionalQualificationSchema = require("../../models/ReportersManagementModule/ProffesionalQualificationModel");
 const teamSchema = require("../../models/ReportersManagementModule/TeamModel");
 const productSchema = require("../../models/ReportersManagementModule/ProductModel");
-
-//const candidateSchema = require('../../models/RecruitmentModule/CandidateModel');
+const { findOne } = require("../../models/ReportersManagementModule/EmployeeModel");
+const sensitiveDetailsSchema=require("../../models/ReportersManagementModule/SensitiveDetailsModel");
+const candidateSchema = require('../../models/RecruitmentModule/CandidateModel');
 
 //-------View Employees-----------------------------
 
@@ -20,50 +22,60 @@ exports.viewEmployees = async (req,res)=>{
 //-------Create Employee Profile--------------------
 
 exports.createEmployee = async (req, res) => {
-  const employeeID = req.body.employeeID;
-  const employeeFirstName = req.body.employeeFirstName;
-  const employeeLastName = req.body.employeeLastName;
-  const birthday = req.body.birthday;
+  const{
+    employeeID ,
+  employeeFirstName,
+  employeeLastName ,
+ /* const birthday = req.body.birthday;
   const streetNo = req.body.streetNo;
   const city = req.body.city;
-  const phoneNumber = req.body.phoneNumber;
-  const jobRole = req.body.jobRole;
-  const NIC = req.body.NIC;
-  const companyEmail = req.body.companyEmail;
-  const status = req.body.status;
-  const joinDate = new Date();
-  const resignDate = new Date();
-  const jobType = req.body.jobType;
-  const candidateID = req.body.candidateID;
-  const teamID = req.body.teamID;
+  const phoneNumber = req.body.phoneNumber;*/
+  jobRole ,
+    NIC ,
+  companyEmail,
+  status ,
+  /*const joinDate = new Date();*/
+  /*const resignDate = new Date();*/
+  jobType 
+}=req.body;
+
+
+ /* const teamID = req.body.teamID;*/
+
+  //const joinedDate=new Date();
+
+//----------create username & password---------------------------
+const username=employeeFirstName+"."+employeeID;
+const password=NIC;
+
+
+  const salt = await bcrypt.genSalt();
+  const encryptedPassword=await bcrypt.hash(password, salt);
+
+  const candidate = await candidateSchema.findOne({NIC});
 
   const newEmployee = new employeeSchema({
     employeeID,
     employeeFirstName,
     employeeLastName,
-    birthday,
+    /*birthday,
     streetNo,
     city,
-    phoneNumber,
+    phoneNumber,*/
     jobRole,
     NIC,
     companyEmail,
     status,
-    joinDate,
-    resignDate,
+    //joinDate:joinedDate,
+    //resignDate,
     jobType,
-    candidateID,
-    teamID,
+    candidateID : candidate._id,
+   // teamID,
   });
-   /*
-    const existsCandidate = await candidateSchema.findOne({ NIC });
-    if (existsCandidate) {
-      return res.status(400).json({ message: "candidate already exists" });
-    }*/
-  /*
-  if (status == "resigned") {
-    const resignDate = String(req.body.resignDate);
-  }*/
+
+  const sensitiveDetails= new sensitiveDetailsSchema({
+    username,password:encryptedPassword,employeeID
+  });
 
   await newEmployee
     .save()
@@ -74,26 +86,74 @@ exports.createEmployee = async (req, res) => {
       res.status(400).json({ message: "Employee is not Added!" });
       console.log(err);
     });
+
+    await sensitiveDetails.save().then(() => {
+      res.json("Sensitive Details has successfully added!");
+    })
+    .catch((err) => {
+      res.status(400).json({ message: "Sensitive Details are not Added!" });
+      console.log(err);
+    });
 };
 
-//--------Add academic qualification----------------
-exports.addAcademicQualification = async (req, res) => {
+
+//--------Update academic qualification----------------
+exports.updateEmployeeProfile = async (req, res) => {
+  const {id} = req.params;
   const {
-    academicQualificationID,
-    employeeID,
+    employeeFirstName,
+   employeeLastName,
+   birthday,
+    streetNo,
+    city,
+    phoneNumber,
+   jobRole,
+   NIC,
+   companyEmail,
+   status,
+   jobType,
     ordinaryLevelResult,
     advancedLevelResults,
     achievements,
+    degree, 
+    language,
+     course 
   } = req.body;
 
-  newAcademicQualification = new academicQualificaationSchema({
-    academicQualificationID,
-    employeeID,
+  const newAcademicQualification = new academicQualificaationSchema({
+    //academicQualificationID,
+    employeeID:id,
     ordinaryLevelResult,
     advancedLevelResults,
     achievements,
   });
 
+  const employee  = {   
+    employeeID:id,
+    employeeFirstName,
+    employeeLastName,
+    birthday,
+     streetNo,
+     city,
+     phoneNumber,
+    jobRole,
+    NIC,
+    companyEmail,
+    status,
+    jobType
+   // candidateID : candidate._id,
+  }
+const proffesional={
+  employeeID:id,
+  degree, 
+  language,
+   course 
+}
+ 
+
+//--------------academic qualification update-------------------------------------
+const academicQualification= await academicQualificaationSchema.findOne({id});
+if(! academicQualification){
   await newAcademicQualification
     .save()
     .then(() => {
@@ -104,7 +164,52 @@ exports.addAcademicQualification = async (req, res) => {
         .status(400)
         .json({ message: "Academic Qualifictions are not added!" });
     });
+  }
+  await academicQualificaationSchema.findByIdAndUpdate(id,newAcademicQualification, {new : true}) .then(() => {
+    res.json("Academic Qualifictions added successfully!");
+  })
+  .catch((err) => {
+    res
+      .status(400)
+      .json({ message: "Academic Qualifictions added successfully!" });
+  });
+
+//-------------proffesional qualification update------------------------------
+
+const proffesionalQualification= await ProffesionalQualificationSchema.findOne({employeeID:id});
+if(! proffesionalQualification){
+  await proffesional
+    .save()
+    .then(() => {
+      res.json("Proffesional Qualifictions added successfully!");
+    })
+    .catch((err) => {
+      res
+        .status(400)
+        .json({ message: "Proffesional Qualifictions are not added!" });
+    });
+  }
+  await academicQualificaationSchema.findByIdAndUpdate(id,proffesional, {new : true}) .then(() => {
+    res.json("Proffesional Qualifictions added successfully!");
+  })
+  .catch((err) => {
+    res
+      .status(400)
+      .json({ message: "Proffesional Qualifictions added successfully!" });
+  });
+
+//-----------update employee details-------------------------------
+ await employeeSchema.findByIdAndUpdate(id, employee, {new : true}) .then(() => {
+      res.json("Employee Updated successfully!");
+    })
+    .catch((err) => {
+      res
+        .status(400)
+        .json({ message: "Employee is not updated!" });
+    });
 };
+//------------------------------------------------------------
+//------------------------------------------------------------
 
 /* 
  const existingEmployee = await employeeSchema
@@ -116,11 +221,11 @@ if(existingEmployee){
 
 //--------Add Proffesional qualification----------------
 exports.addProffesionalQualification = async (req, res) => {
-  const { proffesionalQualificationID, employeeID, degree, language, course } =
+  const { employeeID, degree, language, course } =
     req.body;
 
   newProffesionalQualification = new ProffesionalQualificationSchema({
-    proffesionalQualificationID,
+ 
     employeeID,
     degree,
     language,
@@ -183,6 +288,17 @@ try{
       res.status(500).send({message:"Cannot create team!"})
     
   }*/
+
+//-------View Team-----------------------------
+
+exports.viewTeam = async (req,res)=>{
+  await teamSchema.find().then((team)=>{
+      res.json(team)
+  }).catch((err)=>{
+      console.log(err)
+  })
+}
+
 
 //---------------add product----------------
 exports.addProduct = async (req, res) => {

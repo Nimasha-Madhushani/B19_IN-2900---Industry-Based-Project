@@ -25,4 +25,4 @@ app.listen(PORT, () => {
 app.use("/recruitment", recruitmentRoutes);
 app.use("/assets",assetRoutes);
 
-app.use("/employeeRoutes", employeeRouter);
+app.use("/employee", employeeRouter);

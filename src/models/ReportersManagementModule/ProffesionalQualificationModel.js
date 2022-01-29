@@ -1,24 +1,24 @@
 const mongoose = require("mongoose");
 
 const proffesionalQualificaationSchema = new mongoose.Schema({
-  proffesionalQualificationID: {
+  /*proffesionalQualificationID: {
     type: String,
     required: true
-  },
+  },*/
   employeeID: {
     type: String,
     required: true
   },
   degree: {
-    type: String,
+    type: Array,
     required: true
   },
   language: {
-    type: String,
+    type: Array,
     required: true
   },
   course: {
-    type: String,
+    type: Array,
     required: true
   },
 });
