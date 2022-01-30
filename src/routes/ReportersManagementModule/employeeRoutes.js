@@ -1,28 +1,32 @@
 const router = require("express").Router();
 const {
-createEmployee, addAcademicQualification,addProffesionalQualification,addProduct, addTeam, viewEmployees, viewTeam, updateEmployeeProfile
+createEmployee,addProduct, addTeam, viewEmployees, viewTeam, updateEmployeeProfile, updateProduct, updateTeam
 } = require("../../controllers/ReportersSection/employeeControllers");
 
 //view all employees
 router.get('/',viewEmployees);
 
-//view all teams
-router.get('/viewTeam',viewTeam);
-
 //create employee
 router.post('/add', createEmployee);
 
-//add employee profile update
+//employee profile update including academic/proffesional qualifications
 router.put('/update/:id',updateEmployeeProfile);
 
-//add proffesional qualifications
-router.post('/proffesionalAdd',addProffesionalQualification);
+//view all teams
+router.get('/viewTeam',viewTeam);
 
 //add team
 router.post('/teamAdd',addTeam);
 
+//update team
+router.put('/updateTeam/:id',updateTeam);
+
 //add product
-router.post('/productAdd',addProduct);
+router.post('/addProduct',addProduct);
+
+//update product
+router.put('/updateProduct/:id',updateProduct);
+
 
 
 
