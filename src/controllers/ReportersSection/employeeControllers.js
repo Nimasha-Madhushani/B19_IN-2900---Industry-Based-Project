@@ -315,6 +315,7 @@ exports.viewTeam = async (req, res) => {
       console.log(err);
     });
 };
+//------------------------------------------
 
 //---------------add product----------------
 exports.addProduct = async (req, res) => {
@@ -358,7 +359,7 @@ exports.updateProduct = async (req, res) => {
   const productID = req.body.productID;
   const productName = req.body.productName;
   const description = req.body.description;
-  // const recievedDate=new Date();
+  //const recievedDate=new Date();
   //const launchDate=req.body.launchDate;
   const teamID = req.body.teamID;
 
@@ -367,14 +368,14 @@ exports.updateProduct = async (req, res) => {
     productName,
     description,
     // recievedDate,
-    /// launchDate,
+    // launchDate,
     teamID,
   };
 
   const existingProduct = await productSchema.findById(id);
   if (existingProduct) {
     await productSchema
-      .findByIdAndUpdate(id, newProductUpdate)
+      .findByIdAndUpdate(existingProduct._id, newProductUpdate, { new: true })
       .then(() => {
         res.json("product is updated successfully!");
       })
@@ -384,3 +385,33 @@ exports.updateProduct = async (req, res) => {
   }
 };
 //-----------------------------------------------
+
+//-----------update resign status----------------
+
+exports.updateProduct = async (req, res) => {
+  const { id } = req.params;
+  const resignDate = new Date();
+  const status = req.body.status;
+
+  const existingEmployee = await employeeSchema.findById(id);
+  if (existingEmployee) {
+  }
+};
+
+//-----------------------------------------------
+
+//-----------create recently joined section------
+
+//-----------------------------------------------
+
+//------------create organization structure------
+
+//-----------------------------------------------
+
+//---assign & remove team members, team leads----
+
+//-----------------------------------------------
+
+//-----------employee profile progress----------
+
+//----------------------------------------------
