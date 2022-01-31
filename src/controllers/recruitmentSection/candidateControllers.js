@@ -43,8 +43,6 @@ module.exports.createCandidate = async (req, res) => {
 
 module.exports.findCandidate = async (req, res) => {
   const { NIC } = req.params;
-  if (!mongoose.Types.ObjectId.isValid(NIC))
-    return res.status(400).send("NIC invalid : " + NIC);
 
   try {
     const candidate = await candidateSchema.findOne({ NIC });
@@ -73,7 +71,7 @@ module.exports.findCandidate = async (req, res) => {
 module.exports.updateCandidate = async (req, res) => {
   const { id } = req.params;
   if (!mongoose.Types.ObjectId.isValid(id))
-    return res.status(400).send("ID invalid : " + id);
+    return res.status(404).send("ID invalid : " + id);
 
   try {
     const { candidateName, NIC, email, phoneNumber, cv } = req.body;
@@ -87,7 +85,7 @@ module.exports.updateCandidate = async (req, res) => {
     if (!updatedCandidate) {
       return res
         .status(404)
-        .json({ success: false, description: "candidate failed to update" });
+        .json({ success: false, description: "candidate is failed to update" });
     }
     res.status(201).json({
       success: true,
@@ -97,7 +95,7 @@ module.exports.updateCandidate = async (req, res) => {
   } catch (error) {
     res.status(404).json({
       success: false,
-      description: "candidate failed to update",
+      description: "candidate is failed to update",
       error: error.message,
     });
   }
