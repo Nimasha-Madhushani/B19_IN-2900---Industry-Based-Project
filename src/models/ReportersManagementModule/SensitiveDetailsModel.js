@@ -1,22 +1,25 @@
 const mongoose = require("mongoose");
 
-const sensitiveDetailsSchema = new mongoose.Schema({
-  userName: {
+const sensitiveDetailsSchema = new mongoose.Schema(
+  {
+    userName: {
+      type: String,
+      required: true,
+    },
+    /* accessLevel: {
     type: String,
-    required: [true, "Please enter the user name"],
+    required: true
+  },*/
+    password: {
+      type: String,
+      required: true,
+    },
+    employeeID: {
+      type: String,
+      required: true,
+    },
   },
-  accessLevel: {
-    type: String,
-    required: [true, "Please enter the access level"],
-  },
-  password: {
-    type: String,
-    required: [true, "Please enter the  team password"],
-  },
-  employeeID: {
-    type: String,
-    required: [true, "Please enter the employee ID"],
-  },
-});
+  { timestamps: true }
+);
 
 module.exports = mongoose.model("SensitiveDetails", sensitiveDetailsSchema);
