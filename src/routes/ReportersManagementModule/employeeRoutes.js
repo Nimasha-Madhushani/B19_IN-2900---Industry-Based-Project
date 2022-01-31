@@ -25,7 +25,7 @@ router.put('/updateTeam/:id',updateTeam);
 router.post('/addProduct',addProduct);
 
 //update product
-router.put('/updateProduct/:id',updateProduct);
+router.post('/updateProduct/:id',updateProduct);
 
 
 

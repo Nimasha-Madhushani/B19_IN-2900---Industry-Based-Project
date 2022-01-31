@@ -354,6 +354,7 @@ exports.addProduct = async (req, res) => {
 //-----------update product------------------------
 
 exports.updateProduct = async (req, res) => {
+
   const { id } = req.params;
 
   const productID = req.body.productID;
@@ -367,13 +368,15 @@ exports.updateProduct = async (req, res) => {
     productID,
     productName,
     description,
-    // recievedDate,
+     //recievedDate:id,
     // launchDate,
     teamID,
   };
 
+
   const existingProduct = await productSchema.findById(id);
   if (existingProduct) {
+   
     await productSchema
       .findByIdAndUpdate(existingProduct._id, newProductUpdate, { new: true })
       .then(() => {
@@ -388,7 +391,7 @@ exports.updateProduct = async (req, res) => {
 
 //-----------update resign status----------------
 
-exports.updateProduct = async (req, res) => {
+exports.updateResignStatus= async (req, res) => {
   const { id } = req.params;
   const resignDate = new Date();
   const status = req.body.status;
