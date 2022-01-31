@@ -8,7 +8,7 @@ require("dotenv").config();
 const dbConnection = require("./src/Config/connectDataBase");
 const recruitmentRoutes = require("./src/routes/RecruitmentModule/recruitmentRoutes");
 const assetRoutes = require("./src/routes/AssetsManagementModule/assetRoutes");
-
+const employeeRoutes = require("./src/routes/ReportersManagementModule/employee")
 
 app.use(cors());
 app.use(bodyParser.json());
@@ -22,6 +22,7 @@ app.listen(PORT, () => {
 
 app.use("/recruitment", recruitmentRoutes);
 app.use("/assets",assetRoutes);
+
 
 
 
