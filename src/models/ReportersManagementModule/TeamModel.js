@@ -1,18 +1,21 @@
 const mongoose = require("mongoose");
 
-const teamSchema = new mongoose.Schema({
-  teamID: {
-    type: String,
-    required: [true, "Please enter the team ID"],
+const teamSchema = new mongoose.Schema(
+  {
+    teamID: {
+      type: String,
+      required: true,
+    },
+    teamName: {
+      type: String,
+      required: true,
+    },
+    teamLeadID: {
+      type: String,
+      required: true,
+    },
   },
-  teamName: {
-    type: String,
-    required: [true, "Please enter the team name"],
-  },
-  teamLeadID: {
-    type: String,
-    required: [true, "Please enter the  team lead ID"],
-  },
-});
+  { timestamps: true }
+);
 
 module.exports = mongoose.model("Team", teamSchema);

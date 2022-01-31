@@ -1,27 +1,30 @@
 const mongoose = require("mongoose");
 
-const proffesionalQualificaationSchema = new mongoose.Schema({
-  proffesionalQualificationID: {
+const proffesionalQualificaationSchema = new mongoose.Schema(
+  {
+    /*proffesionalQualificationID: {
     type: String,
-    required: [true, "Please enter the proffesional qualification ID"],
+    required: true
+  },*/
+    employeeID: {
+      type: String,
+      required: true,
+    },
+    degree: {
+      type: Array,
+      required: true,
+    },
+    language: {
+      type: Array,
+      required: true,
+    },
+    course: {
+      type: Array,
+      required: true,
+    },
   },
-  employeeID: {
-    type: String,
-    required: [true, "Please enter the  employee ID"],
-  },
-  degree: {
-    type: String,
-    required: [true, "Please enter the degree"],
-  },
-  language: {
-    type: String,
-    required: [true, "Please enter the language"],
-  },
-  course: {
-    type: String,
-    required: [true, "Please enter the course"],
-  },
-});
+  { timestamps: true }
+);
 
 module.exports = mongoose.model(
   "proffesionalQualification",

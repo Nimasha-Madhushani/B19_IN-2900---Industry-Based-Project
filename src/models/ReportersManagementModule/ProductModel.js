@@ -1,30 +1,34 @@
 const mongoose = require("mongoose");
 
-const productSchema = new mongoose.Schema({
-  productID: {
-    type: String,
-    required: [true, "Please enter the product ID"],
+const productSchema = new mongoose.Schema(
+  {
+    productID: {
+      type: String,
+      required: true,
+    },
+    productName: {
+      type: String,
+      required: true,
+    },
+    description: {
+      type: String,
+      required: true,
+    },
+    recievedDate: {
+      type: String,
+      required: true,
+    },
+
+    launchDate: {
+      type: String,
+      //required: true,
+    },
+    teamID: {
+      type: String,
+      required: true,
+    },
   },
-  productName: {
-    type: String,
-    required: [true, "Please enter the  eproduct name"],
-  },
-  description: {
-    type: String,
-    required: [true, "Please enter the description"],
-  },
-  recievedDate: {
-    type: String,
-    required: [true, "Please enter the recieved date"],
-  },
-  launchDate: {
-    type: String,
-    required: [true, "Please enter the launch date"],
-  },
-  teamID: {
-    type: String,
-    required: [true, "Please enter the team ID"],
-  },
-});
+  { timestamps: true }
+);
 
 module.exports = mongoose.model("Product", productSchema);
