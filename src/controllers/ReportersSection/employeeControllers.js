@@ -3,13 +3,12 @@ const bcrypt = require("bcrypt");
 const employeeSchema = require("../../models/ReportersManagementModule/EmployeeModel");
 const academicQualificaationSchema = require("../../models/ReportersManagementModule/AcademicQualificaationModel");
 const ProffesionalQualificationSchema = require("../../models/ReportersManagementModule/ProffesionalQualificationModel");
-const teamSchema = require("../../models/ReportersManagementModule/TeamModel");
-const productSchema = require("../../models/ReportersManagementModule/ProductModel");
 const {
   findOne,
 } = require("../../models/ReportersManagementModule/EmployeeModel");
 const sensitiveDetailsSchema = require("../../models/ReportersManagementModule/SensitiveDetailsModel");
 const candidateSchema = require("../../models/RecruitmentModule/CandidateModel");
+const AssetLender = require("../../models/AssetsManagementModule/AssetsLender");
 
 //-------View Employees-----------------------------
 
@@ -255,148 +254,14 @@ exports.updateEmployeeProfile = async (req, res) => {
 //------------------------------------------------------------
 //------------------------------------------------------------
 
-//---------------add team-------------------
-
-exports.addTeam = async (req, res) => {
-  const { teamID, teamName, teamLeadID } = req.body;
-
-  newTeam = new teamSchema({
-    teamID,
-    teamName,
-    teamLeadID,
-  });
-
-  await newTeam
-    .save()
-    .then(() => {
-      res.json("Team added successfully!");
-    })
-    .catch((err) => {
-      res.status(400).json({ message: "Team is not added!" });
-    });
-};
-//-----------------------------------------
-
-//--------------update team----------------
-
-exports.updateTeam = async (req, res) => {
-  const { id } = req.params;
-
-  const { teamID, teamName, teamLeadID } = req.body;
-
-  newTeamUpdate = {
-    teamID,
-    teamName,
-    teamLeadID,
-  };
-  const existingTeam = await teamSchema.findById(id);
-  if (existingTeam) {
-    await teamSchema
-      .findByIdAndUpdate(existingTeam._id, newTeamUpdate, { new: true })
-      .then(() => {
-        res.json("team is updated successfully!");
-      })
-      .catch((err) => {
-        res.status(400).json({ message: "team is not updated!" });
-      });
-  }
-};
-//--------------------------------------------
-
-//-------View Team-----------------------------
-
-exports.viewTeam = async (req, res) => {
-  await teamSchema
-    .find()
-    .then((team) => {
-      res.json(team);
-    })
-    .catch((err) => {
-      console.log(err);
-    });
-};
-//------------------------------------------
-
-//---------------add product----------------
-exports.addProduct = async (req, res) => {
-  const productID = req.body.productID;
-  const productName = req.body.productName;
-  const description = req.body.description;
-  const recievedDate = new Date();
-  //const launchDate=req.body.launchDate;
-  const teamID = req.body.teamID;
-
-  newProduct = new productSchema({
-    productID,
-    productName,
-    description,
-    recievedDate,
-    // launchDate,
-    teamID,
-  });
-
-  const existingTeam = await teamSchema.findOne({ teamID });
-  if (existingTeam) {
-    await newProduct
-      .save()
-      .then(() => {
-        res.json("product is added successfully!");
-      })
-      .catch((err) => {
-        res.status(400).json({ message: "product is not added!" });
-      });
-  } else {
-    res.status(500).send({ message: "Cannot add product!" });
-  }
-};
-//--------------------------------------------------
-
-//-----------update product------------------------
-
-exports.updateProduct = async (req, res) => {
-
-  const { id } = req.params;
-
-  const productID = req.body.productID;
-  const productName = req.body.productName;
-  const description = req.body.description;
-  //const recievedDate=new Date();
-  //const launchDate=req.body.launchDate;
-  const teamID = req.body.teamID;
-
-  newProductUpdate = {
-    productID,
-    productName,
-    description,
-     //recievedDate:id,
-    // launchDate,
-    teamID,
-  };
-
-
-  const existingProduct = await productSchema.findById(id);
-  if (existingProduct) {
-   
-    await productSchema
-      .findByIdAndUpdate(existingProduct._id, newProductUpdate, { new: true })
-      .then(() => {
-        res.json("product is updated successfully!");
-      })
-      .catch((err) => {
-        res.status(400).json({ message: "product is not updated!" });
-      });
-  }
-};
-//-----------------------------------------------
-
 //-----------update resign status----------------
 
-exports.updateResignStatus= async (req, res) => {
+exports.updateResignStatus = async (req, res) => {
   const { id } = req.params;
   const resignDate = new Date();
   const status = req.body.status;
 
-  const existingEmployee = await employeeSchema.findById(id);
+  const existingEmployee = await AssetLender.findOne({ employeeID });
   if (existingEmployee) {
   }
 };
