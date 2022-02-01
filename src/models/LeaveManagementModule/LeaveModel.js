@@ -19,6 +19,7 @@ const leaveSchema = new mongoose.Schema ({
     },
     status : {
         type : String,
+        default : "Pending"
         
     },
     leaveMethod : {
