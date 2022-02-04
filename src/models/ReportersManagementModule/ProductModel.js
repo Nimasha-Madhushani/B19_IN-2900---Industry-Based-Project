@@ -16,16 +16,16 @@ const productSchema = new mongoose.Schema(
     },
     recievedDate: {
       type: String,
-      required: true,
-    },
-
-    launchDate: {
-      type: String,
       //required: true,
     },
+
+  /*  launchDate: {
+      type: String,
+      //required: true,
+    },*/
     teamID: {
       type: String,
-      required: true,
+     // required: true,
     },
   },
   { timestamps: true }
