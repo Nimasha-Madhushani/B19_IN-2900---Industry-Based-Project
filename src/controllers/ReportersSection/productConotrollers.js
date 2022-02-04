@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+
 const teamSchema = require("../../models/ReportersManagementModule/TeamModel");
 const employeeSchema = require("../../models/ReportersManagementModule/EmployeeModel");
 const productSchema = require("../../models/ReportersManagementModule/ProductModel");
@@ -8,36 +9,44 @@ const {
 
 //---------------add product----------------
 exports.addProduct = async (req, res) => {
-  const productID = req.body.productID;
-  const productName = req.body.productName;
-  const description = req.body.description;
-  const recievedDate = new Date();
-  //const launchDate=req.body.launchDate;
-  const teamID = req.body.teamID;
+  const { productID, productName, description, teamNames } = req.body;
+  //const recievedDate = new Date();
 
-  newProduct = new productSchema({
+  //const teamName=req.body.teamName;
+  const findTeam = await teamSchema.findOne({ teamName: teamNames });
+  console.log(findTeam._id);
+  console.log(findTeam);
+  const newProduct = new productSchema({
     productID,
     productName,
     description,
-    recievedDate,
-    // launchDate,
-    teamID,
+    teamID: findTeam._id, //frontend
   });
-  const existingProduct=await productSchema.findOne({productID})
-  const existingTeam = await teamSchema.findOne({ teamID });
-  if (existingTeam && !existingProduct) {
-    await newProduct
+
+  //product eka id duplicateda
+  const existingProduct = await productSchema.findOne({ productID: productID });
+
+  //dan danna yana id eka denata product ekkakt dalada
+  const teamProduct = await productSchema.findOne({ teamID: findTeam._id });
+
+  if (!existingProduct && !teamProduct) {
+    const savedProduct = await newProduct
       .save()
       .then(() => {
         res.json("product is added successfully!");
       })
       .catch((err) => {
-        res.status(400).json({ message: "product is not added!" });
+        res
+          .status(400)
+          .json({ message: "product is not added !", err: err.message });
       });
   } else {
-    res.status(500).send({ message: "Cannot add product!" });
+    res
+      .status(500)
+      .send({ message: "product is existing or team has a prouct" });
   }
 };
+
 //--------------------------------------------------
 
 //-----------update product------------------------
@@ -45,23 +54,20 @@ exports.addProduct = async (req, res) => {
 exports.updateProduct = async (req, res) => {
   const { id } = req.params;
 
-  const productID = req.body.productID;
-  const productName = req.body.productName;
-  const description = req.body.description;
-  //const recievedDate=new Date();
-  //const launchDate=req.body.launchDate;
-  const teamID = req.body.teamID;
+  const { productID, productName, description } = req.body;
 
-  newProductUpdate = {
+  //const recievedDate=new Date();
+  //const teamID = req.body.teamID;
+
+  const newProductUpdate = {
     productID,
     productName,
     description,
     //recievedDate:id,
-    
-    teamID,
+    //teamID,
   };
 
-  const existingProduct = await productSchema.findById(id);
+  const existingProduct = await productSchema.findOne({ productID: productID });
   if (existingProduct) {
     await productSchema
       .findByIdAndUpdate(existingProduct._id, newProductUpdate, { new: true })
@@ -69,7 +75,7 @@ exports.updateProduct = async (req, res) => {
         res.json("product is updated successfully!");
       })
       .catch((err) => {
-        res.status(400).json({ message: "product is not updated!" });
+        res.status(400).json({ message: "product is not updated!", err: err });
       });
   }
 };
