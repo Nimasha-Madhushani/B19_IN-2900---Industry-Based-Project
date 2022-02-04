@@ -1,6 +1,7 @@
 const nodemailer = require("nodemailer");
 const googleapis = require("googleapis");
 
+
 const CLIENT_ID = process.env.CLIENT_ID;
 const CLIENT_SECRET = process.env.CLIENT_SECRET;
 const REDIRECT_URI = process.env.REDIRECT_URI;
@@ -16,9 +17,9 @@ oAuth2Client.setCredentials({ refresh_token: REFRESH_TOKEN });
 
 const sendEmails = async (
   employee,
-  newLeave,
+  data,
   teamLeader,
-  teamLeaderBoolean
+  condition
 ) => {
   try {
     const accessToken = await oAuth2Client.getAccessToken();
@@ -27,24 +28,22 @@ const sendEmails = async (
       service: "gmail",
       auth: {
         type: "OAuth2",
-        user: "yours authorized email address",
+        user: "blackbugs2022@gmail.com",
         clientId: CLIENT_ID,
         clientSecret: CLIENT_SECRET,
         refreshToken: REFRESH_TOKEN,
         accessToken: accessToken,
       },
     });
-
+    
     const mailOptions = {
-      from: teamLeaderBoolean
-        ? teamLeader.employeeFirstName
-        : employee.employeeFirstName + "<" + teamLeaderBoolean
-        ? teamLeader.companyEmail
-        : employee.companyEmail + ">",
-      to: teamLeaderBoolean ? employee.companyEmail : teamLeader.companyEmail,
-      subject: "request a" + newLeave.leaveType + "leave",
-      text: newLeave.reason,
-      html: "<h1>your email</h1>",
+      // from: {
+      //   name : employee.employeeFirstName
+      // },
+      to: condition.teamLeaderBoolean ? employee.companyEmail : teamLeader.companyEmail,
+      subject: condition.teamLeaderBoolean ? condition.task: condition.tack + " "+data.leaveType+ " " + "leave",
+      text: data.reason,
+      html: "<h2>your mail</h2>",
     };
 
     const result = await transporter.sendMail(mailOptions);

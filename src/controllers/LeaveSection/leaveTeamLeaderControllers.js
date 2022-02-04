@@ -8,14 +8,21 @@ const sendEmails = require("./mailHandler");
 module.exports.getRequestedLeave = async (req, res) => {
   const { id } = req.params;
   try {
+    const requestedLeave = [];
     const employeeTeam = await teamSchema.findOne({ teamLeadID: id });
-    const employee = await employeeSchema.findOne({
-      teamID: employeeTeam.teamID,
+    const employee = await employeeSchema.find({
+      teamID: employeeTeam._id,
     });
-    const requestedLeave = await leaveSchema.findOne({
-      employeeID: employee.employeeId,
-      status: "Pending",
-    });
+
+   
+    for (let index = 0; index < employee.length; index++) {
+      requestedLeave.push(
+        await leaveSchema.find({
+          employeeId: employee[index].employeeID,
+          status: "Pending",
+        })
+      );
+    }
     if (requestedLeave) {
       return res.status(200).json({
         message: "requested leaves are successfully fetched",
@@ -41,47 +48,60 @@ module.exports.responseRequestedLeave = async (req, res) => {
       return res.status(400).send("ID invalid : " + id);
 
     const leave = await leaveSchema.findById(id);
+    
     const employee = await employeeSchema.findOne({
       employeeID: leave.employeeId,
     });
-    const team = await teamSchema.findOne({ teamID: employee.teamID });
+    const team = await teamSchema.findOne({ _id: employee.teamID });
+   
     const teamLeader = await employeeSchema.findOne({
       employeeID: team.teamLeadID,
     });
-    const teamLeaderBoolean = true;
-
+    const condition = {
+      teamLeaderBoolean: true,
+      task: reason ? "Reject" : "Approve",
+    };
+    const data = {
+      reason: reason,
+      leaveType: leave.leaveType,
+    };
+    
     if (reason) {
+
       await leaveSchema.findByIdAndUpdate(id, {
         $set: { status: "Rejected" },
       });
-      await sendEmails(employee, reason, teamLeader, teamLeaderBoolean);
+      await sendEmails(employee, data, teamLeader, condition);
+      
     } else {
       await leaveSchema.findByIdAndUpdate(id, {
         $set: { status: "approved" },
       });
-      await sendEmails(employee, reason, teamLeader, teamLeaderBoolean);
-    }
+      const result = await sendEmails(employee, data, teamLeader, condition);
+     
+    
 
     const leaveBalance = await leaveBalanceSchema.findOne({
       employeeId: leave.employeeId,
     });
 
-    const numberOfLeaveDates = 0;
-    const holidays = 0;
-    const newLeaveBalance = 0;
+    let numberOfLeaveDates = 0;
+    let holidays = 0;
+    let newLeaveBalance = 0;
 
-    for (
-      let index = new Date("2022-02-01");
-      index <= new Date("2022-02-10");
-      index.setDate(index.getDate() + 1)
-    ) {
+    for (let index = new Date(leave.startDate); index <= new Date(leave.endDate);  index.setDate(index.getDate() + 1)) {
+
       if (index.getDay() == 0 || index.getDay() == 6) {
         holidays++;
+
       }
+
       numberOfLeaveDates++;
     }
 
     numberOfLeaveDates -= holidays;
+    console.log(numberOfLeaveDates);
+    
 
     switch (leave.leaveType) {
       case "casual":
@@ -107,6 +127,9 @@ module.exports.responseRequestedLeave = async (req, res) => {
         );
         break;
     }
+
+
+  }
     res.status(200).json({
       message:
         "response has managed successfully and leave balance has updated",

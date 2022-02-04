@@ -13,7 +13,7 @@ const router = express.Router();
 
 router.get("/:id", getLeaveList);
 router.post("/request", requestLeave);
-router.delete("/cancel/:id", cancelLeave);
+router.delete("/cancel/:id", cancelLeave); 
 
 
 router.get("/requestedLeave/:id", getRequestedLeave);
