@@ -8,18 +8,17 @@ const {
 } = require("../../models/ReportersManagementModule/EmployeeModel");
 const sensitiveDetailsSchema = require("../../models/ReportersManagementModule/SensitiveDetailsModel");
 const candidateSchema = require("../../models/RecruitmentModule/CandidateModel");
-const AssetLender = require("../../models/AssetsManagementModule/AssetsLender");
 
-//-------View Employees-----------------------------
+//-------View Employees----------------------------
 
 exports.viewEmployees = async (req, res) => {
   await employeeSchema
     .find()
     .then((employees) => {
-      res.json(employees);
+      res.status(200).json({ state: true, data: employees });
     })
     .catch((err) => {
-      console.log(err);
+      res.status(400).json({ state: false, err: err });
     });
 };
 
@@ -38,53 +37,64 @@ exports.createEmployee = async (req, res) => {
   } = req.body;
 
   //----------create username & password---------------------------
-  const username = employeeFirstName + "." + employeeID;
-  const password = NIC;
+  try {
+    const username = employeeFirstName + "." + employeeID;
+    const password = NIC;
+    // console.log(username);
+    const salt = await bcrypt.genSalt();
+    const encryptedPassword = await bcrypt.hash(password, salt);
 
-  const salt = await bcrypt.genSalt();
-  const encryptedPassword = await bcrypt.hash(password, salt);
+   
 
-  const candidate = await candidateSchema.findOne({ NIC });
-
-  const newEmployee = new employeeSchema({
-    employeeID,
-    employeeFirstName,
-    employeeLastName,
-    jobRole,
-    NIC,
-    companyEmail,
-    status,
-    //resignDate,
-    jobType,
-    candidateID: candidate._id,
-  });
-
-  const sensitiveDetails = new sensitiveDetailsSchema({
-    username,
-    password: encryptedPassword,
-    employeeID,
-  });
-
-  await newEmployee
-    .save()
-    .then(() => {
-      res.json("Employee has successfully added!");
-    })
-    .catch((err) => {
-      res.status(400).json({ message: "Employee is not Added!" });
-      console.log(err);
+    const existingSensitiveDetails = await sensitiveDetailsSchema.findOne({
+      employeeID,
     });
+    const candidate = await candidateSchema.findOne({ NIC });
+    const existingEmpID = await employeeSchema.findOne({ employeeID });
 
-  await sensitiveDetails
-    .save()
-    .then(() => {
-      res.json("Sensitive Details has successfully added!");
-    })
-    .catch((err) => {
-      res.status(400).json({ message: "Sensitive Details are not Added!" });
-      console.log(err);
+    if (!candidate) {
+      return res.status(400).json("Candidate is not existing");
+    }
+
+    if (!existingEmpID && !existingSensitiveDetails) {
+      const newEmployee = new employeeSchema({
+        employeeID,
+        employeeFirstName,
+        employeeLastName,
+        jobRole,
+        NIC,
+        companyEmail,
+        status,
+        jobType,
+        candidateID: candidate._id,
+      });
+
+      const sensitiveDetails = new sensitiveDetailsSchema({
+        userName: username,
+        password: encryptedPassword,
+        employeeID,
+      });
+      const savedEmployee = await newEmployee.save();
+
+      const savedSensitiveDetail = await sensitiveDetails.save();
+
+      if (savedEmployee && savedSensitiveDetail) {
+        res.status(200).json("Employee and Sensitive Details are Added!");
+      }
+    } else {
+      res.status(400).json({
+        message: "Employee or sensitive details is Duplicated!",
+      });
+    }
+  } catch (err) {
+    res.status(400).json({
+      message: "Employee and Sensitive Details are not Added!",
+      error: err.message,
     });
+  }
 };
+//--------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------
 
 //--------Update employee profile includeing academic proffesional----------------
 exports.updateEmployeeProfile = async (req, res) => {
@@ -97,10 +107,11 @@ exports.updateEmployeeProfile = async (req, res) => {
     city,
     phoneNumber,
     jobRole,
-    NIC,
+  //  NIC,
     companyEmail,
     status,
     jobType,
+    profilePic,
     ordinaryLevelResult,
     advancedLevelResults,
     achievements,
@@ -118,19 +129,19 @@ exports.updateEmployeeProfile = async (req, res) => {
     city,
     phoneNumber,
     jobRole,
-    NIC,
+    profilePic,
+    //NIC,//frontend
     companyEmail,
     status,
     jobType,
+    //teamID
     // candidateID : candidate._id,
   };
-
-  const existingEmployee = await employeeSchema.findOne({ employeeID: id });
+try{
+  const existingEmployee = await employeeSchema.findOne({ employeeID: id }); //???????
 
   if (existingEmployee) {
-    let academicFlag = 0,
-      proffesionalFlag = 0,
-      employeeFlag = 0; //flags
+ 
 
     //--------------academic qualification update-------------------------------------
     const academicQualification = await academicQualificaationSchema.findOne({
@@ -143,17 +154,7 @@ exports.updateEmployeeProfile = async (req, res) => {
         advancedLevelResults,
         achievements,
       });
-      await newAcademicQualification
-        .save()
-        .then(() => {
-          //  res.json("Academic Qualifictions added successfully!");
-          academicFlag = 1;
-        })
-        .catch((err) => {
-          res
-            .status(400)
-            .json({ message: "Academic Qualifictions are not added!" });
-        });
+     await newAcademicQualification.save();
     } else {
       const newAcademicQualification = {
         employeeID: id,
@@ -161,21 +162,12 @@ exports.updateEmployeeProfile = async (req, res) => {
         advancedLevelResults,
         achievements,
       };
-      await academicQualificaationSchema
-        .findByIdAndUpdate(
+    
+        await academicQualificaationSchema.findByIdAndUpdate(
           academicQualification._id,
           newAcademicQualification,
           { new: true }
-        )
-        .then(() => {
-          // res.json("Academic Qualifictions updated successfully!");
-          academicFlag = 1;
-        })
-        .catch((err) => {
-          res
-            .status(400)
-            .json({ message: "Academic Qualifictions are not updated !" });
-        });
+        );
     }
 
     //-------------proffesional qualification update------------------------------
@@ -189,17 +181,9 @@ exports.updateEmployeeProfile = async (req, res) => {
         language,
         course,
       });
-      await proffesional
+ await proffesional
         .save()
-        .then(() => {
-          // res.json("Proffesional Qualifictions added successfully!");
-          proffesionalFlag = 1;
-        })
-        .catch((err) => {
-          res
-            .status(400)
-            .json({ message: "Proffesional Qualifictions are not added!" });
-        });
+    
     } else {
       const proffesional = {
         employeeID: id,
@@ -207,64 +191,48 @@ exports.updateEmployeeProfile = async (req, res) => {
         language,
         course,
       };
-      await ProffesionalQualificationSchema.findByIdAndUpdate(
-        proffesionalQualification._id,
-        proffesional,
-        { new: true }
-      )
-        .then(() => {
-          // res.json("Proffesional Qualifictions updated successfully!");
-          proffesionalFlag = 1;
-        })
-        .catch((err) => {
-          res
-            .status(400)
-            .json({ message: "Proffesional Qualifictions are not updated " });
-        });
+        await ProffesionalQualificationSchema.findByIdAndUpdate(
+          proffesionalQualification._id,
+          proffesional,
+          { new: true }
+        );
     }
 
     //-----------update employee details-------------------------------
 
-    await employeeSchema
-      .findByIdAndUpdate(existingEmployee._id, employee, { new: true })
-      .then(() => {
-        //res.json("Employee Updated successfully!");
-        employeeFlag = 1;
-      })
-      .catch((err) => {
-        //res.status(400).json({ message: "Employee is not updated!" });
-        employeeFlag = 0;
-      });
-
-    const academicResponse = academicFlag
+   await employeeSchema.findByIdAndUpdate(
+      existingEmployee._id,
+      employee,
+      { new: true }
+    );
+/*
+    const academicResponse = savedAcaQualification || updatedAcaQualification
       ? "Upadted academic"
       : "not updated academic";
-    const proffesionalResponse = proffesionalFlag
+    const proffesionalResponse = savedProfQualification||updatedProfQualification
       ? "Upadted proffesional"
       : "not updated proffesional";
-    const employeeResponse = employeeFlag
+    const employeeResponse = updatedEmployee
       ? "Upadted employee"
       : "not updated employee";
+*/
+    res
+      .status(200)
+      .json({ message:"employee profile,academic qulification, proffesional qualification are  updated successfully" });
 
-    res.json({ academicResponse, proffesionalResponse, employeeResponse });
   } else {
-    res.json("Employee is not existing");
+    res.status(400).json("Employee is not existing");
   }
+}catch(err){
+  res
+  .status(400)
+  .json({ message:"employee profile,academic qulification, proffesional qualification are not updated" ,err:err.message});
+}
 };
 //------------------------------------------------------------
 //------------------------------------------------------------
 
 //-----------update resign status----------------
-
-exports.updateResignStatus = async (req, res) => {
-  const { id } = req.params;
-  const resignDate = new Date();
-  const status = req.body.status;
-
-  const existingEmployee = await AssetLender.findOne({ employeeID });
-  if (existingEmployee) {
-  }
-};
 
 //-----------------------------------------------
 
