@@ -24,7 +24,6 @@ const {
   addTeam,
   viewTeam,
   updateTeam,
-  viewOrgStructure
 } = require("../../controllers/ReportersSection/teamControllers");
 
 //view all teams
@@ -36,15 +35,11 @@ router.post("/teamAdd", addTeam);
 //update team
 router.put("/updateTeam/:id", updateTeam);
 
-//organizationStructure
-router.get("/viewOrgStructure",viewOrgStructure);
-
 //------------------------productController---------------------------------------
 
 const {
   addProduct,
   updateProduct,
-  
 } = require("../../controllers/ReportersSection/productConotrollers");
 
 //add product
@@ -54,9 +49,10 @@ router.post("/addProduct", addProduct);
 router.post("/updateProduct/:id", updateProduct);
 
 
-/*
 //--------recent section-----------
-const{recentSection }=require("../../controllers/ReportersSection/recentSectionController")
-router.get("/recentSection ",recentSection )
-*/
+const {
+  recentSection,
+} = require("../../controllers/ReportersSection/recentSectionController");
+router.get("/recentSection", recentSection);
+
 module.exports = router;
