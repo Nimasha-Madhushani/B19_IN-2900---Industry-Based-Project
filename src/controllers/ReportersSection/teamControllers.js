@@ -1,27 +1,107 @@
 const mongoose = require("mongoose");
+const {
+  find,
+  findOne,
+} = require("../../models/ReportersManagementModule/EmployeeModel");
 const employeeSchema = require("../../models/ReportersManagementModule/EmployeeModel");
 const teamSchema = require("../../models/ReportersManagementModule/TeamModel");
 
-//---------------add team-------------------
+//---------------create team-------------------
 
 exports.addTeam = async (req, res) => {
-  const { teamID, teamName, teamLeadID } = req.body;
+  const { teamName, teamLeadID, teamMembers } = req.body; //?teamMembers
 
-  newTeam = new teamSchema({
-    teamID,
+  const newTeam = new teamSchema({
     teamName,
     teamLeadID,
   });
 
-  await newTeam
-    .save()
-    .then(() => {
-      res.json("Team added successfully!");
-    })
-    .catch((err) => {
-      res.status(400).json({ message: "Team is not added!" });
+  try {
+    // can check for existing team by same name
+    const existingTeam = await teamSchema.findOne({ teamName: teamName });
+
+    if (existingTeam) {
+      return res.status(400).json({ message: "This Team Name already exists" });
+    }
+
+    //front end eken enwa. me if eka oni ne
+    /*
+  const existingEmp = await employeeSchema.findOne({ employeeID: teamLeadID });
+  if (!existingEmp) {
+    return res.status(200).json({ message: "TeamLead is not existing" });
+  }*/
+    const existingTeamLead = await teamSchema.findOne({
+      teamLeadID: teamLeadID,
     });
+    if (existingTeamLead) {
+      return res
+        .status(400)
+        .json({ message: "Team lead has already belongs to a team" });
+    }
+
+    let memberFlag = false;
+    if (teamMembers) {
+      await Promise.all(
+        teamMembers.map(async (member) => {
+          const existingEmp = await employeeSchema.findOne({
+            employeeID: member,
+          });
+
+          if (existingEmp.teamID || !existingEmp) {
+            return (memberFlag = true);
+          }
+        })
+      );
+    }
+    if (memberFlag) {
+      return res.status(400).json({ message: "Team cannot be created!" });
+    }
+    const savedTeam = await newTeam.save();
+    /*  const savedTeam_ID = await teamSchema
+      .findOne({ teamName: teamName }, { _id: 1 })
+      .sort({ _id: -1 }); //?
+*/
+    //update teamLead profile
+    const teamLeadUpdate = await employeeSchema.findOneAndUpdate(
+      { employeeID: teamLeadID },
+      { $set: { teamID: savedTeam._id } } //?
+    );
+    let updateEmployeeCount = 0;
+    if (teamMembers) {
+      updateEmployeeCount = teamMembers.length; //?
+
+      await Promise.all(
+        teamMembers.map(async (member) => {
+          const existingEmp = await employeeSchema.findOne({
+            employeeID: member,
+          });
+
+          if (!existingEmp.teamID) {
+            await employeeSchema.findOneAndUpdate(
+              { employeeID: member },
+              { $set: { teamID: savedTeam._id } } //?
+            );
+            updateEmployeeCount--;
+          } else {
+            return res
+              .status(400)
+              .json({ message: "member already belongs to a team" });
+          }
+        })
+      );
+    }
+    if (savedTeam && !updateEmployeeCount && teamLeadUpdate) {
+      return res
+        .status(200)
+        .json({ message: "Team added successfully and employee updated" });
+    }
+
+    res.status(200).json({ message: "Team is  added!" });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
 };
+//-----------------------------------------
 //-----------------------------------------
 
 //--------------update team----------------
@@ -29,28 +109,119 @@ exports.addTeam = async (req, res) => {
 exports.updateTeam = async (req, res) => {
   const { id } = req.params;
 
-  const { teamID, teamName, teamLeadID } = req.body;
+  const { teamMembers, teamName, teamLeadID } = req.body;
 
-  newTeamUpdate = {
-    teamID,
-    teamName,
-    teamLeadID,
-  };
-  const existingTeam = await teamSchema.findById(id);
-  if (existingTeam) {
-    await teamSchema
-      .findByIdAndUpdate(existingTeam._id, newTeamUpdate, { new: true })
-      .then(() => {
-        res.json("team is updated successfully!");
-      })
-      .catch((err) => {
-        res.status(400).json({ message: "team is not updated!" });
+  try {
+    const newTeamUpdate = {
+      teamName,
+      teamLeadID,
+    };
+    const existingTeamLdEmp = await employeeSchema.findOne({
+      employeeID: teamLeadID,
+    });
+    const team = await teamSchema.findOne({ _id: id });
+
+    if (team && existingTeamLdEmp) {
+      const filterTeams = await teamSchema.find({ _id: { $ne: id } });
+
+      let chekFalg = false;
+      await Promise.all(
+        filterTeams.map(async (filtervalue) => {
+          if (
+            filtervalue.teamName == teamName ||
+            filtervalue.teamLeadID == teamLeadID
+          ) {
+            chekFalg = true;
+          }
+        })
+      );
+
+      //name exist saha update eke ena name
+      //teamleadid thiyana ha danna yana eka
+
+      const oldTeamLead = await employeeSchema.findOne({
+        teamID: team.teamLeadID,
       });
+
+      const oldMembers = await employeeSchema.find({ teamID: id });
+
+      
+      const duplicateTeamLd = await teamSchema.findOne({
+        teamLeadID: teamLeadID,
+      });
+// update team
+      if (!chekFalg) {
+        await teamSchema.findByIdAndUpdate(id, newTeamUpdate, {
+          new: true,
+        });
+
+        //{ _id: { $ne: team._id } }
+
+        // update old team members profile : remove their Team ID
+
+        await Promise.all(
+          oldMembers.map(async (oldmember) => {
+            await Promise.all(
+              teamMembers.map(async (teammember) => {
+                if (oldmember.employeeID != teammember) {
+                  await employeeSchema.findOneAndUpdate(
+                    { employeeID: oldmember.employeeID },
+                    { $set: { teamID: "" } }
+                  );
+                }
+              })
+            );
+          })
+        );
+
+        // update new team members profile
+
+        await Promise.all(
+          teamMembers.map(async (teammember) => {
+            await employeeSchema.findOneAndUpdate(
+              { employeeID: teammember },
+              { $set: { teamID: id } }
+            );
+          })
+        );
+        if (teamLeadID != team.teamLeadID) {
+          // updateOldTeamLead
+        
+         /* me comment eka nathuwa hariyata weda. eth logic eka anuwa meka enna oni. passe balanna
+         
+         await employeeSchema.findOneAndUpdate(
+            { employeeID: oldTeamLead.employeeID },
+            { $set: { teamID: "" } }
+          );
+        */
+          // updateNewTeamLead
+          await employeeSchema.findOneAndUpdate(
+            { employeeID: teamLeadID },
+            { $set: { teamID: id } }
+          );
+        }
+        console.log("Hiiiiiiiiiiiiiiiiiiii")
+
+        res
+          .status(201)
+          .json({ message: "Team and employee have updated successfully" });
+      } else {
+        res.json("cannot update");
+      }
+    } else {
+      res.json("searching _id is not existed in team schema");
+    }
+  } catch (error) {
+    res.status(404).json({
+      message: "Team and employee have not updated",
+      error: error.message,
+    });
   }
 };
 //--------------------------------------------
+//--------------------------------------------
 
-//-------View all Teams-----------------------------
+//-------View all Teams-----------------------
 
 exports.viewTeam = async (req, res) => {
   await teamSchema
@@ -64,37 +235,3 @@ exports.viewTeam = async (req, res) => {
 };
 
 //------------------------------------------
-
-//------------create organization structure---------------------------------
-exports.viewOrgStructure = async (req, res) => {
-  const { id } = req.params;
-
-  const teamList = await teamSchema.find(id);
-
-  const levelOne = [],
-    levelTwo = [],
-    levelThree = [];
-
-  if (teamList) {
-    for (let index = 0; index < teamList.length; index++) {
-      const job = await employeeSchema.find({
-        jobRole: teamList[index].jobRole,
-      });
-      if (job === " CEO ") {
-        levelOne.push({ jobRole: teamList[index].jobRole, job: job });
-        //res.json(levelOne);
-      } else if (job === "SE" || job === "SSA ") {
-        levelTwo.push({ jobRole: teamList[index].jobRole, job: job });
-        //res.json(levelTwo);
-      } else {
-        levelThree.push({ jobRole: teamList[index].jobRole, job: job });
-        res.json(levelThree);
-
-        if (!job) {
-          //res.json("Employee not found");
-        }
-      }
-    }
-    res.status(201).json(levelOne, levelTwo, levelThree);
-  }
-};
