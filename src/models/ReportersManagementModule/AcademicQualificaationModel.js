@@ -1,28 +1,34 @@
 const mongoose = require("mongoose");
 
-const academicQualificaationSchema = new mongoose.Schema({
-  academicQualificationID: {
+const academicQualificaationSchema = new mongoose.Schema(
+  {
+    /*academicQualificationID: {
     type: String,
-    required: [true, "Please enter the academic qualification ID"],
-  },
-  employeeID: {
-    type: String,
-    required: [true, "Please enter the  employee ID"],
-  },
+    required:true
+  },*/
+    employeeID: {
+      type: String,
+      required: true,
+    },
 
-  ordinaryLevelResult: {
-    type: String,
-    required: [true, "Please enter the O/L Result"],
-  },
-  advancedLevelResults: {
-    type: String,
-    required: [true, "Please enter the A/L Results"],
-  },
+    ordinaryLevelResult: {
+      type: Array,
+      required: true,
+    },
+    advancedLevelResults: {
+      type: Array,
+      required: true,
+    },
 
-  achievements: {
-    type: String,
-    required: [true, "Please enter the acheivement"],
+    achievements: {
+      type: Array,
+      required: true,
+    },
   },
-});
+  { timestamps: true }
+);
 
-module.exports = mongoose.model("academicQualification",academicQualificaationSchema);
+module.exports = mongoose.model(
+  "academicQualification",
+  academicQualificaationSchema
+);

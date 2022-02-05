@@ -9,9 +9,13 @@ require("dotenv").config();
 const dbConnection = require("./src/Config/connectDataBase");
 
 
+const salaryPaymentRoutes = require("./src/routes/SalaryPaymentModule/salaryPaymentRoutes");
+const employeeRouter = require("./src/routes/ReportersManagementModule/employeeRoutes");
 const recruitmentRoutes = require("./src/routes/RecruitmentModule/recruitmentRoutes");
 const assetRoutes = require("./src/routes/AssetsManagementModule/assetRoutes");
-const salaryPaymentRoutes = require("./src/routes/SalaryPaymentModule/salaryPaymentRoutes");
+
+const leaveRoutes = require("./src/routes/LeaveModule/leaveRoutes");
+
 
 app.use(cors());
 app.use(bodyParser.json());
@@ -26,9 +30,12 @@ app.listen(PORT, () => {
 
 
 app.use("/recruitment", recruitmentRoutes);
-app.use("/assets", assetRoutes);
 app.use("/salary", salaryPaymentRoutes);
 
 
+app.use("/assets", assetRoutes);
+
+app.use("/employee", employeeRouter);
+app.use("/leave", leaveRoutes);
 
 
