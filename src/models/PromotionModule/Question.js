@@ -8,6 +8,10 @@ const QuestionSchema = new Schema({
         required: true,
         unique: true
     },
+    QuestionCatogory: {
+        type: String,
+        required: true
+    },
     QuestionBody: {
         type: String,
         required: true

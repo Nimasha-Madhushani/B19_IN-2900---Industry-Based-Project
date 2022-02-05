@@ -1,23 +1,15 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
-//summary of salary details of all employees for total time period
-const salaryPaymentSchema = new Schema({
-    SalarySheetID: {
+//current salary details of all employees for ongoing time period
+const currentSalarySchema = new Schema({
+    CurrentSalarySheetID: {
         type: String,
-        required: true,
-        unique: true
+        required: true
+        //unique: true
     },
     EmployeeID: {
         type: String,
-        required: true
-    },
-    Year: {
-        type: Date,
-        required: true
-    },
-    Month: {
-        type: Date,
         required: true
     },
     BasicSalary: {
@@ -50,5 +42,5 @@ const salaryPaymentSchema = new Schema({
     }
 });
 
-const salaryPayment = mongoose.model("salaryPayment", salaryPaymentSchema);
-module.exports = salaryPayment;
+const currentSalary = mongoose.model("currentSalary", currentSalarySchema);
+module.exports = currentSalary;
