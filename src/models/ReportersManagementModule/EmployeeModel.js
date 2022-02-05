@@ -19,21 +19,15 @@ const employeeSchema = new mongoose.Schema(
     },
     birthday: {
       type: String,
-      // required: true,
     },
     streetNo: {
       type: String,
-      // required: true,
     },
     city: {
       type: String,
-      //required: true,
     },
     phoneNumber: {
       type: String,
-     
-      // default:"add mobile"
-      // required: true,
     },
 
     jobRole: {
@@ -43,24 +37,20 @@ const employeeSchema = new mongoose.Schema(
     NIC: {
       type: String,
       required: true,
-      unique:true
+      unique: true,
     },
     companyEmail: {
       type: String,
       required: true,
-      unique:true
+      unique: true,
     },
     status: {
       type: String,
       required: true,
     },
-    /* joinDate: {
-      type: String,
-      required: true,
-    },*/
+
     resignDate: {
       type: String,
-      // required: true,
     },
     jobType: {
       type: String,
@@ -72,7 +62,6 @@ const employeeSchema = new mongoose.Schema(
     },
     teamID: {
       type: String,
-      //required: true,
     },
   },
   { timestamps: true }

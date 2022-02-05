@@ -36,15 +36,13 @@ exports.createEmployee = async (req, res) => {
     jobType,
   } = req.body;
 
-  //----------create username & password---------------------------
   try {
+    //cerate username and password
     const username = employeeFirstName + "." + employeeID;
     const password = NIC;
-    // console.log(username);
+
     const salt = await bcrypt.genSalt();
     const encryptedPassword = await bcrypt.hash(password, salt);
-
-   
 
     const existingSensitiveDetails = await sensitiveDetailsSchema.findOne({
       employeeID,
@@ -93,8 +91,6 @@ exports.createEmployee = async (req, res) => {
     });
   }
 };
-//--------------------------------------------------------------------------------
-//--------------------------------------------------------------------------------
 
 //--------Update employee profile includeing academic proffesional----------------
 exports.updateEmployeeProfile = async (req, res) => {
@@ -107,7 +103,7 @@ exports.updateEmployeeProfile = async (req, res) => {
     city,
     phoneNumber,
     jobRole,
-  //  NIC,
+    //  NIC,
     companyEmail,
     status,
     jobType,
@@ -134,120 +130,91 @@ exports.updateEmployeeProfile = async (req, res) => {
     companyEmail,
     status,
     jobType,
-    //teamID
-    // candidateID : candidate._id,
   };
-try{
-  const existingEmployee = await employeeSchema.findOne({ employeeID: id }); //???????
+  try {
+    const existingEmployee = await employeeSchema.findOne({ employeeID: id }); //???????
 
-  if (existingEmployee) {
- 
-
-    //--------------academic qualification update-------------------------------------
-    const academicQualification = await academicQualificaationSchema.findOne({
-      employeeID: id,
-    });
-    if (!academicQualification) {
-      const newAcademicQualification = new academicQualificaationSchema({
+    if (existingEmployee) {
+      //--------------academic qualification update-------------------------------------
+      const academicQualification = await academicQualificaationSchema.findOne({
         employeeID: id,
-        ordinaryLevelResult,
-        advancedLevelResults,
-        achievements,
       });
-     await newAcademicQualification.save();
-    } else {
-      const newAcademicQualification = {
-        employeeID: id,
-        ordinaryLevelResult,
-        advancedLevelResults,
-        achievements,
-      };
-    
+      if (!academicQualification) {
+        const newAcademicQualification = new academicQualificaationSchema({
+          employeeID: id,
+          ordinaryLevelResult,
+          advancedLevelResults,
+          achievements,
+        });
+        await newAcademicQualification.save();
+      } else {
+        const newAcademicQualification = {
+          employeeID: id,
+          ordinaryLevelResult,
+          advancedLevelResults,
+          achievements,
+        };
+
         await academicQualificaationSchema.findByIdAndUpdate(
           academicQualification._id,
           newAcademicQualification,
           { new: true }
         );
-    }
+      }
 
-    //-------------proffesional qualification update------------------------------
+      //-------------proffesional qualification update------------------------------
 
-    const proffesionalQualification =
-      await ProffesionalQualificationSchema.findOne({ employeeID: id });
-    if (!proffesionalQualification) {
-      const proffesional = new ProffesionalQualificationSchema({
-        employeeID: id,
-        degree,
-        language,
-        course,
-      });
- await proffesional
-        .save()
-    
-    } else {
-      const proffesional = {
-        employeeID: id,
-        degree,
-        language,
-        course,
-      };
+      const proffesionalQualification =
+        await ProffesionalQualificationSchema.findOne({ employeeID: id });
+      if (!proffesionalQualification) {
+        const proffesional = new ProffesionalQualificationSchema({
+          employeeID: id,
+          degree,
+          language,
+          course,
+        });
+        await proffesional.save();
+      } else {
+        const proffesional = {
+          employeeID: id,
+          degree,
+          language,
+          course,
+        };
         await ProffesionalQualificationSchema.findByIdAndUpdate(
           proffesionalQualification._id,
           proffesional,
           { new: true }
         );
+      }
+
+      //-----------update employee details-------------------------------
+
+      await employeeSchema.findByIdAndUpdate(existingEmployee._id, employee, {
+        new: true,
+      });
+      res
+        .status(200)
+        .json({
+          message:
+            "employee profile,academic qulification, proffesional qualification are  updated successfully",
+        });
+    } else {
+      res.status(400).json("Employee is not existing");
     }
-
-    //-----------update employee details-------------------------------
-
-   await employeeSchema.findByIdAndUpdate(
-      existingEmployee._id,
-      employee,
-      { new: true }
-    );
-/*
-    const academicResponse = savedAcaQualification || updatedAcaQualification
-      ? "Upadted academic"
-      : "not updated academic";
-    const proffesionalResponse = savedProfQualification||updatedProfQualification
-      ? "Upadted proffesional"
-      : "not updated proffesional";
-    const employeeResponse = updatedEmployee
-      ? "Upadted employee"
-      : "not updated employee";
-*/
+  } catch (err) {
     res
-      .status(200)
-      .json({ message:"employee profile,academic qulification, proffesional qualification are  updated successfully" });
-
-  } else {
-    res.status(400).json("Employee is not existing");
+      .status(400)
+      .json({
+        message:
+          "employee profile,academic qulification, proffesional qualification are not updated",
+        err: err.message,
+      });
   }
-}catch(err){
-  res
-  .status(400)
-  .json({ message:"employee profile,academic qulification, proffesional qualification are not updated" ,err:err.message});
-}
 };
-//------------------------------------------------------------
-//------------------------------------------------------------
 
 //-----------update resign status----------------
 
-//-----------------------------------------------
-
-//-----------create recently joined section------
-
-//-----------------------------------------------
-
 //------------create organization structure------
 
-//-----------------------------------------------
-
-//---assign & remove team members, team leads----
-
-//-----------------------------------------------
-
 //-----------employee profile progress----------
-
-//----------------------------------------------
