@@ -17,14 +17,13 @@ exports.addTeam = async (req, res) => {
   });
 
   try {
-    // can check for existing team by same name
     const existingTeam = await teamSchema.findOne({ teamName: teamName });
 
     if (existingTeam) {
       return res.status(400).json({ message: "This Team Name already exists" });
     }
 
-    //front end eken enwa. me if eka oni ne
+    //front end
     /*
   const existingEmp = await employeeSchema.findOne({ employeeID: teamLeadID });
   if (!existingEmp) {
@@ -57,10 +56,7 @@ exports.addTeam = async (req, res) => {
       return res.status(400).json({ message: "Team cannot be created!" });
     }
     const savedTeam = await newTeam.save();
-    /*  const savedTeam_ID = await teamSchema
-      .findOne({ teamName: teamName }, { _id: 1 })
-      .sort({ _id: -1 }); //?
-*/
+
     //update teamLead profile
     const teamLeadUpdate = await employeeSchema.findOneAndUpdate(
       { employeeID: teamLeadID },
@@ -101,8 +97,6 @@ exports.addTeam = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
-//-----------------------------------------
-//-----------------------------------------
 
 //--------------update team----------------
 
@@ -136,26 +130,20 @@ exports.updateTeam = async (req, res) => {
         })
       );
 
-      //name exist saha update eke ena name
-      //teamleadid thiyana ha danna yana eka
-
       const oldTeamLead = await employeeSchema.findOne({
         teamID: team.teamLeadID,
       });
 
       const oldMembers = await employeeSchema.find({ teamID: id });
 
-      
       const duplicateTeamLd = await teamSchema.findOne({
         teamLeadID: teamLeadID,
       });
-// update team
+      // update team
       if (!chekFalg) {
         await teamSchema.findByIdAndUpdate(id, newTeamUpdate, {
           new: true,
         });
-
-        //{ _id: { $ne: team._id } }
 
         // update old team members profile : remove their Team ID
 
@@ -186,8 +174,8 @@ exports.updateTeam = async (req, res) => {
         );
         if (teamLeadID != team.teamLeadID) {
           // updateOldTeamLead
-        
-         /* me comment eka nathuwa hariyata weda. eth logic eka anuwa meka enna oni. passe balanna
+
+          /* 
          
          await employeeSchema.findOneAndUpdate(
             { employeeID: oldTeamLead.employeeID },
@@ -200,7 +188,6 @@ exports.updateTeam = async (req, res) => {
             { $set: { teamID: id } }
           );
         }
-        console.log("Hiiiiiiiiiiiiiiiiiiii")
 
         res
           .status(201)
@@ -218,8 +205,6 @@ exports.updateTeam = async (req, res) => {
     });
   }
 };
-//--------------------------------------------
-//--------------------------------------------
 
 //-------View all Teams-----------------------
 
@@ -233,5 +218,3 @@ exports.viewTeam = async (req, res) => {
       res.json({ state: false, err: err });
     });
 };
-
-//------------------------------------------

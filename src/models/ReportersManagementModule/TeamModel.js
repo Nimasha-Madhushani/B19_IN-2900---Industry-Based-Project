@@ -2,10 +2,6 @@ const mongoose = require("mongoose");
 
 const teamSchema = new mongoose.Schema(
   {
-    /*teamID: {
-      type: String,
-      required: true,
-    },*/
     teamName: {
       type: String,
       required: true,
@@ -14,10 +10,6 @@ const teamSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    //--------------------
-   /* teamMembers:{
-      type:Array
-    }*/
   },
   { timestamps: true }
 );
