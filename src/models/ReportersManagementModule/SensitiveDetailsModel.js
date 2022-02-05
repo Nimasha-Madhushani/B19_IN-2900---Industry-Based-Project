@@ -6,10 +6,6 @@ const sensitiveDetailsSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    /* accessLevel: {
-    type: String,
-    required: true
-  },*/
     password: {
       type: String,
       required: true,

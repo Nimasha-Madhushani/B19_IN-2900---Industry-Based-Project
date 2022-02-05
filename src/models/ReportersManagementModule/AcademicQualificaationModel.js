@@ -2,10 +2,6 @@ const mongoose = require("mongoose");
 
 const academicQualificaationSchema = new mongoose.Schema(
   {
-    /*academicQualificationID: {
-    type: String,
-    required:true
-  },*/
     employeeID: {
       type: String,
       required: true,
