@@ -10,9 +10,7 @@ const {
 //---------------add product----------------
 exports.addProduct = async (req, res) => {
   const { productID, productName, description, teamNames } = req.body;
-  //const recievedDate = new Date();
 
-  //const teamName=req.body.teamName;
   const findTeam = await teamSchema.findOne({ teamName: teamNames });
   console.log(findTeam._id);
   console.log(findTeam);
@@ -23,10 +21,8 @@ exports.addProduct = async (req, res) => {
     teamID: findTeam._id, //frontend
   });
 
-  //product eka id duplicateda
   const existingProduct = await productSchema.findOne({ productID: productID });
 
-  //dan danna yana id eka denata product ekkakt dalada
   const teamProduct = await productSchema.findOne({ teamID: findTeam._id });
 
   if (!existingProduct && !teamProduct) {
@@ -47,8 +43,6 @@ exports.addProduct = async (req, res) => {
   }
 };
 
-//--------------------------------------------------
-
 //-----------update product------------------------
 
 exports.updateProduct = async (req, res) => {
@@ -56,27 +50,56 @@ exports.updateProduct = async (req, res) => {
 
   const { productID, productName, description } = req.body;
 
-  //const recievedDate=new Date();
-  //const teamID = req.body.teamID;
-
   const newProductUpdate = {
     productID,
     productName,
     description,
-    //recievedDate:id,
     //teamID,
   };
 
-  const existingProduct = await productSchema.findOne({ productID: productID });
-  if (existingProduct) {
-    await productSchema
-      .findByIdAndUpdate(existingProduct._id, newProductUpdate, { new: true })
-      .then(() => {
-        res.json("product is updated successfully!");
+  try {
+    const existingProduct = await productSchema.findById(id);
+    const filterProducts = await productSchema.find({ _id: { $ne: id } }); //except the product which is going to update
+
+    let chekFalg = false;
+    await Promise.all(
+      filterProducts.map(async (filterproduct) => {
+        if (
+          filterproduct.productID == productID ||
+          filterproduct.productName == productName
+        ) {
+          chekFalg = true;
+        }
       })
-      .catch((err) => {
-        res.status(400).json({ message: "product is not updated!", err: err });
-      });
+    );
+
+    if (existingProduct && !chekFalg) {
+      await productSchema.findByIdAndUpdate(
+        existingProduct._id,
+        newProductUpdate,
+        { new: true }
+      );
+
+      return res.status(200).json("product is updated successfully!");
+    } else {
+      return res.status(400).json("product is not updated!");
+    }
+  } catch (err) {
+    res
+      .status(400)
+      .json({ message: "Cannot Update product", err: err.message });
   }
 };
-//---------------------------------------------------------
+
+//---------------view all products-------------------------
+
+exports.viewProducts = async (req, res) => {
+  await productSchema
+    .find()
+    .then((product) => {
+      res.json({ state: true, data: product });
+    })
+    .catch((err) => {
+      res.json({ state: false, err: err });
+    });
+};
