@@ -12,9 +12,4 @@ module.exports.recentSection = async (req, res) => {
 };
 
 
-/*
-
-//------------create organization structure---------------------------------
-
-*/
 
