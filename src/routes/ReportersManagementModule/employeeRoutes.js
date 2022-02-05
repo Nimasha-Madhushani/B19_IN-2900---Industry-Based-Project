@@ -1,33 +1,53 @@
 const router = require("express").Router();
+
 const {
-createEmployee,addProduct, addTeam, viewEmployees, viewTeam, updateEmployeeProfile, updateProduct, updateTeam
+  createEmployee,
+  viewEmployees,
+  updateEmployeeProfile,
 } = require("../../controllers/ReportersSection/employeeControllers");
 
-//view all employees
-router.get('/',viewEmployees);
+const {
+  addTeam,
+  viewTeam,
+  updateTeam,
+} = require("../../controllers/ReportersSection/teamControllers");
 
-//create employee
-router.post('/add', createEmployee);
+const {
+  addProduct,
+  updateProduct,
+  viewProducts,
+} = require("../../controllers/ReportersSection/productConotrollers");
 
-//employee profile update including academic/proffesional qualifications
-router.put('/update/:id',updateEmployeeProfile);
+const {
+  recentSection,
+} = require("../../controllers/ReportersSection/recentSectionController");
 
-//view all teams
-router.get('/viewTeam',viewTeam);
+//----------------employee controller------------------------------------------
 
-//add team
-router.post('/teamAdd',addTeam);
+router.get("/", viewEmployees);
 
-//update team
-router.put('/updateTeam/:id',updateTeam);
+router.post("/add", createEmployee);
 
-//add product
-router.post('/addProduct',addProduct);
+router.put("/update/:id", updateEmployeeProfile);
 
-//update product
-router.post('/updateProduct/:id',updateProduct);
+//----------------------teamController------------------------------------------
 
+router.get("/viewTeam", viewTeam);
 
+router.post("/teamAdd", addTeam);
 
+router.put("/updateTeam/:id", updateTeam);
+
+//------------------------productController---------------------------------------
+
+router.post("/addProduct", addProduct);
+
+router.post("/updateProduct/:id", updateProduct);
+
+router.get("/viewProducts", viewProducts);
+
+//--------recent section--------------------------------------------------------
+
+router.get("/recentSection", recentSection);
 
 module.exports = router;
