@@ -13,12 +13,14 @@ const leaveSchema = new mongoose.Schema ({
         type : Date,
         required : [true, "please select the date"]
     },
-    EndDate : {
+    endDate : {
         type : Date,
         required : [true, "please select the endDate"]
     },
+
     status : {
         type : String,
+        default : "Pending"
         
     },
     leaveMethod : {
@@ -33,4 +35,4 @@ const leaveSchema = new mongoose.Schema ({
 
 })
 
-module.exports = mongoose.model("Leaves",leaveSchema);;
+module.exports = mongoose.model("Leaves",leaveSchema);
