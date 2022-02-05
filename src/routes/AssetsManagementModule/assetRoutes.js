@@ -1,38 +1,48 @@
 const router = require("express").Router();
-const { viewAssets, assignAsset, createAsset, unassignAsset, createFault, availableAssets, unavailableAssets, detailsOfAsset, assignPerson, releaseFault, assetsByCategory } = require("../../controllers/assetSection/assetControllers");
+const {
+  viewAssets,
+  assignAsset,
+  createAsset,
+  unassignAsset,
+  createFault,
+  availableAssets,
+  unavailableAssets,
+  detailsOfAsset,
+  assignPerson,
+  releaseFault,
+  assetsByCategory,
+} = require("../../controllers/assetSection/assetControllers");
 //create assets
-router.post('/add',createAsset)
+router.post("/add", createAsset);
 
 //view all assets
-router.get('/',viewAssets)
+router.get("/", viewAssets);
 
 //assign asset
-router.patch("/assign/:id",assignAsset)
+router.patch("/assign/:id", assignAsset);
 
 //unassign asset
-router.patch("/unassign/:id",unassignAsset)
+router.patch("/unassign/:id", unassignAsset);
 
 //create fault for asset
-router.patch("/fault/:id",createFault)
+router.patch("/fault/:id", createFault);
 
 //release fault for asset
-router.patch("/releaseFault/:id",releaseFault)
+router.patch("/releaseFault/:id", releaseFault);
 
 //get available assets
-router.get("/available",availableAssets)
+router.get("/available", availableAssets);
 
 //get unavailable assets
-router.get("/unavailable",unavailableAssets)
+router.get("/unavailable", unavailableAssets);
 
 //get details of specific asset
-router.get("/detail/:id",detailsOfAsset)
-
+router.get("/detail/:id", detailsOfAsset);
 
 //find who has assigned  for an asset at current time
-router.get("/assignPerson/:id",assignPerson)
+router.get("/assignPerson/:id", assignPerson);
 
 //find assets by category wise
-router.get("/category",assetsByCategory)
-
+router.get("/category", assetsByCategory);
 
 module.exports = router;

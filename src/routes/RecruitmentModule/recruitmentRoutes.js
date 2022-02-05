@@ -21,6 +21,6 @@ router.put("/candidate/:id", updateCandidate);
 router.post("/interview/create", createInterview);
 router.delete("/interview/:id", cancelInterview);
 router.put("/interview/:id", updateInterview);
-router.get("/interview/", getInterviews);
+router.get("/interview/:id", getInterviews);
 
 module.exports = router;
