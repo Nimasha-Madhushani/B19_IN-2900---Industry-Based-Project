@@ -68,7 +68,7 @@ module.exports.cancelInterview = async (req, res) => {
     } else {
       res.status(404).json({
         success: false,
-        description: "Interview has already canceled",
+        description: "Interview does not exists",
       });
     }
   } catch (error) {

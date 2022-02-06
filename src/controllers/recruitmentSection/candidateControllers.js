@@ -1,17 +1,16 @@
 const mongoose = require("mongoose");
-const candidateSchema = require('../../models/RecruitmentModule/CandidateModel');
-// create a new candidate
+const candidateSchema = require("../../models/RecruitmentModule/CandidateModel");
 
+// create a new candidate
 module.exports.createCandidate = async (req, res) => {
   const { candidateName, NIC, email, phoneNumber, cv } = req.body;
 
-  
   try {
     const existsCandidate = await candidateSchema.findOne({ NIC });
     if (existsCandidate) {
       return res
         .status(400)
-        .json({ success: false, error: "candidate already exists" });
+        .json({ success: false, message: "candidate already exists" });
     }
     const candidate = new candidateSchema({
       candidateName,
@@ -21,21 +20,17 @@ module.exports.createCandidate = async (req, res) => {
       cv,
     });
     const savedCandidate = await candidate.save();
-    res
-      .status(200)
-      .json({
-        success: true,
-        description: "candidate created",
-        candidateName: savedCandidate.candidateName,
-      });
+    res.status(200).json({
+      success: true,
+      description: "candidate created",
+      candidateName: savedCandidate.candidateName,
+    });
   } catch (error) {
-    res
-      .status(400)
-      .json({
-        success: false,
-        description: "candidate is not created",
-        error: error.message,
-      });
+    res.status(400).json({
+      success: false,
+      description: "candidate is not created",
+      error: error.message,
+    });
   }
 };
 
@@ -45,18 +40,24 @@ module.exports.findCandidate = async (req, res) => {
   const { NIC } = req.params;
 
   try {
-    const candidate = await candidateSchema.findOne({ NIC });
-    if (!candidate) {
-      return res
-        .status(404)
-        .json({ success: false, message: "This candidate does not exists" });
+    if (!NIC) {
+     return res.status(400).json({
+        success: false,
+        description: "NIC have not received",
+      });
     }
+      const candidate = await candidateSchema.findOne({ NIC });
+      if (!candidate) {
+        return res
+          .status(404)
+          .json({ success: false, message: "This candidate does not exists" });
+      }
 
-    res.status(200).json({
-      success: true,
-      description: "candidate found",
-      candidate: candidate,
-    });
+      res.status(200).json({
+        success: true,
+        description: "candidate found",
+        candidate: candidate,
+      });
   } catch (error) {
     res.status(404).json({
       success: false,
