@@ -68,7 +68,7 @@ module.exports.cancelInterview = async (req, res) => {
     } else {
       res.status(404).json({
         success: false,
-        description: "Interview has already canceled",
+        description: "Interview does not exists",
       });
     }
   } catch (error) {
@@ -79,7 +79,7 @@ module.exports.cancelInterview = async (req, res) => {
     });
   }
 };
-
+//update interview
 module.exports.updateInterview = async (req, res) => {
   if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
     return res.status(404).send("ID invalid : " + req.params.id);

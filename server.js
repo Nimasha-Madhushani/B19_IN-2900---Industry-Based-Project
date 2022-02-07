@@ -13,7 +13,6 @@ const salaryPaymentRoutes = require("./src/routes/SalaryPaymentModule/salaryPaym
 const employeeRouter = require("./src/routes/ReportersManagementModule/employeeRoutes");
 const recruitmentRoutes = require("./src/routes/RecruitmentModule/recruitmentRoutes");
 const assetRoutes = require("./src/routes/AssetsManagementModule/assetRoutes");
-
 const leaveRoutes = require("./src/routes/LeaveModule/leaveRoutes");
 
 
@@ -31,10 +30,7 @@ app.listen(PORT, () => {
 
 app.use("/recruitment", recruitmentRoutes);
 app.use("/salary", salaryPaymentRoutes);
-
-
 app.use("/assets", assetRoutes);
-
 app.use("/employee", employeeRouter);
 app.use("/leave", leaveRoutes);
 

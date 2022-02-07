@@ -10,11 +10,13 @@ module.exports.getRequestedLeave = async (req, res) => {
   try {
     const requestedLeave = [];
     const employeeTeam = await teamSchema.findOne({ teamLeadID: id });
-    const employee = await employeeSchema.find({
-      teamID: employeeTeam._id,
-    });
+    const employee = await employeeSchema.find(
+      {
+        teamID: employeeTeam._id,
+        employeeID: { $ne: id }
+      }
+    );
 
-   
     for (let index = 0; index < employee.length; index++) {
       requestedLeave.push(
         await leaveSchema.find({
@@ -48,12 +50,12 @@ module.exports.responseRequestedLeave = async (req, res) => {
       return res.status(400).send("ID invalid : " + id);
 
     const leave = await leaveSchema.findById(id);
-    
+
     const employee = await employeeSchema.findOne({
       employeeID: leave.employeeId,
     });
     const team = await teamSchema.findOne({ _id: employee.teamID });
-   
+
     const teamLeader = await employeeSchema.findOne({
       employeeID: team.teamLeadID,
     });
@@ -65,71 +67,68 @@ module.exports.responseRequestedLeave = async (req, res) => {
       reason: reason,
       leaveType: leave.leaveType,
     };
-    
-    if (reason) {
 
+    if (reason) {
       await leaveSchema.findByIdAndUpdate(id, {
         $set: { status: "Rejected" },
       });
       await sendEmails(employee, data, teamLeader, condition);
-      
     } else {
       await leaveSchema.findByIdAndUpdate(id, {
         $set: { status: "approved" },
       });
       const result = await sendEmails(employee, data, teamLeader, condition);
-     
-    
 
-    const leaveBalance = await leaveBalanceSchema.findOne({
-      employeeId: leave.employeeId,
-    });
+      const leaveBalance = await leaveBalanceSchema.findOne({
+        employeeId: leave.employeeId,
+      });
 
-    let numberOfLeaveDates = 0;
-    let holidays = 0;
-    let newLeaveBalance = 0;
+      let numberOfLeaveDates = 0;
+      let holidays = 0;
+      let newLeaveBalance = 0;
 
-    for (let index = new Date(leave.startDate); index <= new Date(leave.endDate);  index.setDate(index.getDate() + 1)) {
+      for (
+        let index = new Date(leave.startDate);
+        index <= new Date(leave.endDate);
+        index.setDate(index.getDate() + 1)
+      ) {
+        if (index.getDay() == 0 || index.getDay() == 6) {
+          holidays++;
+        }
 
-      if (index.getDay() == 0 || index.getDay() == 6) {
-        holidays++;
-
+        numberOfLeaveDates++;
       }
 
-      numberOfLeaveDates++;
+      numberOfLeaveDates -= holidays;
+      console.log(numberOfLeaveDates);
+
+      switch (leave.leaveType) {
+        case "casual":
+          newLeaveBalance =
+            leaveBalance.approvedCasualLeave + numberOfLeaveDates;
+          await leaveBalanceSchema.findOneAndUpdate(
+            { employeeId: leave.employeeId },
+            { $set: { approvedCasualLeave: newLeaveBalance } }
+          );
+          break;
+        case "annual":
+          newLeaveBalance =
+            leaveBalance.approvedAnnualLeave + numberOfLeaveDates;
+          await leaveBalanceSchema.findOneAndUpdate(
+            { employeeId: leave.employeeId },
+            { $set: { approvedAnnualLeave: newLeaveBalance } }
+          );
+          break;
+        case "medical":
+          newLeaveBalance =
+            leaveBalance.approvedMedicalLeave + numberOfLeaveDates;
+          await leaveBalanceSchema.findOneAndUpdate(
+            { employeeId: leave.employeeId },
+            { $set: { approvedMedicalLeave: newLeaveBalance } }
+          );
+          break;
+      }
     }
-
-    numberOfLeaveDates -= holidays;
-    console.log(numberOfLeaveDates);
-    
-
-    switch (leave.leaveType) {
-      case "casual":
-        newLeaveBalance = leaveBalance.approvedCasualLeave + numberOfLeaveDates;
-        await leaveBalanceSchema.findOneAndUpdate(
-          { employeeId: leave.employeeId },
-          { $set: { approvedCasualLeave: newLeaveBalance } }
-        );
-        break;
-      case "annual":
-        newLeaveBalance = leaveBalance.approvedAnnualLeave + numberOfLeaveDates;
-        await leaveBalanceSchema.findOneAndUpdate(
-          { employeeId: leave.employeeId },
-          { $set: { approvedAnnualLeave: newLeaveBalance } }
-        );
-        break;
-      case "medical":
-        newLeaveBalance =
-          leaveBalance.approvedMedicalLeave + numberOfLeaveDates;
-        await leaveBalanceSchema.findOneAndUpdate(
-          { employeeId: leave.employeeId },
-          { $set: { approvedMedicalLeave: newLeaveBalance } }
-        );
-        break;
-    }
-
-
-  }
     res.status(200).json({
       message:
         "response has managed successfully and leave balance has updated",
