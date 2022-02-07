@@ -79,7 +79,7 @@ module.exports.cancelInterview = async (req, res) => {
     });
   }
 };
-
+//update interview
 module.exports.updateInterview = async (req, res) => {
   if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
     return res.status(404).send("ID invalid : " + req.params.id);
