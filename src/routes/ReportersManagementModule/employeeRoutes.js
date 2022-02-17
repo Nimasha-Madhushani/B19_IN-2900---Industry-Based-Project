@@ -4,6 +4,7 @@ const {
   createEmployee,
   viewEmployees,
   updateEmployeeProfile,
+  loginEmployee,
 } = require("../../controllers/ReportersSection/employeeControllers");
 
 const {
@@ -27,6 +28,8 @@ const {
 router.get("/", viewEmployees);
 
 router.post("/add", createEmployee);
+
+router.post("/login/",loginEmployee);
 
 router.put("/update/:id", updateEmployeeProfile);
 
