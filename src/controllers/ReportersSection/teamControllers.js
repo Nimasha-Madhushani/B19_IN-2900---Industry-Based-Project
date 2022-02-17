@@ -227,7 +227,7 @@ exports.updateTeam = async (req, res) => {
         res.json("cannot update");
       }
     } else {
-      res.json("mkemkcfkrf"); //?
+      res.json("team is not updated"); //?
     }
   } catch (error) {
     res.status(404).json({
