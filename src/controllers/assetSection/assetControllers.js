@@ -1,7 +1,7 @@
 //const router = require("express").Router();
 let Asset = require("../../models/AssetsManagementModule/AssetsModel");
 let Asset_Lending = require("../../models/AssetsManagementModule/AssetsLender");
-
+let Employee = require("../../models/ReportersManagementModule/EmployeeModel");
 
 //view all assets
 exports.viewAssets = async (req,res)=>{
@@ -199,24 +199,43 @@ exports.assignPerson = async(req,res)=>{
         catch(err){
             res.status(500).send({message:err.message})
         }
-    }else{
+    }else if(asset.status == "Fault")
+    {
+        res.status(200).send({message:"Asset has a fault"})
+    }
+    else{
         res.status(200).send({message:"Asset is currently Available"})
     }
       
 }
 
-//find whether an employee has assigned for an asset current time or give it back
+//find whether an employee has assigned for an asset current time or give it back for changing employee status to resign
 exports.isAssigned = async(req,res)=>{
     let empID = req.body.empID;
-    
-    const lenderAsset =  await Asset_Lending.findOne({"employeeID":empID,"reassignDate":null},{"employeeID":1,"assetID":1}).sort({_id:-1})
-    if(lenderAsset)
+    if(empID)
     {
-        res.status(200).send({assetID:lenderAsset.assetID})
-    }else
-    {
-        res.status(200).send({assetID:"Nothing has assigned!"})
+        const lenderAsset =  await Asset_Lending.findOne({"employeeID":empID,"reassignDate":null},{"employeeID":1,"assetID":1}).sort({_id:-1})
+        if(lenderAsset)
+        {
+            res.status(200).send({assetID:lenderAsset.assetID,message:"You cannot change the status to resign"})
+        }else
+        {
+            //res.status(200).send({assetID:"Nothing has assigned!",message:"You can change the status to resign"})
+            const updateEmpStatus = await Employee.updateOne(
+                {employeeID : empID},
+                {
+                    $set:{status:"Resign"}
+                }
+            ).then(()=>{
+                    res.status(200).send({message:"Change the employee status to the resign!"})
+            }).catch((err)=>{
+                    res.status(500).send({message:"Cannot change the status!",error:err.message})
+            })
+        }
+    }else{
+        res.status(500).send({message:"Please fill the Employee ID"})
     }
+    
 
 }
 
