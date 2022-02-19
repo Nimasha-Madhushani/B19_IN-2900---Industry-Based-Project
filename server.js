@@ -8,7 +8,7 @@ require("dotenv").config();
 
 const dbConnection = require("./src/Config/connectDataBase");
 
-
+const userAuthRoutes = require("./src/routes/UserAuthRoutes/UserAuth")
 const salaryPaymentRoutes = require("./src/routes/SalaryPaymentModule/salaryPaymentRoutes");
 const employeeRouter = require("./src/routes/ReportersManagementModule/employeeRoutes");
 const recruitmentRoutes = require("./src/routes/RecruitmentModule/recruitmentRoutes");
@@ -27,11 +27,12 @@ app.listen(PORT, () => {
     console.log(`Server is running on ${PORT} port`);
 });
 
-
+app.use("/", userAuthRoutes);
 app.use("/recruitment", recruitmentRoutes);
 app.use("/salary", salaryPaymentRoutes);
 app.use("/assets", assetRoutes);
 app.use("/employee", employeeRouter);
 app.use("/leave", leaveRoutes);
+
 
 
