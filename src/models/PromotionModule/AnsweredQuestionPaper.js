@@ -4,23 +4,28 @@ const Schema = mongoose.Schema;
 //Ratings of employee and examinee to each question
 const AnsweredQuestionPaperSchema = new Schema({
     PaperID: {
-        type: String,
-        required: true,
-        unique: true
+        type: String
     },
-    QuestionID: {
+    EmployeeID: {
         type: String,
-        required: true,
-        unique: true
     },
-    UserRating: {
+    TeamLeadID: {
         type: String,
-        required: true
     },
-    PanelRating: {
-        type: String,
-        required: true
-    }
+    DateAttempted: {
+        type: String
+    },
+    Questions: [{
+        QuestionID: { type: String },
+        EmployeeRating: { type: String },
+        TeamLeadRating: { type: String }
+    }],
+    Feedback: {
+        type: String
+    },
+    DateOfEvaluation: {
+        type: String
+    },
 });
 
 const AnsweredQuestionPaper = mongoose.model("AnsweredQuestionPaper", AnsweredQuestionPaperSchema);

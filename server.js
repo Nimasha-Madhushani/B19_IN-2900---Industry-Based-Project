@@ -1,7 +1,6 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const cors = require("cors");
-
 const app = express();
 require("dotenv").config();
 
@@ -13,8 +12,8 @@ const salaryPaymentRoutes = require("./src/routes/SalaryPaymentModule/salaryPaym
 const employeeRouter = require("./src/routes/ReportersManagementModule/employeeRoutes");
 const recruitmentRoutes = require("./src/routes/RecruitmentModule/recruitmentRoutes");
 const assetRoutes = require("./src/routes/AssetsManagementModule/assetRoutes");
-
 const leaveRoutes = require("./src/routes/LeaveModule/leaveRoutes");
+const promotionRoutes = require("./src/routes/PromotionModule/promotionRoutes");
 
 
 app.use(cors());
@@ -24,18 +23,16 @@ const PORT = process.env.PORT || 8070;
 
 dbConnection();
 
+
 app.listen(PORT, () => {
     console.log(`Server is running on ${PORT} port`);
 });
 
-
 app.use("/recruitment", recruitmentRoutes);
 app.use("/salary", salaryPaymentRoutes);
-
-
 app.use("/assets", assetRoutes);
-
 app.use("/employee", employeeRouter);
 app.use("/leave", leaveRoutes);
+app.use("/promotion", promotionRoutes);
 
 

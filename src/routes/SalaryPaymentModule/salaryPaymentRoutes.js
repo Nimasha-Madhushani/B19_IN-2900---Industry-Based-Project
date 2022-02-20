@@ -9,7 +9,7 @@ const {
     findCurrentSalarySheet,
     updateCurrentSalarySheet,
     deleteCurrentSalarySheet,
-    sendToSummarySalarySheet
+    // sendToSummarySalarySheet
 } = require("../../controllers/salaryPaymentSection/currentSalarySheetControllers");
 
 
@@ -17,7 +17,7 @@ const {
 //importing controllers of summary salary payment
 const {
     viewSummarySalarySheet,
-    findSummarySalarySheet
+    findSummarySalarySheetByEid
 } = require("../../controllers/salaryPaymentSection/summarySalaryController");
 
 
@@ -33,15 +33,17 @@ const {
 router.get('/currentSalary/', viewCurrentSalarySheet); //view all current payments
 router.post('/currentSalary/create', createCurrentSalarySheet);
 router.get('/currentSalary/:EmployeeID', findCurrentSalarySheet);
-router.patch("/currentSalary/update/:EmployeeID", updateCurrentSalarySheet);
-router.delete("/currentSalary/delete/:EmployeeID", deleteCurrentSalarySheet);
-router.post("/currentSalary/sendToSummary", sendToSummarySalarySheet);
+router.patch('/currentSalary/update/:EmployeeID', updateCurrentSalarySheet);
+router.delete('/currentSalary/delete/:EmployeeID', deleteCurrentSalarySheet);
+//router.post('/currentSalary/sendToSummary', sendToSummarySalarySheet);
+
 
 
 
 // routes for the summary salary payment
 router.get('/summarySalary/', viewSummarySalarySheet); //view all summary payments
-router.get("/summarySalary/:EmployeeID", findSummarySalarySheet);
+router.get('/summarySalary/:EmployeeID', findSummarySalarySheetByEid);
+
 
 
 // routes for the employee salary sheet
