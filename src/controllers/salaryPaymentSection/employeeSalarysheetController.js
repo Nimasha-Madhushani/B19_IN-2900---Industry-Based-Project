@@ -1,37 +1,49 @@
 //controllers for current month salary sheets of all employees
-const mongoose = require("mongoose");
 
 let summarySheet = require("../../models/SalaryPaymentModule/SummarySalary");
 let CurrentSheet = require("../../models/SalaryPaymentModule/CurrentSalary");
+const Employee = require("../../models/ReportersManagementModule/EmployeeModel");
 
 
-//find Current Salary Sheet by employee id on current salry table
+
+//display Current Salary Sheet by employee id on current salary table
 exports.viewCurrentEmployeeSalarySheet = async (req, res) => {
-    //  const employeeSalarySheet = 
-    await CurrentSheet.find(
-        { 'EmployeeID': req.params.EmployeeID })
-        .then((currentEmployeeSalarySheets) => {
-            res.json(currentEmployeeSalarySheets)
-        }).catch((err) => {
-            console.log(err);
-        })
+    try {
+        const eid = req.params.EmployeeID;
+
+        const existsEmployeeId = await Employee.findOne({ employeeID: eid });
+        if (existsEmployeeId == null) {
+            return res.status(400).json({ message: "Invalid EmployeeID. Enter a valid employee ID" });
+        }
+
+        const currentEmployeeSalarySheets = await CurrentSheet.find({ 'EmployeeID': req.params.EmployeeID });
+        if (currentEmployeeSalarySheets == null) {
+            return res.status(400).json({ message: "Current salary sheet not found" });
+        }
+        res.status(200).json({ message: "Successfull", currentEmployeeSalarySheets });
+    } catch (error) {
+        res.status(404).json({ message: "Error", error })
+    }
 }
 
-//finds employee salary sheets by month on summary salry table
+//finds employee salary sheets by month on summary salary table
 exports.findEmployeeSalarySheetByMonth = async (req, res) => {
-    //const employeeMonthlySalarySheet = 
-    await summarySheet.find(
-        {
-            'EmployeeID': req.params.EmployeeID,
-            'Month': req.params.Month,
-        })
-        .then((employeeMonthlySalarySheet) => {
-            res.json(employeeMonthlySalarySheet)
-        }).catch((err) => {
-            console.log(err);
-            res.status(500).send(
-                { message: "Fault Employee ID and Month", error: err.message }
-            )
-        })
+    try {
+        const eid = req.params.EmployeeID;
+        const month = req.params.Month;
+
+        const existsEmployeeId = await Employee.findOne({ employeeID: eid });
+        if (existsEmployeeId == null) {
+            return res.status(400).json({ message: "Invalid EmployeeID. Enter a valid employee ID" });
+        }
+
+        const employeeMonthlySalarySheet = await summarySheet.find({ EmployeeID: eid, Month: month });
+        if (employeeMonthlySalarySheet == null) {
+            return res.status(400).json({ message: "Salary sheet not found" });
+        }
+        res.status(200).json({ message: "Successfull", employeeMonthlySalarySheet });
+    } catch (error) {
+        res.status(500).send({ message: "Invalid Employee ID or Month", error: err.message });
+    }
 }
 

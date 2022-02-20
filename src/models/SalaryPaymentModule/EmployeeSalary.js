@@ -3,11 +3,6 @@ const Schema = mongoose.Schema;
 
 //salary details for current month of all employees
 const employeeSalarySchema = new Schema({
-    CuurrentSalarySheetID: {
-        type: String,
-        required: true,
-        unique: true
-    },
     EmployeeID: {
         type: String,
         required: true

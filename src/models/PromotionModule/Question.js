@@ -5,8 +5,7 @@ const Schema = mongoose.Schema;
 const QuestionSchema = new Schema({
     QuestionID: {
         type: String,
-        required: true,
-        unique: true
+        required: true
     },
     QuestionCatogory: {
         type: String,

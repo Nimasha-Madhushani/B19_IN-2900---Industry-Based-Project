@@ -1,48 +1,25 @@
 //controllers for all summary salary sheets of all employees
-// const mongoose = require("mongoose");
-
-
-
 let summarySheet = require("../../models/SalaryPaymentModule/SummarySalary");
 
-
-//view all current salary sheets
-// exports.viewSummarySalarySheet = async (req, res) => {
-//     await summarySheet.find().then((summarySalarySheets) => {
-//         res.json(summarySalarySheets)
-//     }).catch((err) => {
-//         console.log(err);
-//         res.status(500).send(
-//             { error: err.message }
-//         );
-//     })
-// };
-
+//view all salary summary sheets of all employees
 exports.viewSummarySalarySheet = async (req, res) => {
-    await summarySheet.find().then((summarySalarySheets) => {
-        res.json(summarySalarySheets);
-        return res.status(200);
-    }).catch((err) => {
-        console.log(err);
-        res.status(500).send(error.message);
-    })
+    try {
+        const summarySalarySheets = await summarySheet.find();
+        res.status(200).json(summarySalarySheets);
+    } catch (error) {
+        res.status(400).send(error.message);
+    }
 };
 
 
 //find Summary Salary Sheet by employee id
-exports.findSummarySalarySheet = async (req, res) => {
-    // const employeeSummarySlarySheet = 
-    await summarySheet.find(
-        { 'EmployeeID': req.params.EmployeeID })
-        .then((employeeSummarySlarySheet) => {
-            res.json(employeeSummarySlarySheet)
-        }).catch((err) => {
-            console.log(err);
-            res.status(500).send(
-                { message: "Fault Employee ID", error: err.message }
-            )
-        })
+exports.findSummarySalarySheetByEid = async (req, res) => {
+    try {
+        const employeeSummarySlarySheet = await summarySheet.find({ 'EmployeeID': req.params.EmployeeID });
+        res.status(200).json(employeeSummarySlarySheet);
+    } catch (error) {
+        res.status(400).send({ message: "Fault Employee ID", error: err.message });
+    }
 }
-
 
 
