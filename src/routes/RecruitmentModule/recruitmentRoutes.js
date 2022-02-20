@@ -1,4 +1,5 @@
 const express = require("express");
+const userRoles = require("../../Config/UserRoles");
 const {
   createCandidate,
   findCandidate,
@@ -10,10 +11,11 @@ const {
   updateInterview,
   getInterviews,
 } = require("../../controllers/recruitmentSection/InterviewControllers");
+const verifyRoles = require("../../middleware/verifyUserRole");
 const router = express.Router();
 
 // routes for the candidates
-router.post("/candidate/create", createCandidate);
+router.post("/candidate/create", verifyRoles([userRoles.HR]), createCandidate);
 router.get("/candidate/:NIC", findCandidate);
 router.put("/candidate/:id", updateCandidate);
 
