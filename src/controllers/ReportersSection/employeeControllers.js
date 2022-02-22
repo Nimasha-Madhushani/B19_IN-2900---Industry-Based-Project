@@ -92,6 +92,7 @@ exports.createEmployee = async (req, res) => {
   }
 };
 
+
 //--------Update employee profile includeing academic proffesional----------------
 exports.updateEmployeeProfile = async (req, res) => {
   const { id } = req.params;
