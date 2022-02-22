@@ -63,6 +63,12 @@ const employeeSchema = new mongoose.Schema(
     teamID: {
       type: String,
     },
+    lastSeen: {
+      type: String,
+    },
+    token: {
+      type: String,
+    },
   },
   { timestamps: true }
 );
