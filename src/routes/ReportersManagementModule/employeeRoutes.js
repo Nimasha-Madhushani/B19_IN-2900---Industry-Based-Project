@@ -22,6 +22,10 @@ const {
   recentSection,
 } = require("../../controllers/ReportersSection/recentSectionController");
 
+const {
+  displayLastSeen,
+} = require("../../controllers/ReportersSection/lastSeenController");
+
 //----------------employee controller------------------------------------------
 
 router.get("/", viewEmployees);
@@ -49,5 +53,9 @@ router.get("/viewProducts", viewProducts);
 //--------recent section--------------------------------------------------------
 
 router.get("/recentSection", recentSection);
+
+//----------last seen----------------------------------------------------------
+
+router.get("/lastSeen", displayLastSeen);
 
 module.exports = router;

@@ -12,6 +12,12 @@ exports.addProduct = async (req, res) => {
   const { productID, productName, description, teamNames } = req.body;
 
   const findTeam = await teamSchema.findOne({ teamName: teamNames });
+  if(!findTeam){
+    return res
+    .status(400)
+    .json("team is not existing, product cannot be created")
+  }
+  
   console.log(findTeam._id);
   console.log(findTeam);
   const newProduct = new productSchema({
@@ -20,12 +26,15 @@ exports.addProduct = async (req, res) => {
     description,
     teamID: findTeam._id, //frontend
   });
+  
+
 
   const existingProduct = await productSchema.findOne({ productID: productID });
+  const existingProductName=await productSchema.findOne({productName:productName});
 
   const teamProduct = await productSchema.findOne({ teamID: findTeam._id });
 
-  if (!existingProduct && !teamProduct) {
+  if (!existingProduct && !teamProduct && !existingProductName) {
     const savedProduct = await newProduct
       .save()
       .then(() => {
