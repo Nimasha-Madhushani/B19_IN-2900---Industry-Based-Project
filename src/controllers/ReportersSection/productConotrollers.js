@@ -18,8 +18,7 @@ exports.addProduct = async (req, res) => {
     .json("team is not existing, product cannot be created")
   }
   
-  console.log(findTeam._id);
-  console.log(findTeam);
+  
   const newProduct = new productSchema({
     productID,
     productName,
