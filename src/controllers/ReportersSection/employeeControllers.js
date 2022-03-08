@@ -92,7 +92,6 @@ exports.createEmployee = async (req, res) => {
   }
 };
 
-
 //--------Update employee profile includeing academic proffesional----------------
 exports.updateEmployeeProfile = async (req, res) => {
   const { id } = req.params;
@@ -103,11 +102,8 @@ exports.updateEmployeeProfile = async (req, res) => {
     streetNo,
     city,
     phoneNumber,
-    jobRole,
-    //  NIC,
+    NIC,
     companyEmail,
-    status,
-    jobType,
     profilePic,
     ordinaryLevelResult,
     advancedLevelResults,
@@ -125,15 +121,27 @@ exports.updateEmployeeProfile = async (req, res) => {
     streetNo,
     city,
     phoneNumber,
-    jobRole,
     profilePic,
-    //NIC,//frontend
+    NIC,
     companyEmail,
-    status,
-    jobType,
   };
   try {
     const existingEmployee = await employeeSchema.findOne({ employeeID: id }); //???????
+
+    const candidate = await candidateSchema.findOne({
+      _id: existingEmployee.candidateID,
+    });
+    let changeNIC = false;
+    if (candidate.NIC != NIC) {
+      await candidateSchema.updateOne(
+        { _id: existingEmployee.candidateID },
+        {
+          $set: { NIC: NIC },
+        }
+      );
+
+      changeNIC = true;
+    }
 
     if (existingEmployee) {
       //--------------academic qualification update-------------------------------------
@@ -194,27 +202,22 @@ exports.updateEmployeeProfile = async (req, res) => {
       await employeeSchema.findByIdAndUpdate(existingEmployee._id, employee, {
         new: true,
       });
-      res
-        .status(200)
-        .json({
-          message:
-            "employee profile,academic qulification, proffesional qualification are  updated successfully",
-        });
+      res.status(200).json({
+        message: changeNIC
+          ? "employee profile,academic qulification, proffesional qualification candidate NIC are  updated successfully"
+          : "employee profile,academic qulification, proffesional qualification  are  updated successfully",
+      });
     } else {
       res.status(400).json("Employee is not existing");
     }
   } catch (err) {
-    res
-      .status(400)
-      .json({
-        message:
-          "employee profile,academic qulification, proffesional qualification are not updated",
-        err: err.message,
-      });
+    res.status(400).json({
+      message:
+        "employee profile,academic qulification, proffesional qualification are not updated",
+      err: err.message,
+    });
   }
 };
-
-//-----------update resign status----------------
 
 //------------create organization structure------
 

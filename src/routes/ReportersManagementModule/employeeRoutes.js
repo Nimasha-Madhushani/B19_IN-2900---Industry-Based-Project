@@ -32,7 +32,9 @@ router.get("/", viewEmployees);
 
 router.post("/add", createEmployee);
 
-router.put("/update/:id", updateEmployeeProfile);
+router.put("/update/:id", updateEmployeeProfile);//update own profile(NIC disable)
+
+router.put("/update/employee/:id",  updateEmployeeProfile);//only HR can access
 
 //----------------------teamController------------------------------------------
 

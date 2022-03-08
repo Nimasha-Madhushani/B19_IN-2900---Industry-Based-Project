@@ -71,7 +71,6 @@ exports.addTeam = async (req, res) => {
       { employeeID: teamLeadID },
       { $set: { teamID: savedTeam._id } } //?
     );
-    console.log(teamMembers);
 
     let updateEmployeeCount = 0;
     if (teamMembers) {
@@ -82,8 +81,6 @@ exports.addTeam = async (req, res) => {
           const existingEmp = await employeeSchema.findOne({
             employeeID: member,
           });
-
-          console.log(existingEmp);
 
           if (!existingEmp.teamID) {
             await employeeSchema.findOneAndUpdate(
@@ -138,7 +135,6 @@ exports.updateTeam = async (req, res) => {
         employeeID: teamMembers[index],
       });
       if (member.teamID && member.teamID != id) {
-        console.log("log 1");
         return res
           .status(401)
           .json(
@@ -196,15 +192,7 @@ exports.updateTeam = async (req, res) => {
             );
           })
         );
-        // update new team members profile
-        await Promise.all(
-          teamMembers.map(async (teammember) => {
-            await employeeSchema.findOneAndUpdate(
-              { employeeID: teammember },
-              { $set: { teamID: id } }
-            );
-          })
-        );
+
         if (teamLeadID != team.teamLeadID) {
           // updateOldTeamLead
 
@@ -219,6 +207,15 @@ exports.updateTeam = async (req, res) => {
             { $set: { teamID: id } }
           );
         }
+        // update new team members profile
+        await Promise.all(
+          teamMembers.map(async (teammember) => {
+            await employeeSchema.findOneAndUpdate(
+              { employeeID: teammember },
+              { $set: { teamID: id } }
+            );
+          })
+        );
 
         res
           .status(201)
