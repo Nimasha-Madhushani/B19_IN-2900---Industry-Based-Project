@@ -1,14 +1,18 @@
 const teamSchema = require("../models/ReportersManagementModule/TeamModel");
+const jwt = require("jsonwebtoken");
 
 const verifyRoles = (allowedRoles) => {
   return async (req, res, next) => {
     try {
-      const accessToken = req.headers.authorization.split(" ")[1];
+      let accessToken = req.headers.authorization;
+      let authorized = false;
       if (!accessToken) {
         return res
           .status(401)
           .json({ message: "You are not authenticated..Please log In" });
       }
+
+      accessToken = accessToken.split(" ")[1];
       await jwt.verify(
         accessToken,
         process.env.ACCESS_TOKEN_SECRET_KEY,
@@ -26,37 +30,42 @@ const verifyRoles = (allowedRoles) => {
               await Promise.all(
                 allowedRoles.map((role) => {
                   if (role == decodeData.jobRole) {
-                    next();
+                    authorized = true;
                   }
                 })
-              )
+              );
               break;
             default:
-              const isTeamLeader = await teamSchema.findOne({teamLeadID : decodeData.id});
+              const isTeamLeader = await teamSchema.findOne({
+                teamLeadID: decodeData.id,
+              });
               if (isTeamLeader) {
                 await Promise.all(
                   allowedRoles.map((role) => {
-                    if (role == "TeamLeader ") {
-                      next();
+                    if (role == "TeamLeader") {
+                      authorized = true;
                     }
                   })
-                )
+                );
               }
 
               break;
           }
-
-          return res.status(403).json({
-            message: "You are not authorized for this action.",
-          });
+          if (authorized) {
+            next();
+          } else {
+            return res.status(403).json({
+              message: "You are not authorized for this action.",
+            });
+          }
         }
       );
-    } catch (error) {}
-    const result = req.roles
-      .map((role) => rolesArray.includes(role))
-      .find((val) => val === true);
-    if (!result) return res.sendStatus(403);
-    next();
+    } catch (error) {
+      res.status(403).json({
+        message: "You are not authorized for this action.",
+        error: error.message,
+      });
+    }
   };
 };
 
