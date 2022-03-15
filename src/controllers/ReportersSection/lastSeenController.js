@@ -28,6 +28,7 @@ exports.displayLastSeen = async (req, res) => {
             birthday,
             city,
             teamID,
+            token,
             ...others
           } = filterEmployees.toObject();
           lastSeenArr.push(others);

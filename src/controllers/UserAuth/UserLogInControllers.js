@@ -55,7 +55,7 @@ exports.logOutEmployee = async (req, res) => {
   try {
     await employeeSchema.updateOne(
       { token : refreshToken },
-      { $set: { token: "" } }
+      { $set: { token: "", lastSeen : new Date() } }
     );
     res.status(201).json({message : "Successfully log out..!"})
   } catch (error) {
