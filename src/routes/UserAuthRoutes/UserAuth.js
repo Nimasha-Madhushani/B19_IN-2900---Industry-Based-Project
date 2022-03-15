@@ -5,7 +5,7 @@ const verify = require('../../middleware/VerifyJWT');
 const router = express.Router();
 
 router.post("/login", loginEmployee);
-router.post("/logout/:id", verify, logOutEmployee);
+router.post("/logout/:id", logOutEmployee);
 
 router.post("/refresh", refreshToken);
 
