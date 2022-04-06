@@ -69,8 +69,7 @@ exports.assignAsset = async(req,res) => {
 
 //find assets by category
 exports.assetsByCategory = async(req,res) => {
-    const CATEGORY = req.body.assetCategory;
-    
+    const CATEGORY = req.params.assetCategory;
     const asset = await Asset.find({"assetCategory" :{$regex: new RegExp([CATEGORY?.toLowerCase()], "i") }})
     .then((assets)=>{
         res.json(assets)
