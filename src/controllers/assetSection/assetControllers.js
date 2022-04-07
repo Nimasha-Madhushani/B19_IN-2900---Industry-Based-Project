@@ -55,13 +55,13 @@ exports.assignAsset = async(req,res) => {
     
         insertLending.save()
         .then(()=>{
-                res.status(200).send({message:"Asset assigned!"})
+                res.status(200).send({message:"Asset assigned!",success:true})
             }).catch((err)=>{
                    console.log(err);
-                res.status(500).send({message:"Asset is not assigned!",error:err.message})
+                res.status(500).send({message:"Asset is not assigned!",error:err.message,success:false})
         })
     }else{
-        res.status(400).send({message:"Cannot assigned!"})
+        res.status(400).send({message:"Cannot assigned!",success:false})
     }
     
 
@@ -72,10 +72,11 @@ exports.assetsByCategory = async(req,res) => {
     const CATEGORY = req.params.assetCategory;
     const asset = await Asset.find({"assetCategory" :{$regex: new RegExp([CATEGORY?.toLowerCase()], "i") }})
     .then((assets)=>{
-        res.json(assets)
+        res.json({data:assets,success:true})
+        //res.status(400).json(assets)
     }).catch((err)=>{
-            console.log(err);
-            res.status(500).send({message:"No assets like that category!",error:err.message})
+            //console.log(err);
+            res.status(500).send({message:"No assets like that category!",error:err.message,success:false})
     })
     
 }
@@ -109,10 +110,10 @@ exports.unassignAsset = async(req,res) => {
         }
     )
     .then(()=>{
-            res.status(200).send({status:"Asset unassigned!"})
+            res.status(200).send({status:"Asset unassigned!",success:true})
         }).catch((err)=>{
                console.log(err);
-            res.status(500).send({status:"Asset is not unassigned!",error:err.message})
+            res.status(500).send({status:"Asset is not unassigned!",error:err.message, success:false})
     })
 
 }
@@ -127,10 +128,10 @@ exports.createFault = async(req,res) => {
             $set:{status:"Fault"}
         }
     ).then(()=>{
-            res.status(200).send({status:"Create a fault!"})
+            res.status(200).send({status:"Create a fault!", success:true})
         }).catch((err)=>{
                console.log(err);
-            res.status(500).send({status:"Not create a fault!",error:err.message})
+            res.status(500).send({status:"Not create a fault!",error:err.message, success:false})
     })
 
 }
@@ -145,10 +146,10 @@ exports.releaseFault = async(req,res) => {
             $set:{status:"Available"}
         }
     ).then(()=>{
-            res.status(200).send({status:"Release a fault!"})
+            res.status(200).send({status:"Release a fault!",success:true})
         }).catch((err)=>{
                console.log(err);
-            res.status(500).send({status:"Not release a fault!",error:err.message})
+            res.status(500).send({status:"Not release a fault!",error:err.message,success:false})
     })
 
 }
