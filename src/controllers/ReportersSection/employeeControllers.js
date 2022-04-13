@@ -9,17 +9,51 @@ const {
 const sensitiveDetailsSchema = require("../../models/ReportersManagementModule/SensitiveDetailsModel");
 const candidateSchema = require("../../models/RecruitmentModule/CandidateModel");
 
+//-------SearchEmployee to update------------------
+
+// exports.filterEmployee = async (req, res) => {
+//   const id = req.params.empId;
+//   let employee;
+//   try {
+//     employee = await employeeSchema.findById(id);
+//   } catch (err) {
+//     console.log(err);
+//   }
+//   if (!employee) {
+//     return res.status(400).json({ message: "Employee is not existing" });
+//   } else {
+//     return res.status(200).json({ employee: employee });
+//   }
+// };
+
 //-------View Employees----------------------------
 
 exports.viewEmployees = async (req, res) => {
-  await employeeSchema
-    .find()
-    .then((employees) => {
-      res.status(200).json({ state: true, data: employees });
-    })
-    .catch((err) => {
-      res.status(400).json({ state: false, err: err });
-    });
+  try {
+    const collectionOne = await employeeSchema.aggregate([
+      {
+        $lookup: {
+          from: "academicqualifications",
+          localField: "employeeID", // field in the orders collection
+          foreignField: "employeeID", // field in the items collection
+          as: "EmployeeWithAcc",
+        },
+      },
+
+      {
+        $lookup: {
+          from: "proffesionalqualifications",
+          localField: "employeeID",
+          foreignField: "employeeID",
+          as: "EmpWithProf",
+        },
+      },
+    ]);
+    res.status(200).json({ data: collectionOne });
+   
+  } catch (err) {
+    return res.status(404).json({ err: err.message });
+  }
 };
 
 //-------Create Employee Profile--------------------
@@ -131,6 +165,7 @@ exports.updateEmployeeProfile = async (req, res) => {
     const candidate = await candidateSchema.findOne({
       _id: existingEmployee.candidateID,
     });
+
     let changeNIC = false;
     if (candidate.NIC != NIC) {
       await candidateSchema.updateOne(
