@@ -3,6 +3,7 @@ const router = require("express").Router();
 const {
   createEmployee,
   viewEmployees,
+  filterEmployee,
   updateEmployeeProfile,
 } = require("../../controllers/ReportersSection/employeeControllers");
 
@@ -28,13 +29,15 @@ const {
 
 //----------------employee controller------------------------------------------
 
+// router.get("/filterEmployee/:empId",filterEmployee)
+
 router.get("/", viewEmployees);
 
 router.post("/add", createEmployee);
 
-router.put("/update/:id", updateEmployeeProfile);//update own profile(NIC disable)
+router.put("/update/:id", updateEmployeeProfile); //update own profile(NIC disable)
 
-router.put("/update/employee/:id",  updateEmployeeProfile);//only HR can access
+router.put("/update/employee/:id", updateEmployeeProfile); //only HR can access
 
 //----------------------teamController------------------------------------------
 
