@@ -235,13 +235,54 @@ exports.updateTeam = async (req, res) => {
 };
 //-------View all Teams-----------------------
 
+// exports.viewTeam = async (req, res) => {
+//   await teamSchema
+//     .find()
+//     .then((team) => {
+//       res.json({ state: true, Team: team });
+//     })
+//     .catch((err) => {
+//       res.json({ state: false, err: err });
+//     });
+// };
+
+//view all team details
+
 exports.viewTeam = async (req, res) => {
-  await teamSchema
-    .find()
-    .then((team) => {
-      res.json({ state: true, data: team });
-    })
-    .catch((err) => {
-      res.json({ state: false, err: err });
-    });
+  try {
+    const newCollection = await teamSchema.aggregate([
+      {
+        $addFields: {
+          _id: { $toString: "$_id" },//converts the ObjectId of teams collecton to string
+        },
+      },
+      {
+        $lookup: {
+          from: "employees",
+          localField: "_id", // field in the employee collection
+          foreignField: "teamID", // field in the team collection
+          as: "TeamWithEmp",
+        },
+      },
+      {
+        $addFields: {
+          _id: { $toString: "$_id" },//converts the ObjectId of teams collecton to string
+        },
+      },
+
+      {
+        $lookup: {
+          from: "products",
+          localField: "_id", // field in the product collection
+          foreignField: "teamID", // field in the team collection
+          as: "ProductOfTeam",
+        },
+      },
+    ]);
+    res.status(200).json({ data: newCollection });
+  } catch (err) {
+    return res.status(404).json({ err: err.message });
+  }
 };
+
+
