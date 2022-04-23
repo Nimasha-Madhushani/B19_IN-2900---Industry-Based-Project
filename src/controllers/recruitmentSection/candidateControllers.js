@@ -100,3 +100,26 @@ module.exports.updateCandidate = async (req, res) => {
     });
   }
 };
+
+
+module.exports.getAllCandidates = async(req, res) =>{
+try {
+  const candidates = await candidateSchema.find();
+  if(!candidates) {
+    return res
+    .status(404)
+    .json({ success: false, description: "failed to fetch candidates" });
+  }
+  res.status(200).json({
+    success: true,
+    description: "successfully fetched",
+    candidates: candidates
+  });
+} catch (error) {
+  res.status(404).json({
+    success: false,
+    description: "failed to fetch candidates",
+    error: error.message,
+  });
+}
+}

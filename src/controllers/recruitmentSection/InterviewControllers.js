@@ -1,5 +1,7 @@
 const mongoose = require("mongoose");
 const InterviewSchema = require("../../models/RecruitmentModule/InterviewModel");
+const candidateSchema = require("../../models/RecruitmentModule/CandidateModel");
+const employeeSchema = require("../../models/ReportersManagementModule/EmployeeModel");
 
 module.exports.createInterview = async (req, res) => {
   const {
@@ -14,7 +16,7 @@ module.exports.createInterview = async (req, res) => {
       return res.status(400).send("ID invalid : " + candidateID);
 
     const hour = InterviewTime.slice(0, 2);
-    const minute = InterviewTime.slice(3);
+    const minute = InterviewTime.slice(3, 5);
     const year = new Date(InterviewDate).getFullYear();
     const month = new Date(InterviewDate).getMonth();
     const day = new Date(InterviewDate).getDate();
@@ -91,13 +93,22 @@ module.exports.updateInterview = async (req, res) => {
 
     if (ExistsInterview) {
       if (new Date() < ExistsInterview.InterviewDate) {
-        const { candidateID, InterviewType, InterviewDate, InterviewerID } =
+        const { candidateID, InterviewType, InterviewDate, InterviewTime, InterviewerID } =
           req.body;
+
+          const hour = InterviewTime.slice(0, 2);
+          const minute = InterviewTime.slice(3, 5);
+          const year = new Date(InterviewDate).getFullYear();
+          const month = new Date(InterviewDate).getMonth();
+          const day = new Date(InterviewDate).getDate();
+      
+          const InterviewDateAndTime = new Date(year, month, day, hour, minute);
+
         const interview = {
           _id: req.params.id,
           candidateID,
           InterviewType,
-          InterviewDate,
+          InterviewDate : InterviewDateAndTime,
           InterviewerID,
         };
         const updatedInterview = await InterviewSchema.findByIdAndUpdate(
@@ -116,16 +127,9 @@ module.exports.updateInterview = async (req, res) => {
           description: "interview updated",
         });
       } else {
-        const { CandidateMarks } = req.body;
-
-        await InterviewSchema.updateOne(
-          { _id: req.params.id },
-          { $push: { CandidateMarks: CandidateMarks } }
-        );
-
-        res.status(201).json({
-          success: true,
-          description: "candidate marks updated in interview",
+        res.status(401).json({
+          success: false,
+          description: "interview can not updated. Interview Date has passed",
         });
       }
     }
@@ -150,21 +154,62 @@ module.exports.getInterviews = async (req, res) => {
             date.getFullYear(),
             date.getMonth(),
             date.getDate(),
-            date.getHours() - 6,
+            date.getHours() - 6
           ),
         ],
       },
       InterviewerID: {
-        $elemMatch: { 
-          id: id
+        $elemMatch: {
+          id: id,
         },
       },
     });
-    
+
+    let interviewList = [];
+    await Promise.all(
+      interviews.map(async (interview) => {
+        const {
+          _id,
+          candidateID,
+          InterviewDate,
+          InterviewType,
+          InterviewerID,
+        } = interview;
+        const candidate = await candidateSchema.findOne({ _id: candidateID });
+        let Interviewers =[];
+        await Promise.all(
+          InterviewerID.map(async(interviewer)=> {
+            Interviewers.push(await employeeSchema.findOne({ employeeID: interviewer.id }));
+          })
+
+        )
+        interviewList.push({
+          _id,
+          candidateID,
+          candidateName: candidate.candidateName,
+          InterviewDate: InterviewDate,
+          InterviewTime: new Date(
+            "1970-01-01T" +
+              new Date(InterviewDate).toTimeString().slice(0, 5) +
+              "Z"
+          ).toLocaleTimeString("en-US", {
+            timeZone: "UTC",
+            hour12: true,
+            hour: "numeric",
+            minute: "numeric",
+          }),
+          InterviewType,
+          Interviewers: Interviewers
+        });
+      })
+    );
+
+    //console.log(interviewList);
+
     res.status(201).json({
       success: true,
       description: "interviews are fetched successfully",
-      Interviews: interviews,
+      Interviews: interviewList,
     });
   } catch (error) {
     res.status(404).json({
