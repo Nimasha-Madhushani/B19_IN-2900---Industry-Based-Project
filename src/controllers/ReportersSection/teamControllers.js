@@ -10,12 +10,12 @@ const teamSchema = require("../../models/ReportersManagementModule/TeamModel");
 
 exports.addTeam = async (req, res) => {
   const { teamName, teamLeadID, teamMembers } = req.body; //?teamMembers
-
+console.log(req.body);
   const newTeam = new teamSchema({
     teamName,
     teamLeadID,
   });
-  console.log(teamMembers);
+
   try {
     const existingTeam = await teamSchema.findOne({ teamName: teamName });
 
@@ -72,6 +72,20 @@ exports.addTeam = async (req, res) => {
       { $set: { teamID: savedTeam._id } } //?
     );
 
+    // const findEmp = await employeeSchema.findOne({ employeeID: teamLeadID });
+
+    // //update team lead name in team
+    // const addLeadName = await teamSchema.findOneAndUpdate(
+    //   { teamLeadID: findEmp.employeeID },
+    //   {
+    //     $set: {
+    //       leadFirstName: findEmp.employeeFirstName,
+    //       leadLastName: findEmp.employeeLastName,
+    //       leaderProfPic: findEmp.profilePic,
+    //     },
+    //   }
+    // );
+
     let updateEmployeeCount = 0;
     if (teamMembers) {
       updateEmployeeCount = teamMembers.length; //?
@@ -96,7 +110,7 @@ exports.addTeam = async (req, res) => {
         })
       );
     }
-    if (savedTeam && !updateEmployeeCount && teamLeadUpdate) {
+    if (savedTeam && !updateEmployeeCount && teamLeadUpdate ) {
       return res
         .status(200)
         .json({ message: "Team added successfully and employee updated" });
@@ -235,25 +249,25 @@ exports.updateTeam = async (req, res) => {
 };
 //-------View all Teams-----------------------
 
-// exports.viewTeam = async (req, res) => {
-//   await teamSchema
-//     .find()
-//     .then((team) => {
-//       res.json({ state: true, Team: team });
-//     })
-//     .catch((err) => {
-//       res.json({ state: false, err: err });
-//     });
-// };
+exports.getTeam = async (req, res) => {
+  await teamSchema
+    .find()
+    .then((team) => {
+      res.json({ state: true, data: team });
+    })
+    .catch((err) => {
+      res.json({ state: false, err: err });
+    });
+};
 
-//view all team details
+//view all team details 
 
 exports.viewTeam = async (req, res) => {
   try {
     const newCollection = await teamSchema.aggregate([
       {
         $addFields: {
-          _id: { $toString: "$_id" },//converts the ObjectId of teams collecton to string
+          _id: { $toString: "$_id" }, //converts the ObjectId of teams collecton to string
         },
       },
       {
@@ -266,7 +280,7 @@ exports.viewTeam = async (req, res) => {
       },
       {
         $addFields: {
-          _id: { $toString: "$_id" },//converts the ObjectId of teams collecton to string
+          _id: { $toString: "$_id" }, //converts the ObjectId of teams collecton to string
         },
       },
 
@@ -284,5 +298,4 @@ exports.viewTeam = async (req, res) => {
     return res.status(404).json({ err: err.message });
   }
 };
-
 
