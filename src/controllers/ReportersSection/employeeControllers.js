@@ -26,7 +26,37 @@ const candidateSchema = require("../../models/RecruitmentModule/CandidateModel")
 //   }
 // };
 
-//-------View Employees----------------------------
+//-------View all Employees----------------------------
+exports.getallEmployees = async (req, res) => {
+  await employeeSchema
+    .find()
+    .then((employees) => {
+      res.status(200).json({ state: true, data: employees });
+    })
+    .catch((err) => {
+      res.status(400).json({ state: false, err: err });
+    });
+};
+
+//------------filter employees without teams------------------------------
+exports.getEmployees = async (req, res) => {
+  try {
+    let employees = [];
+    const filterEmp = await employeeSchema.find();
+    await Promise.all(
+      filterEmp.map(async (employee) => {
+        if (employee.teamID == "" || employee.teamID == undefined) {
+          employees.push(employee);
+        }
+      })
+    );
+    res.status(200).json({ state: true, data: employees });
+  } catch (err) {
+    res.status(400).json({ state: false, err: err });
+  }
+};
+
+//-------View Employees with acc & prof Qualification----------------------------
 
 exports.viewEmployees = async (req, res) => {
   try {
@@ -50,7 +80,6 @@ exports.viewEmployees = async (req, res) => {
       },
     ]);
     res.status(200).json({ data: collectionOne });
-   
   } catch (err) {
     return res.status(404).json({ err: err.message });
   }
@@ -160,12 +189,15 @@ exports.updateEmployeeProfile = async (req, res) => {
     companyEmail,
   };
   try {
+    console.log(req);
+
     const existingEmployee = await employeeSchema.findOne({ employeeID: id }); //???????
+    // console.log(existingEmployee);
 
     const candidate = await candidateSchema.findOne({
       _id: existingEmployee.candidateID,
     });
-
+    //console.log(candidate);
     let changeNIC = false;
     if (candidate.NIC != NIC) {
       await candidateSchema.updateOne(
