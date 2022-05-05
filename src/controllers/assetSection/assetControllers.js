@@ -20,12 +20,12 @@ exports.createAsset = async (req,res) => {
     })
     const duplicateAssetID = await Asset.findOne({ assetID });
     if(duplicateAssetID)
-        return res.status(400).json({ message: "Asset ID already exists" });
+        return res.status(200).json({ message: "Asset ID already exists",success:false });
     
     await newAsset.save().then(()=>{
-        res.json("Asset has successfully added!")
+        res.status(200).json({message: "Asset has successfully added!",success:true})
     }).catch((err)=>{
-        res.status(500).json({ message: "Asset has not inserted!" });
+        res.status(500).json({ message: "Asset has not inserted!",error:err.message, success:"false1" });
     })
 }
 
