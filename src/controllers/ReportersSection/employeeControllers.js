@@ -46,10 +46,21 @@ exports.getEmployees = async (req, res) => {
     await Promise.all(
       filterEmp.map(async (employee) => {
         if (employee.teamID == "" || employee.teamID == undefined) {
-          employees.push(employee);
+          const {
+            employeeID,
+            employeeFirstName,
+            employeeLastName,
+            profilePic,
+          } = employee;
+          employees.push({
+            employeeID,
+            employeeName: employeeFirstName + " " + employeeLastName,
+            profilePic,
+          });
         }
       })
     );
+
     res.status(200).json({ state: true, data: employees });
   } catch (err) {
     res.status(400).json({ state: false, err: err });
