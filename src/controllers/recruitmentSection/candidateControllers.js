@@ -38,26 +38,25 @@ module.exports.createCandidate = async (req, res) => {
 
 module.exports.findCandidate = async (req, res) => {
   const { NIC } = req.params;
-
   try {
     if (!NIC) {
-     return res.status(400).json({
+      return res.status(400).json({
         success: false,
         description: "NIC have not received",
       });
     }
-      const candidate = await candidateSchema.findOne({ NIC });
-      if (!candidate) {
-        return res
-          .status(404)
-          .json({ success: false, message: "This candidate does not exists" });
-      }
+    const candidate = await candidateSchema.find({ NIC: { $regex: NIC } });
+    if (!candidate) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Candidate does not exists" });
+    }
 
-      res.status(200).json({
-        success: true,
-        description: "candidate found",
-        candidate: candidate,
-      });
+    res.status(200).json({
+      success: true,
+      description: "candidate found",
+      candidate: candidate,
+    });
   } catch (error) {
     res.status(404).json({
       success: false,
@@ -101,3 +100,26 @@ module.exports.updateCandidate = async (req, res) => {
     });
   }
 };
+
+
+module.exports.getAllCandidates = async(req, res) =>{
+try {
+  const candidates = await candidateSchema.find();
+  if(!candidates) {
+    return res
+    .status(404)
+    .json({ success: false, description: "failed to fetch candidates" });
+  }
+  res.status(200).json({
+    success: true,
+    description: "successfully fetched",
+    candidates: candidates
+  });
+} catch (error) {
+  res.status(404).json({
+    success: false,
+    description: "failed to fetch candidates",
+    error: error.message,
+  });
+}
+}

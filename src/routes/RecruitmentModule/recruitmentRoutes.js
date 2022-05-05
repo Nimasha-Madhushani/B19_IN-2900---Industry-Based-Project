@@ -4,6 +4,7 @@ const {
   createCandidate,
   findCandidate,
   updateCandidate,
+  getAllCandidates,
 } = require("../../controllers/recruitmentSection/candidateControllers");
 const {
   createInterview,
@@ -16,19 +17,15 @@ const verifyRoles = require("../../middleware/verifyUserRole");
 const router = express.Router();
 
 // routes for the candidates
-router.post("/candidate/create", verifyRoles([userRoles.HR]), createCandidate);
-router.get("/candidate/:NIC", verifyRoles([userRoles.HR]), findCandidate);
-router.put("/candidate/:id", verifyRoles([userRoles.HR]), updateCandidate);
+router.post("/candidate/create", createCandidate);
+router.get("/candidate/:NIC", findCandidate);
+router.put("/candidate/:id", updateCandidate);
+router.get("/candidates", getAllCandidates); // need to make this right(It should change to fetch last two months updated candidate)
 
 // routes for the interviews
-router.post("/interview/create", verifyRoles([userRoles.HR]), createInterview);
-router.delete("/interview/:id", verifyRoles([userRoles.HR]), cancelInterview);
-router.put("/interview/:id", verifyRoles([userRoles.HR]), updateInterview);
-router.get(
-  "/interview/:id",
-  verify,
-  verifyRoles([userRoles.HR, userRoles.CTO, userRoles.TeamLeader]),
-  getInterviews
-);
+router.post("/interview/create", createInterview);
+router.delete("/interview/:id", cancelInterview);
+router.put("/interview/:id", updateInterview);
+router.get("/interview/:id", getInterviews);
 
 module.exports = router;

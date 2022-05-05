@@ -11,12 +11,12 @@ exports.loginEmployee = async (req, res) => {
     const oldUser = await sensitiveDetailsSchema.findOne({ userName });
 
     if (!oldUser)
-      return res.status(404).json({ message: "User doesn't exist" });
+      return res.status(200).json({ message: "User doesn't exist" , success:false});
 
     const isPasswordCorrect = await bcrypt.compare(password, oldUser.password);
 
     if (!isPasswordCorrect) {
-      return res.status(400).json({ message: "Invalid credentials" });
+      return res.status(200).json({ message: "Invalid credentials", success:false});
     }
     const userProfile = await employeeSchema.findOne({
       employeeID: oldUser.employeeID,
@@ -43,6 +43,7 @@ exports.loginEmployee = async (req, res) => {
       message: "User has successfully sign in!",
       user: userProfile,
       accessToken: accessToken,
+      success:true,
     });
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -57,9 +58,9 @@ exports.logOutEmployee = async (req, res) => {
       { token : refreshToken },
       { $set: { token: "", lastSeen : new Date() } }
     );
-    res.status(201).json({message : "Successfully log out..!"})
+    res.status(201).json({message : "Successfully log out..!",success:true})
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({ message: error.message,success:false });
   }
 
 };
