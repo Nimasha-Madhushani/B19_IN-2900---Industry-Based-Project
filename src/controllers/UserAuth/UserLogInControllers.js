@@ -11,12 +11,16 @@ exports.loginEmployee = async (req, res) => {
     const oldUser = await sensitiveDetailsSchema.findOne({ userName });
 
     if (!oldUser)
-      return res.status(200).json({ message: "User doesn't exist" , success:false});
+      return res
+        .status(200)
+        .json({ message: "User doesn't exist", success: false });
 
     const isPasswordCorrect = await bcrypt.compare(password, oldUser.password);
 
     if (!isPasswordCorrect) {
-      return res.status(200).json({ message: "Invalid credentials", success:false});
+      return res
+        .status(200)
+        .json({ message: "Invalid credentials", success: false });
     }
     const userProfile = await employeeSchema.findOne({
       employeeID: oldUser.employeeID,
@@ -34,16 +38,31 @@ exports.loginEmployee = async (req, res) => {
       { employeeID: userProfile.employeeID },
       { $set: { token: refreshToken } }
     );
-    //refreshTokens.push(refreshToken);
+
+    const {
+      _id,
+      employeeID,
+      employeeFirstName,
+      employeeLastName,
+      jobRole,
+      profilePic
+    } = userProfile;
 
     res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
     });
     res.status(200).json({
       message: "User has successfully sign in!",
-      user: userProfile,
+      user: {
+        _id,
+        employeeID,
+        employeeFirstName,
+        employeeLastName,
+        jobRole,
+        profilePic
+      },
       accessToken: accessToken,
-      success:true,
+      success: true,
     });
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -55,12 +74,11 @@ exports.logOutEmployee = async (req, res) => {
   const { refreshToken } = req.body;
   try {
     await employeeSchema.updateOne(
-      { token : refreshToken },
-      { $set: { token: "", lastSeen : new Date() } }
+      { token: refreshToken },
+      { $set: { token: "", lastSeen: new Date() } }
     );
-    res.status(201).json({message : "Successfully log out..!",success:true})
+    res.status(201).json({ message: "Successfully log out..!", success: true });
   } catch (error) {
-    res.status(500).json({ message: error.message,success:false });
+    res.status(500).json({ message: error.message, success: false });
   }
-
 };
