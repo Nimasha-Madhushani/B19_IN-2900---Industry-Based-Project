@@ -19,19 +19,26 @@ exports.viewAllQuestions = async (req, res) => {
 //create Questions
 exports.createQuestions = async (req, res) => {
 
-    const { QuestionID, QuestionCatogory, QuestionBody } = req.body;
+    console.log("1");
 
+    const { QuestionID, QuestionCatogory, QuestionBody } = req.body;
+    console.log("****req.body*****");
+    console.log(req.body);
     const newQuestion = new Question({ QuestionID, QuestionCatogory, QuestionBody });
 
     const duplicateQuestionID = await Question.findOne({ QuestionID });
     if (duplicateQuestionID) {
         return res.status(400).json({ message: "QuestionID already exists" });
     }
-
+    console.log(duplicateQuestionID);
     await newQuestion.save().then(() => {
-        res.json("New Question created")
+        res.json("New Question created");
+        console.log("******newQuestion******");
+        console.log("newQuestion");
     }).catch((err) => {
         res.status(400).json({ message: "Question not created", error: err.message });
     })
 }
+
+
 

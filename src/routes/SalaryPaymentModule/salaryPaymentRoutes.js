@@ -30,7 +30,7 @@ const {
 
 
 // routes for the currunt salary payment
-router.get('/currentSalary/', viewCurrentSalarySheet); //view all current payments
+router.get('/currentSalary', viewCurrentSalarySheet); //view all current payment
 router.post('/currentSalary/create', createCurrentSalarySheet);
 router.get('/currentSalary/:EmployeeID', findCurrentSalarySheet);
 router.patch('/currentSalary/update/:EmployeeID', updateCurrentSalarySheet);
@@ -41,7 +41,7 @@ router.delete('/currentSalary/delete/:EmployeeID', deleteCurrentSalarySheet);
 
 
 // routes for the summary salary payment
-router.get('/summarySalary/', viewSummarySalarySheet); //view all summary payments
+router.get('/summarySalary', viewSummarySalarySheet); //view all summary payments
 router.get('/summarySalary/:EmployeeID', findSummarySalarySheetByEid);
 
 
