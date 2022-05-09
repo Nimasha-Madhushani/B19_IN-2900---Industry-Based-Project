@@ -26,7 +26,8 @@ exports.viewAllPapersList = async (req, res) => {
         if (!fullPapers) {
             return res.status(404).json({ message: "paper list has not fetch successfully" })
         }
-        res.status(201).json({ message: "paper list has fetch successfully", paperList: fullPapers })
+        // res.status(201).json({ message: "paper list has fetch successfully", paperList: fullPapers })
+        res.status(201).json(fullPapers)
 
     } catch (error) {
         res.status(404).json({ message: "paper list has not fetch successfully", error: error.message })

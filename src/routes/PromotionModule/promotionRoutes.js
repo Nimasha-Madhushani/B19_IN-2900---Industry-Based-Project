@@ -6,7 +6,7 @@ const router = express.Router();
 const { viewAllQuestions, createQuestions } = require("../../controllers/promotionSection/questionControllers");
 
 
-//importing controllers of
+//importing controllers of papper
 const {
     viewAllPapersList,
     createPaper,
@@ -35,13 +35,13 @@ const {
 
 
 // routes for the Questions
-router.get('/Questions/', viewAllQuestions); //view all questions
+router.get('/Questions', viewAllQuestions); //view all questions
 router.post('/Questions/create', createQuestions);//create new questions
 
 
 
 // routes for the paper
-router.get('/Paper/', viewAllPapersList); //view all papers created
+router.get('/Paper', viewAllPapersList); //view all papers created
 router.post('/Paper/createPaper', createPaper);//create new paper
 router.patch('/Paper/addMoreQuestions/:PaperID', addMoreQuestions);
 router.patch('/Paper/updatePaperDetails/:PaperID', updatePaperDetails);

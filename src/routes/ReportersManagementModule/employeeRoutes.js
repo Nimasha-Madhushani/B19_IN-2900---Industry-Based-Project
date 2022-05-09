@@ -3,13 +3,17 @@ const router = require("express").Router();
 const {
   createEmployee,
   viewEmployees,
+  getEmployees,
+  filterEmployee,
   updateEmployeeProfile,
+  getallEmployees,
 } = require("../../controllers/ReportersSection/employeeControllers");
 
 const {
   addTeam,
   viewTeam,
   updateTeam,
+  getTeam,
 } = require("../../controllers/ReportersSection/teamControllers");
 
 const {
@@ -28,17 +32,25 @@ const {
 
 //----------------employee controller------------------------------------------
 
+// router.get("/filterEmployee/:empId",filterEmployee)
+
 router.get("/", viewEmployees);
+
+router.get("/getall",getallEmployees)
+
+router.get("/get",getEmployees)
 
 router.post("/add", createEmployee);
 
-router.put("/update/:id", updateEmployeeProfile);//update own profile(NIC disable)
+router.put("/update/:id", updateEmployeeProfile); //update own profile(NIC disable)
 
-router.put("/update/employee/:id",  updateEmployeeProfile);//only HR can access
+router.put("/update/employee/:id", updateEmployeeProfile); //only HR can access
 
 //----------------------teamController------------------------------------------
 
 router.get("/viewTeam", viewTeam);
+
+router.get("/getTeam",getTeam)
 
 router.post("/teamAdd", addTeam);
 
@@ -48,7 +60,7 @@ router.put("/updateTeam/:id", updateTeam);
 
 router.post("/addProduct", addProduct);
 
-router.post("/updateProduct/:id", updateProduct);
+router.put("/updateProduct/:id", updateProduct);
 
 router.get("/viewProducts", viewProducts);
 
