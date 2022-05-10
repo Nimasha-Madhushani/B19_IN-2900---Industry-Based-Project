@@ -34,7 +34,7 @@ module.exports.createInterview = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      description: "Interview created for " + InterviewDate,
+      message: "Interview created successfully for " + InterviewDate,
       candidateID: savedInterview.candidateID,
     });
   } catch (error) {
@@ -55,11 +55,10 @@ module.exports.cancelInterview = async (req, res) => {
 
     if (interview) {
       if (new Date() < interview.InterviewDate) {
-        const deletedInterview = await InterviewSchema.findByIdAndDelete(id);
+        await InterviewSchema.findByIdAndDelete(id);
         res.status(201).json({
           success: true,
-          description: "Interview canceled",
-          deletedInterview: deletedInterview,
+          message: "Interview successfully canceled",
         });
       } else {
         res.status(404).json({
@@ -93,22 +92,27 @@ module.exports.updateInterview = async (req, res) => {
 
     if (ExistsInterview) {
       if (new Date() < ExistsInterview.InterviewDate) {
-        const { candidateID, InterviewType, InterviewDate, InterviewTime, InterviewerID } =
-          req.body;
+        const {
+          candidateID,
+          InterviewType,
+          InterviewDate,
+          InterviewTime,
+          InterviewerID,
+        } = req.body;
 
-          const hour = InterviewTime.slice(0, 2);
-          const minute = InterviewTime.slice(3, 5);
-          const year = new Date(InterviewDate).getFullYear();
-          const month = new Date(InterviewDate).getMonth();
-          const day = new Date(InterviewDate).getDate();
-      
-          const InterviewDateAndTime = new Date(year, month, day, hour, minute);
+        const hour = InterviewTime.slice(0, 2);
+        const minute = InterviewTime.slice(3, 5);
+        const year = new Date(InterviewDate).getFullYear();
+        const month = new Date(InterviewDate).getMonth();
+        const day = new Date(InterviewDate).getDate();
+
+        const InterviewDateAndTime = new Date(year, month, day, hour, minute);
 
         const interview = {
           _id: req.params.id,
           candidateID,
           InterviewType,
-          InterviewDate : InterviewDateAndTime,
+          InterviewDate: InterviewDateAndTime,
           InterviewerID,
         };
         const updatedInterview = await InterviewSchema.findByIdAndUpdate(
@@ -124,7 +128,7 @@ module.exports.updateInterview = async (req, res) => {
         }
         res.status(201).json({
           success: true,
-          description: "interview updated",
+          message: "Interview successfully updated",
         });
       } else {
         res.status(401).json({
@@ -176,17 +180,17 @@ module.exports.getInterviews = async (req, res) => {
           InterviewerID,
         } = interview;
         const candidate = await candidateSchema.findOne({ _id: candidateID });
-        let Interviewers =[];
+        let Interviewers = [];
         await Promise.all(
-          InterviewerID.map(async(interviewer)=> {
-            Interviewers.push(await employeeSchema.findOne({ employeeID: interviewer.id }));
+          InterviewerID.map(async (interviewer) => {
+            Interviewers.push(
+              await employeeSchema.findOne({ employeeID: interviewer.id })
+            );
           })
-
-        )
+        );
         interviewList.push({
           _id,
-          candidateID,
-          candidateName: candidate.candidateName,
+          candidate: candidate,
           InterviewDate: InterviewDate,
           InterviewTime: new Date(
             "1970-01-01T" +
@@ -199,7 +203,7 @@ module.exports.getInterviews = async (req, res) => {
             minute: "numeric",
           }),
           InterviewType,
-          Interviewers: Interviewers
+          Interviewers: Interviewers,
         });
       })
     );
@@ -215,6 +219,46 @@ module.exports.getInterviews = async (req, res) => {
     res.status(404).json({
       success: false,
       description: "interviews are failed to fetched",
+      error: error.message,
+    });
+  }
+};
+
+module.exports.markedCandidate = async (req, res) => {
+  const { id } = req.params;
+  const  marks  = req.body;
+  
+  try {
+    
+    const isEmpty = Object.values(marks).every(x => (x !== null && x !== ''));
+   
+    if (!isEmpty) {
+      return res.status(404).json({
+        success: false,
+        description: "Marks are failed to Update. All field need be filled",
+      });
+    }
+
+    const updatedInterview = await InterviewSchema.updateOne(
+      { _id: id },
+      { $push: { CandidateMarks: marks } },
+      {new: true}
+    );
+    
+    if (!updatedInterview) {
+     return res.status(404).json({
+        success: false,
+        description: "Marks are failed to Update",
+      });
+    }
+    res.status(200).json({
+      success: true,
+      message: "Marks are successfully Updated",
+    });
+  } catch (error) {
+    res.status(404).json({
+      success: false,
+      description: "Marks are failed to Update",
       error: error.message,
     });
   }
