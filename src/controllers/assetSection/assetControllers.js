@@ -239,4 +239,22 @@ exports.isAssigned = async(req,res)=>{
 
 }
 
+exports.updateAsset = async(req,res) =>{
+    let { id } = req.params;
+    const { assetCategory, model, serialNumber, status } = req.body;
+    const updateAsset = { 
+        assetCategory, 
+        model, 
+        serialNumber, 
+        status 
+    }
+    const update = await Asset.findByIdAndUpdate(id, updateAsset)
+    .then(()=>{
+        res.status(200).send({message:"Updated successfully",success:true})
+    }).catch((err)=>{
+        console.log(err);
+        res.status(500).send({message:"Updated Incomplete", success:false,err:err.message})
+    })
+}
+
 

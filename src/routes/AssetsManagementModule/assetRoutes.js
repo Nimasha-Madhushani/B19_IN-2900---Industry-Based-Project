@@ -11,7 +11,8 @@ const {
   assignPerson,
   releaseFault,
   assetsByCategory,
-  isAssigned
+  isAssigned,
+  updateAsset
 } = require("../../controllers/assetSection/assetControllers");
 //create assets
 router.post("/add", createAsset);
@@ -48,5 +49,7 @@ router.get("/category/:assetCategory", assetsByCategory);
 
 //find whether an employee has assigned for an asset current time or given it back
 router.get("/isAssigned",isAssigned)
+
+router.patch("/update/:id",updateAsset)
 
 module.exports = router;
