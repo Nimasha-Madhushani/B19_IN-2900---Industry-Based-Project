@@ -1,5 +1,7 @@
 const mongoose = require("mongoose");
 const InterviewSchema = require("../../models/RecruitmentModule/InterviewModel");
+const candidateSchema = require("../../models/RecruitmentModule/CandidateModel");
+const employeeSchema = require("../../models/ReportersManagementModule/EmployeeModel");
 
 module.exports.createInterview = async (req, res) => {
   const {
@@ -14,7 +16,7 @@ module.exports.createInterview = async (req, res) => {
       return res.status(400).send("ID invalid : " + candidateID);
 
     const hour = InterviewTime.slice(0, 2);
-    const minute = InterviewTime.slice(3);
+    const minute = InterviewTime.slice(3, 5);
     const year = new Date(InterviewDate).getFullYear();
     const month = new Date(InterviewDate).getMonth();
     const day = new Date(InterviewDate).getDate();
@@ -32,7 +34,7 @@ module.exports.createInterview = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      description: "Interview created for " + InterviewDate,
+      message: "Interview created successfully for " + InterviewDate,
       candidateID: savedInterview.candidateID,
     });
   } catch (error) {
@@ -53,11 +55,10 @@ module.exports.cancelInterview = async (req, res) => {
 
     if (interview) {
       if (new Date() < interview.InterviewDate) {
-        const deletedInterview = await InterviewSchema.findByIdAndDelete(id);
+        await InterviewSchema.findByIdAndDelete(id);
         res.status(201).json({
           success: true,
-          description: "Interview canceled",
-          deletedInterview: deletedInterview,
+          message: "Interview successfully canceled",
         });
       } else {
         res.status(404).json({
@@ -91,13 +92,27 @@ module.exports.updateInterview = async (req, res) => {
 
     if (ExistsInterview) {
       if (new Date() < ExistsInterview.InterviewDate) {
-        const { candidateID, InterviewType, InterviewDate, InterviewerID } =
-          req.body;
+        const {
+          candidateID,
+          InterviewType,
+          InterviewDate,
+          InterviewTime,
+          InterviewerID,
+        } = req.body;
+
+        const hour = InterviewTime.slice(0, 2);
+        const minute = InterviewTime.slice(3, 5);
+        const year = new Date(InterviewDate).getFullYear();
+        const month = new Date(InterviewDate).getMonth();
+        const day = new Date(InterviewDate).getDate();
+
+        const InterviewDateAndTime = new Date(year, month, day, hour, minute);
+
         const interview = {
           _id: req.params.id,
           candidateID,
           InterviewType,
-          InterviewDate,
+          InterviewDate: InterviewDateAndTime,
           InterviewerID,
         };
         const updatedInterview = await InterviewSchema.findByIdAndUpdate(
@@ -113,19 +128,12 @@ module.exports.updateInterview = async (req, res) => {
         }
         res.status(201).json({
           success: true,
-          description: "interview updated",
+          message: "Interview successfully updated",
         });
       } else {
-        const { CandidateMarks } = req.body;
-
-        await InterviewSchema.updateOne(
-          { _id: req.params.id },
-          { $push: { CandidateMarks: CandidateMarks } }
-        );
-
-        res.status(201).json({
-          success: true,
-          description: "candidate marks updated in interview",
+        res.status(401).json({
+          success: false,
+          description: "interview can not updated. Interview Date has passed",
         });
       }
     }
@@ -150,26 +158,107 @@ module.exports.getInterviews = async (req, res) => {
             date.getFullYear(),
             date.getMonth(),
             date.getDate(),
-            date.getHours() - 6,
+            date.getHours() - 6
           ),
         ],
       },
       InterviewerID: {
-        $elemMatch: { 
-          id: id
+        $elemMatch: {
+          id: id,
         },
       },
     });
-    
+
+    let interviewList = [];
+    await Promise.all(
+      interviews.map(async (interview) => {
+        const {
+          _id,
+          candidateID,
+          InterviewDate,
+          InterviewType,
+          InterviewerID,
+        } = interview;
+        const candidate = await candidateSchema.findOne({ _id: candidateID });
+        let Interviewers = [];
+        await Promise.all(
+          InterviewerID.map(async (interviewer) => {
+            Interviewers.push(
+              await employeeSchema.findOne({ employeeID: interviewer.id })
+            );
+          })
+        );
+        interviewList.push({
+          _id,
+          candidate: candidate,
+          InterviewDate: InterviewDate,
+          InterviewTime: new Date(
+            "1970-01-01T" +
+              new Date(InterviewDate).toTimeString().slice(0, 5) +
+              "Z"
+          ).toLocaleTimeString("en-US", {
+            timeZone: "UTC",
+            hour12: true,
+            hour: "numeric",
+            minute: "numeric",
+          }),
+          InterviewType,
+          Interviewers: Interviewers,
+        });
+      })
+    );
+
+    //console.log(interviewList);
+
     res.status(201).json({
       success: true,
       description: "interviews are fetched successfully",
-      Interviews: interviews,
+      Interviews: interviewList,
     });
   } catch (error) {
     res.status(404).json({
       success: false,
       description: "interviews are failed to fetched",
+      error: error.message,
+    });
+  }
+};
+
+module.exports.markedCandidate = async (req, res) => {
+  const { id } = req.params;
+  const  marks  = req.body;
+  
+  try {
+    
+    const isEmpty = Object.values(marks).every(x => (x !== null && x !== ''));
+   
+    if (!isEmpty) {
+      return res.status(404).json({
+        success: false,
+        description: "Marks are failed to Update. All field need be filled",
+      });
+    }
+
+    const updatedInterview = await InterviewSchema.updateOne(
+      { _id: id },
+      { $push: { CandidateMarks: marks } },
+      {new: true}
+    );
+    
+    if (!updatedInterview) {
+     return res.status(404).json({
+        success: false,
+        description: "Marks are failed to Update",
+      });
+    }
+    res.status(200).json({
+      success: true,
+      message: "Marks are successfully Updated",
+    });
+  } catch (error) {
+    res.status(404).json({
+      success: false,
+      description: "Marks are failed to Update",
       error: error.message,
     });
   }

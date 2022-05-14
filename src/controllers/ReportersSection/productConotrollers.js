@@ -12,24 +12,23 @@ exports.addProduct = async (req, res) => {
   const { productID, productName, description, teamNames } = req.body;
 
   const findTeam = await teamSchema.findOne({ teamName: teamNames });
-  if(!findTeam){
+  if (!findTeam) {
     return res
-    .status(400)
-    .json("team is not existing, product cannot be created")
+      .status(400)
+      .json("team is not existing, product cannot be created");
   }
-  
-  
+
   const newProduct = new productSchema({
     productID,
     productName,
     description,
     teamID: findTeam._id, //frontend
   });
-  
-
 
   const existingProduct = await productSchema.findOne({ productID: productID });
-  const existingProductName=await productSchema.findOne({productName:productName});
+  const existingProductName = await productSchema.findOne({
+    productName: productName,
+  });
 
   const teamProduct = await productSchema.findOne({ teamID: findTeam._id });
 
@@ -62,12 +61,13 @@ exports.updateProduct = async (req, res) => {
     productID,
     productName,
     description,
-    //teamID,
+    // teamID,
   };
 
+  
   try {
-    const existingProduct = await productSchema.findById(id);
-    const filterProducts = await productSchema.find({ _id: { $ne: id } }); //except the product which is going to update
+    const existingProduct = await productSchema.findOne({productID:id});
+    const filterProducts = await productSchema.find({ _id: { $ne: existingProduct._id } }); //except the product which is going to update
 
     let chekFalg = false;
     await Promise.all(
@@ -102,12 +102,28 @@ exports.updateProduct = async (req, res) => {
 //---------------view all products-------------------------
 
 exports.viewProducts = async (req, res) => {
-  await productSchema
-    .find()
-    .then((product) => {
-      res.json({ state: true, data: product });
-    })
-    .catch((err) => {
-      res.json({ state: false, err: err });
-    });
+  try {
+    const products = await productSchema.find();
+
+    let allProduct = [];
+    await Promise.all(
+      products.map(async (product) => {
+        const { productID, productName, description, teamID } = product;
+        const team = await teamSchema.findOne({ _id: teamID });
+        allProduct.push({
+        
+          productID,
+          productName,
+          description,
+          teamID,
+          teamName: team.teamName,
+        });
+      })
+    );
+    // .then((product) => {
+    res.json({ state: true, data: allProduct });
+    // })
+  } catch (err) {
+    res.json({ state: false, err: err });
+  }
 };

@@ -20,7 +20,8 @@ exports.viewCurrentEmployeeSalarySheet = async (req, res) => {
         if (currentEmployeeSalarySheets == null) {
             return res.status(400).json({ message: "Current salary sheet not found" });
         }
-        res.status(200).json({ message: "Successfull", currentEmployeeSalarySheets });
+        //res.status(200).json({ message: "Successfull", currentEmployeeSalarySheets });
+        res.status(200).json(currentEmployeeSalarySheets);
     } catch (error) {
         res.status(404).json({ message: "Error", error })
     }

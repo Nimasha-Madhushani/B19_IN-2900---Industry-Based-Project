@@ -20,12 +20,12 @@ exports.createAsset = async (req,res) => {
     })
     const duplicateAssetID = await Asset.findOne({ assetID });
     if(duplicateAssetID)
-        return res.status(400).json({ message: "Asset ID already exists" });
+        return res.status(200).json({ message: "Asset ID already exists",success:false });
     
     await newAsset.save().then(()=>{
-        res.json("Asset has successfully added!")
+        res.status(200).json({message: "Asset has successfully added!",success:true})
     }).catch((err)=>{
-        res.status(500).json({ message: "Asset has not inserted!" });
+        res.status(500).json({ message: "Asset has not inserted!",error:err.message, success:"false1" });
     })
 }
 
@@ -237,6 +237,24 @@ exports.isAssigned = async(req,res)=>{
     }
     
 
+}
+
+exports.updateAsset = async(req,res) =>{
+    let { id } = req.params;
+    const { assetCategory, model, serialNumber, status } = req.body;
+    const updateAsset = { 
+        assetCategory, 
+        model, 
+        serialNumber, 
+        status 
+    }
+    const update = await Asset.findByIdAndUpdate(id, updateAsset)
+    .then(()=>{
+        res.status(200).send({message:"Updated successfully",success:true})
+    }).catch((err)=>{
+        console.log(err);
+        res.status(500).send({message:"Updated Incomplete", success:false,err:err.message})
+    })
 }
 
 
