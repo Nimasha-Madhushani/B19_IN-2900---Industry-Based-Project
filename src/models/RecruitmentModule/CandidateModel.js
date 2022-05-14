@@ -17,6 +17,10 @@ const candidateSchema = new mongoose.Schema(
       required: [true, "Please enter the phone number"],
       unique: true,
     },
+    appliedPosition : {
+      type: String,
+      required: [true, "Please select the applied position"],
+    },
     email: {
       type: String,
       required: [true, "Please enter the phone number"],

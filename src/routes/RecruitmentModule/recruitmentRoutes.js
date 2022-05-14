@@ -11,6 +11,7 @@ const {
   cancelInterview,
   updateInterview,
   getInterviews,
+  markedCandidate,
 } = require("../../controllers/recruitmentSection/InterviewControllers");
 const verify = require("../../middleware/VerifyJWT");
 const verifyRoles = require("../../middleware/verifyUserRole");
@@ -27,5 +28,6 @@ router.post("/interview/create", createInterview);
 router.delete("/interview/:id", cancelInterview);
 router.put("/interview/:id", updateInterview);
 router.get("/interview/:id", getInterviews);
+router.put("/interview/start/:id", markedCandidate);
 
 module.exports = router;
