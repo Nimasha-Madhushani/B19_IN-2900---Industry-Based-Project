@@ -9,17 +9,6 @@ const Employee = require("../../models/ReportersManagementModule/EmployeeModel")
 
 //view all current salary sheets
 exports.viewCurrentSalarySheet = async (req, res) => {
-    // try {
-    //     const currentSalarySheet = await CurrentSheet.find();
-    //     if (!currentSalarySheet) {
-    //         res.status(404).json({ message: "Current salary sheets not foundmmm", error: err.message })
-    //     }
-    //     res.status(200).json({ message: "Current salary sheets found", currentSalarySheet });
-    //     console.log("view current salary sheet executed")
-    // } catch (err) {
-    //     res.status(404).json({ message: "Current salary sheets not found", error: err.message })
-    // }
-
     try {
         const currentSalarySheet = await CurrentSheet.find();
         if (!currentSalarySheet) {
@@ -41,7 +30,6 @@ exports.createCurrentSalarySheet = async (req, res) => {
         return res.status(200).json({ message: "please fill all fields", success: false });
     }
 
-    console.log("=====");
     const ETF = (req.body.BasicSalary + req.body.InternetAllowance + req.body.VehicleAllowance) * 0.03;
     const CompanyEPF = (req.body.BasicSalary + req.body.InternetAllowance + req.body.VehicleAllowance) * 0.12;
     const EmoloyeeEpf = (req.body.BasicSalary + req.body.InternetAllowance + req.body.VehicleAllowance) * 0.08;
@@ -59,8 +47,6 @@ exports.createCurrentSalarySheet = async (req, res) => {
 
         const existsEmployeeId = await Employee.findOne({ employeeID: EmployeeID });
         await newCurrentSalarySheet.save();
-        // res.status(200).json({ message: "New current salary sheet created!", newCurrentSalarySheet });
-        // res.status(200).json(newCurrentSalarySheet);
         res.status(200).json({ message: "Salary details has successfully added!", success: true });
     } catch (error) {
         res.status(400).json({ message: "Salary details not inserted!", success: false });
@@ -133,27 +119,6 @@ exports.updateCurrentSalarySheet = async (req, res) => {
 };
 
 
-// exports.updateCurrentSalarySheet = async (req, res) => {
-//     // var empID = req.params.EmployeeID;
-//     const { EmployeeID } = req.params;
-
-//     const employeeToBeUpdated = await CurrentSheet.findOne({ EmployeeID: EmployeeID });
-//     if (employeeToBeUpdated === null) {
-//         return res.status(404).json({ success: false });
-//     }
-//     try {
-//         const filter = { EmployeeID: EmployeeID };
-//         const update = req.body;
-
-//         let updateData = await CurrentSheet.findOneAndUpdate(filter, update);
-
-//         res.status(200).json({ message: "SUccessfully updated current salary sheet", success: true });
-//     } catch (error) {
-//         res.status(400).json({ message: "Fail to update", success: false });
-//     }
-// };
-
-
 //delete current salary record 
 exports.deleteCurrentSalarySheet = async (req, res) => {
     // console.log("1");
@@ -213,10 +178,3 @@ const job = schedule.scheduleJob('0 0 26 * * ', async function (req, res) {
 });
 
 
-//test
-// const rule = new schedule.RecurrenceRule();
-// rule.minute = 1;
-
-// const job = schedule.scheduleJob(rule, function () {
-//     console.log('Working schedule');
-// });

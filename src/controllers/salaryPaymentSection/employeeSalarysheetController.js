@@ -28,21 +28,44 @@ exports.viewCurrentEmployeeSalarySheet = async (req, res) => {
 }
 
 //finds employee salary sheets by month on summary salary table
-exports.findEmployeeSalarySheetByMonth = async (req, res) => {
-    try {
-        const eid = req.params.EmployeeID;
-        const month = req.params.Month;
+// exports.findEmployeeSalarySheetByMonth = async (req, res) => {
+//     try {
+//         console.log("2")
+//         const eid = req.params.EmployeeID;
+//         const month = req.params.Month;
 
+//         const existsEmployeeId = await Employee.findOne({ employeeID: eid });
+//         if (existsEmployeeId == null) {
+//             return res.status(400).json({ message: "Invalid EmployeeID. Enter a valid employee ID" });
+//         }
+
+//         const employeeMonthlySalarySheet = await summarySheet.find({ EmployeeID: eid, Month: month });
+//         if (employeeMonthlySalarySheet == null) {
+//             return res.status(400).json({ message: "Salary sheet not found" });
+//         }
+//         res.status(200).json({ message: "Successfull", employeeMonthlySalarySheet });
+//     } catch (error) {
+//         res.status(500).send({ message: "Invalid Employee ID or Month", error: err.message });
+//     }
+// }
+
+//
+exports.findEmployeeSalarySheet = async (req, res) => {
+
+    const eid = req.params.EmployeeID;
+
+    try {
         const existsEmployeeId = await Employee.findOne({ employeeID: eid });
         if (existsEmployeeId == null) {
             return res.status(400).json({ message: "Invalid EmployeeID. Enter a valid employee ID" });
         }
 
-        const employeeMonthlySalarySheet = await summarySheet.find({ EmployeeID: eid, Month: month });
-        if (employeeMonthlySalarySheet == null) {
+        const employeeSalarySheet = await summarySheet.find({ EmployeeID: eid });
+        if (employeeSalarySheet == null) {
             return res.status(400).json({ message: "Salary sheet not found" });
         }
-        res.status(200).json({ message: "Successfull", employeeMonthlySalarySheet });
+        res.status(200).json(employeeSalarySheet);
+
     } catch (error) {
         res.status(500).send({ message: "Invalid Employee ID or Month", error: err.message });
     }

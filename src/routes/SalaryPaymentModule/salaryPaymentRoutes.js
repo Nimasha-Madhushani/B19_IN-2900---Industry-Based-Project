@@ -25,7 +25,8 @@ const {
 //importing controllers of employee salary payment
 const {
     viewCurrentEmployeeSalarySheet,
-    findEmployeeSalarySheetByMonth
+    // findEmployeeSalarySheetByMonth,
+    findEmployeeSalarySheet
 } = require("../../controllers/salaryPaymentSection/employeeSalarysheetController");
 
 
@@ -48,8 +49,9 @@ router.get('/summarySalary/:EmployeeID', findSummarySalarySheetByEid);
 
 // routes for the employee salary sheet
 router.get('/employeeSalary/:EmployeeID', viewCurrentEmployeeSalarySheet); //view all summary payments
-router.get('/employeeSalary/:EmployeeID/:Month', findEmployeeSalarySheetByMonth);
-
+//router.get('/employeeSalary/:EmployeeID/:Month', findEmployeeSalarySheetByMonth);
+// router.get('/employeeSalary/:EmployeeID/:Month/:Year', findEmployeeSalarySheet);
+router.get('/employeeSalary/:EmployeeID/previous', findEmployeeSalarySheet);
 
 
 module.exports = router;
