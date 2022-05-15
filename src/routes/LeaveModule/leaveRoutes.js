@@ -3,6 +3,7 @@ const {
   getLeaveList,
   requestLeave,
   cancelLeave,
+  getLeaveBalance,
 } = require("../../controllers/LeaveSection/leaveEmaployeeControllers");
 const {
   getRequestedLeave,
@@ -13,10 +14,12 @@ const router = express.Router();
 
 router.get("/:id", getLeaveList);
 router.post("/request", requestLeave);
-router.delete("/cancel/:id", cancelLeave); 
+router.post("/cancel/:id", cancelLeave); 
 
 
 router.get("/requestedLeave/:id", getRequestedLeave);
 router.post("/requestedLeave/response/:id", responseRequestedLeave);
+router.get("/LeaveBalance/:id", getLeaveBalance);
+
 
 module.exports = router;
