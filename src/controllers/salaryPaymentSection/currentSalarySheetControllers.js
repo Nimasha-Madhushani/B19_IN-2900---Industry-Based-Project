@@ -9,17 +9,6 @@ const Employee = require("../../models/ReportersManagementModule/EmployeeModel")
 
 //view all current salary sheets
 exports.viewCurrentSalarySheet = async (req, res) => {
-    // try {
-    //     const currentSalarySheet = await CurrentSheet.find();
-    //     if (!currentSalarySheet) {
-    //         res.status(404).json({ message: "Current salary sheets not foundmmm", error: err.message })
-    //     }
-    //     res.status(200).json({ message: "Current salary sheets found", currentSalarySheet });
-    //     console.log("view current salary sheet executed")
-    // } catch (err) {
-    //     res.status(404).json({ message: "Current salary sheets not found", error: err.message })
-    // }
-
     try {
         const currentSalarySheet = await CurrentSheet.find();
         if (!currentSalarySheet) {
@@ -34,41 +23,33 @@ exports.viewCurrentSalarySheet = async (req, res) => {
 
 //create a new current salary sheet
 exports.createCurrentSalarySheet = async (req, res) => {
-    // console.log("********************");
-    // console.log(req.body);
+
     const { EmployeeID, BasicSalary, VehicleAllowance, InternetAllowance } = req.body;
+
+    if (req.body.EmployeeID == null || req.body.BasicSalary === null || req.body.VehicleAllowance == null || req.body.InternetAllowance == null) {
+        return res.status(200).json({ message: "please fill all fields", success: false });
+    }
 
     const ETF = (req.body.BasicSalary + req.body.InternetAllowance + req.body.VehicleAllowance) * 0.03;
     const CompanyEPF = (req.body.BasicSalary + req.body.InternetAllowance + req.body.VehicleAllowance) * 0.12;
     const EmoloyeeEpf = (req.body.BasicSalary + req.body.InternetAllowance + req.body.VehicleAllowance) * 0.08;
     const NetSalary = (req.body.BasicSalary + req.body.InternetAllowance + req.body.VehicleAllowance) - ETF - CompanyEPF - EmoloyeeEpf;
-    // console.log("-1");
 
     const newCurrentSalarySheet = new CurrentSheet({
         EmployeeID, BasicSalary, VehicleAllowance, InternetAllowance, EmoloyeeEpf, NetSalary, CompanyEPF, ETF
     });
-    //console.log("0");
     try {
-
         const duplicateEmployeeID = await CurrentSheet.findOne({ EmployeeID });
 
-        if (duplicateEmployeeID != null) {
-            console.log(duplicateEmployeeID);
-            return res.status(400).json({ message: "Salary sheet for this EmployeeID already exists. You have to edit it" });
+        if (duplicateEmployeeID) {
+            return res.status(200).json({ message: "Salary sheet for this EmployeeID already exists. You have to edit it", success: false });
         }
-        // console.log("1");
-        const existsEmployeeId = await Employee.findOne({ employeeID: EmployeeID });
-        if (existsEmployeeId == null) {
-            return res.status(400).json({ message: "Invalid EmployeeID .Enter a valid employee ID" });
-        }
-        // console.log("2");
-        await newCurrentSalarySheet.save();
-        // res.status(200).json({ message: "New current salary sheet created!", newCurrentSalarySheet });
-        res.status(200).json(newCurrentSalarySheet);
 
+        const existsEmployeeId = await Employee.findOne({ employeeID: EmployeeID });
+        await newCurrentSalarySheet.save();
+        res.status(200).json({ message: "Salary details has successfully added!", success: true });
     } catch (error) {
-        console.log("3");
-        res.status(400).json({ message: "Salary details not inserted!", error: error.message });
+        res.status(400).json({ message: "Salary details not inserted!", success: false });
     }
 }
 
@@ -99,47 +80,60 @@ exports.findCurrentSalarySheet = async (req, res) => {
 
 
 //update cureent employee salary sheet
+// exports.updateCurrentSalarySheet = async (req, res) => {
+//     // var empID = req.params.EmployeeID;
+//     const { EmployeeID } = req.params;
+//     try {
+//         const employeeToBeUpdated = await CurrentSheet.findOne({ EmployeeID: EmployeeID });
+
+//         if (employeeToBeUpdated == null) {
+//             return res.status(404).json({ message: "Invalid Employee ID", success: false });
+//         }
+
+//         const filter = { EmployeeID: EmployeeID };
+//         const update = req.body;
+//         await CurrentSheet.findOneAndUpdate(filter, update);
+//         res.status(200).json({ message: "Successfully updated current salary sheet", success: true });
+//     } catch (error) {
+//         res.status(400).json({ message: "Fail to update", success: false });
+//     }
+// };
 exports.updateCurrentSalarySheet = async (req, res) => {
     var empID = req.params.EmployeeID;
 
+
+    const employeeToBeUpdated = await CurrentSheet.findOne({ EmployeeID: empID });
+    if (employeeToBeUpdated === null) {
+        return res.status(404).json({ success: false });
+    }
     try {
-        const employeeToBeUpdated = await CurrentSheet.findOne({ EmployeeID: empID });
-        if (employeeToBeUpdated === null) {
-            return res.status(404).json({ message: "Invalid Employee ID" });
-        }
         const filter = { EmployeeID: empID };
         const update = req.body;
 
         let updateData = await CurrentSheet.findOneAndUpdate(filter, update);
 
-        res.status(200).json({ message: "SUccessfully updated current salary sheet", updateData });
-
+        res.status(200).json({ message: "SUccessfully updated current salary sheet", success: true });
     } catch (error) {
-        res.status(400).json({ message: "Fail to update", error: error.message });
+        res.status(400).json({ message: "Fail to update", success: false });
     }
 };
 
 
-
-//delete current salary record
+//delete current salary record 
 exports.deleteCurrentSalarySheet = async (req, res) => {
-
+    // console.log("1");
     var empID = req.params.EmployeeID;
-
+    // console.log(req.params.EmployeeID);
     try {
-
         const deleteSalarySheet = await CurrentSheet.findOne({ EmployeeID: empID });
         if (deleteSalarySheet == null) {
             res.status(404).send({ message: "Invalid employee ID" });
         }
-
         await CurrentSheet.findOneAndDelete({ EmployeeID: empID });
-
         // return res.status(200).send({ message: "Successfully deleted", deleteSalarySheet });
-        return res.status(200).send(deleteSalarySheet);
-
+        return res.status(200);
     } catch (err) {
-        res.status(404).send({ message: "Current sheet not found to delete", error: err.message });
+        res.status(404).send({ error: err.message });
     }
 };
 
@@ -184,10 +178,3 @@ const job = schedule.scheduleJob('0 0 26 * * ', async function (req, res) {
 });
 
 
-//test
-// const rule = new schedule.RecurrenceRule();
-// rule.minute = 1;
-
-// const job = schedule.scheduleJob(rule, function () {
-//     console.log('Working schedule');
-// });
