@@ -10,7 +10,6 @@ const currentSalarySchema = new Schema({
     },
     BasicSalary: {
         type: Number,
-        required: true
     },
     VehicleAllowance: {
         type: Number,
