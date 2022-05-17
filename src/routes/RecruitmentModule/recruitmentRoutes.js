@@ -5,6 +5,7 @@ const {
   findCandidate,
   updateCandidate,
   getAllCandidates,
+  getRecentCandidates,
 } = require("../../controllers/recruitmentSection/candidateControllers");
 const {
   createInterview,
@@ -22,7 +23,7 @@ router.post("/candidate/create", createCandidate);
 router.get("/candidate/:NIC", findCandidate);
 router.put("/candidate/:id", updateCandidate);
 router.get("/candidates", getAllCandidates); // need to make this right(It should change to fetch last two months updated candidate)
-
+router.get("/candidates/recent", getRecentCandidates); 
 // routes for the interviews
 router.post("/interview/create", createInterview);
 router.delete("/interview/:id", cancelInterview);
