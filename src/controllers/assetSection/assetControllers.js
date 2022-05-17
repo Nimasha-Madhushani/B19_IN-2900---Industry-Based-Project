@@ -5,8 +5,11 @@ let Employee = require("../../models/ReportersManagementModule/EmployeeModel");
 
 //view all assets
 exports.viewAssets = async (req,res)=>{
+    const avbl = await Asset.countDocuments({status:'Available'});
+    const nonavbl = await Asset.countDocuments({status:'Non-Available'});
+    const fault = await Asset.countDocuments({status:'Fault'});
     await Asset.find().then((assets)=>{
-        res.json(assets)
+        res.json({assets:assets,availableCount:avbl,nonavblCount:nonavbl,faultCount:fault})
     }).catch((err)=>{
         console.log(err)
     })
