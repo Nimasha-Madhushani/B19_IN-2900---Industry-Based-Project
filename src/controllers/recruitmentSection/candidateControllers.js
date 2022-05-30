@@ -3,7 +3,8 @@ const candidateSchema = require("../../models/RecruitmentModule/CandidateModel")
 
 // create a new candidate
 module.exports.createCandidate = async (req, res) => {
-  const { candidateName, NIC, email, phoneNumber, cv } = req.body;
+  const { candidateName, appliedPosition, NIC, email, phoneNumber, cv } =
+    req.body;
 
   try {
     const existsCandidate = await candidateSchema.findOne({ NIC });
@@ -14,6 +15,7 @@ module.exports.createCandidate = async (req, res) => {
     }
     const candidate = new candidateSchema({
       candidateName,
+      appliedPosition,
       NIC,
       email,
       phoneNumber,
@@ -74,8 +76,8 @@ module.exports.updateCandidate = async (req, res) => {
     return res.status(404).send("ID invalid : " + id);
 
   try {
-    const { candidateName, NIC, email, phoneNumber, cv } = req.body;
-    const candidate = { _id: id, candidateName, NIC, email, phoneNumber, cv };
+    const { candidateName, appliedPosition, NIC, email, phoneNumber, cv } = req.body;
+    const candidate = { _id: id, candidateName, appliedPosition, NIC, email, phoneNumber, cv };
 
     const updatedCandidate = await candidateSchema.findByIdAndUpdate(
       id,
@@ -101,25 +103,47 @@ module.exports.updateCandidate = async (req, res) => {
   }
 };
 
-
-module.exports.getAllCandidates = async(req, res) =>{
-try {
-  const candidates = await candidateSchema.find();
-  if(!candidates) {
-    return res
-    .status(404)
-    .json({ success: false, description: "failed to fetch candidates" });
+module.exports.getAllCandidates = async (req, res) => {
+  try {
+    const candidates = await candidateSchema.find();
+    if (!candidates) {
+      return res
+        .status(404)
+        .json({ success: false, description: "failed to fetch candidates" });
+    }
+    res.status(200).json({
+      success: true,
+      description: "successfully fetched",
+      candidates: candidates,
+    });
+  } catch (error) {
+    res.status(404).json({
+      success: false,
+      description: "failed to fetch candidates",
+      error: error.message,
+    });
   }
-  res.status(200).json({
-    success: true,
-    description: "successfully fetched",
-    candidates: candidates
-  });
-} catch (error) {
-  res.status(404).json({
-    success: false,
-    description: "failed to fetch candidates",
-    error: error.message,
-  });
-}
-}
+};
+
+
+module.exports.getRecentCandidates = async (req, res) => {
+  try {
+    const candidates = await candidateSchema.find();
+    if (!candidates) {
+      return res
+        .status(404)
+        .json({ success: false, message: "failed to fetch candidates" });
+    }
+    res.status(200).json({
+      success: true,
+      message: "successfully fetched",
+      candidates: candidates,
+    });
+  } catch (error) {
+    res.status(404).json({
+      success: false,
+      message: "failed to fetch candidates",
+      error: error.message,
+    });
+  }
+};

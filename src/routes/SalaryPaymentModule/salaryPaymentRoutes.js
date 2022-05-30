@@ -25,12 +25,13 @@ const {
 //importing controllers of employee salary payment
 const {
     viewCurrentEmployeeSalarySheet,
-    findEmployeeSalarySheetByMonth
+    // findEmployeeSalarySheetByMonth,
+    findEmployeeSalarySheet
 } = require("../../controllers/salaryPaymentSection/employeeSalarysheetController");
 
 
 // routes for the currunt salary payment
-router.get('/currentSalary/', viewCurrentSalarySheet); //view all current payments
+router.get('/currentSalary', viewCurrentSalarySheet); //view all current payment
 router.post('/currentSalary/create', createCurrentSalarySheet);
 router.get('/currentSalary/:EmployeeID', findCurrentSalarySheet);
 router.patch('/currentSalary/update/:EmployeeID', updateCurrentSalarySheet);
@@ -41,15 +42,16 @@ router.delete('/currentSalary/delete/:EmployeeID', deleteCurrentSalarySheet);
 
 
 // routes for the summary salary payment
-router.get('/summarySalary/', viewSummarySalarySheet); //view all summary payments
+router.get('/summarySalary', viewSummarySalarySheet); //view all summary payments
 router.get('/summarySalary/:EmployeeID', findSummarySalarySheetByEid);
 
 
 
 // routes for the employee salary sheet
 router.get('/employeeSalary/:EmployeeID', viewCurrentEmployeeSalarySheet); //view all summary payments
-router.get('/employeeSalary/:EmployeeID/:Month', findEmployeeSalarySheetByMonth);
-
+//router.get('/employeeSalary/:EmployeeID/:Month', findEmployeeSalarySheetByMonth);
+// router.get('/employeeSalary/:EmployeeID/:Month/:Year', findEmployeeSalarySheet);
+router.get('/employeeSalary/:EmployeeID/previous', findEmployeeSalarySheet);
 
 
 module.exports = router;

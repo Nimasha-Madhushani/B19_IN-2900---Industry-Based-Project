@@ -10,21 +10,24 @@ module.exports.getRequestedLeave = async (req, res) => {
   try {
     const requestedLeave = [];
     const employeeTeam = await teamSchema.findOne({ teamLeadID: id });
-    const employee = await employeeSchema.find(
-      {
-        teamID: employeeTeam._id,
-        employeeID: { $ne: id }
-      }
-    );
+    const employee = await employeeSchema.find({
+      teamID: employeeTeam._id,
+      employeeID: { $ne: id },
+    });
 
     for (let index = 0; index < employee.length; index++) {
-      requestedLeave.push(
-        await leaveSchema.find({
-          employeeId: employee[index].employeeID,
-          status: "Pending",
-        })
-      );
+      const leave = await leaveSchema.find({
+        employeeId: employee[index].employeeID,
+      });
+
+      for (let index2 = 0; index2 < leave.length; index2++) {
+        requestedLeave.push({
+          employee: employee[index],
+          leave: leave[index2]
+        });
+      }
     }
+    console.log(requestedLeave);
     if (requestedLeave) {
       return res.status(200).json({
         message: "requested leaves are successfully fetched",

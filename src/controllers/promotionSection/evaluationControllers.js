@@ -19,7 +19,9 @@ exports.allSubmissions = async (req, res) => {
         if (!allPapers) {
             return res.status(404).send({ message: "submitted paper list has not fetch successfully" })
         }
-        res.status(200).json({ message: "Submitted paper list has fetch successfully", paperList: allPapers })
+        // res.status(200).json({ message: "Submitted paper list has fetch successfully", paperList: allPapers })
+
+        res.status(200).json(allPapers);
     } catch (error) {
         res.status(404).json({ message: "Submitted paper list has not fetch successfully", error: error.message })
     }
@@ -61,7 +63,9 @@ exports.displayTeamMemberSubmissions = async (req, res) => {
         if (allPapers == null) {
             return res.status(404).json({ message: "submitted paper list under Team Lead has not fetch successfully" })
         }
-        res.status(200).json({ message: "Submitted paper list under Team Lead has fetch successfully", paperList: allPapers })
+        // res.status(200).json({ message: "Submitted paper list under Team Lead has fetch successfully", paperList: allPapers })
+        res.status(200).json(allPapers);
+
     } catch (error) {
         res.status(404).json({ message: "Submitted paper list under Team Lead has not fetch successfully", error: error.message })
     }

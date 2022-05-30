@@ -5,8 +5,11 @@ let Employee = require("../../models/ReportersManagementModule/EmployeeModel");
 
 //view all assets
 exports.viewAssets = async (req,res)=>{
+    const avbl = await Asset.countDocuments({status:'Available'});
+    const nonavbl = await Asset.countDocuments({status:'Non-Available'});
+    const fault = await Asset.countDocuments({status:'Fault'});
     await Asset.find().then((assets)=>{
-        res.json(assets)
+        res.json({assets:assets,availableCount:avbl,nonavblCount:nonavbl,faultCount:fault})
     }).catch((err)=>{
         console.log(err)
     })
@@ -237,6 +240,24 @@ exports.isAssigned = async(req,res)=>{
     }
     
 
+}
+
+exports.updateAsset = async(req,res) =>{
+    let { id } = req.params;
+    const { assetCategory, model, serialNumber, status } = req.body;
+    const updateAsset = { 
+        assetCategory, 
+        model, 
+        serialNumber, 
+        status 
+    }
+    const update = await Asset.findByIdAndUpdate(id, updateAsset)
+    .then(()=>{
+        res.status(200).send({message:"Updated successfully",success:true})
+    }).catch((err)=>{
+        console.log(err);
+        res.status(500).send({message:"Updated Incomplete", success:false,err:err.message})
+    })
 }
 
 
