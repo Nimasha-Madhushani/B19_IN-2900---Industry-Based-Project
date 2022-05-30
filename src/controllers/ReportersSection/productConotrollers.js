@@ -30,9 +30,9 @@ exports.addProduct = async (req, res) => {
     productName: productName,
   });
 
-  const teamProduct = await productSchema.findOne({ teamID: findTeam._id });
+  //const teamProduct = await productSchema.findOne({ teamID: findTeam._id });
 
-  if (!existingProduct && !teamProduct && !existingProductName) {
+  if (!existingProduct && !existingProductName) {
     const savedProduct = await newProduct
       .save()
       .then(() => {
@@ -64,10 +64,11 @@ exports.updateProduct = async (req, res) => {
     // teamID,
   };
 
-  
   try {
-    const existingProduct = await productSchema.findOne({productID:id});
-    const filterProducts = await productSchema.find({ _id: { $ne: existingProduct._id } }); //except the product which is going to update
+    const existingProduct = await productSchema.findOne({ _id: id });
+    const filterProducts = await productSchema.find({
+      _id: { $ne: id},
+    }); //except the product which is going to update
 
     let chekFalg = false;
     await Promise.all(
@@ -108,10 +109,11 @@ exports.viewProducts = async (req, res) => {
     let allProduct = [];
     await Promise.all(
       products.map(async (product) => {
-        const { productID, productName, description, teamID } = product;
+        const { _id, productID, productName, description, teamID } = product;
         const team = await teamSchema.findOne({ _id: teamID });
+  
         allProduct.push({
-        
+          _id,
           productID,
           productName,
           description,
@@ -124,6 +126,6 @@ exports.viewProducts = async (req, res) => {
     res.json({ state: true, data: allProduct });
     // })
   } catch (err) {
-    res.json({ state: false, err: err });
+    res.json({ state: false, err: err.message });
   }
 };
