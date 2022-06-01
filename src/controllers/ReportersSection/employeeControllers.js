@@ -90,7 +90,17 @@ exports.viewEmployees = async (req, res) => {
         },
       },
     ]);
-    res.status(200).json({ data: collectionOne });
+    let employeesInfo = [];
+    collectionOne.map((userInfo) => {
+      const { EmployeeWithAcc, EmpWithProf, ...other } = userInfo;
+      employeesInfo.push({
+        user: other,
+        EmpWithProf: EmpWithProf[0],
+        EmployeeWithAcc: EmployeeWithAcc[0],
+      });
+    });
+    // const{EmployeeWithAcc,EmpWithProf,other}=collectionOne;
+    res.status(200).json({ data: employeesInfo });
   } catch (err) {
     return res.status(404).json({ err: err.message });
   }
