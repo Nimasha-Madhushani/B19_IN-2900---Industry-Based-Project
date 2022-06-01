@@ -30,7 +30,11 @@ const candidateSchema = new mongoose.Schema(
     cv: {
       type: String,
       required: [true, "Please input the cv"],
-    }
+    },
+    status: {
+      type: String,
+      default: "Initiated"
+    }            // recruited/ Rejected/ Initiated/ Scheduled/ hold
   },
   { timestamps: true }
 );

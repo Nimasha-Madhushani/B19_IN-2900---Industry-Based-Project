@@ -9,7 +9,7 @@ module.exports.createInterview = async (req, res) => {
     InterviewType,
     InterviewDate,
     InterviewTime,
-    InterviewerID,
+    Interviewers,
   } = req.body;
   try {
     if (!mongoose.Types.ObjectId.isValid(candidateID))
@@ -23,11 +23,18 @@ module.exports.createInterview = async (req, res) => {
 
     const InterviewDateAndTime = new Date(year, month, day, hour, minute);
 
+    let interviewers = [];
+    //await Promise.all(
+    Interviewers.map((interviewer) =>
+      interviewers.push({ id: interviewer.employeeID, status: "Not Completed" })
+    );
+    //)
+
     const interview = new InterviewSchema({
       candidateID,
       InterviewType,
       InterviewDate: InterviewDateAndTime,
-      InterviewerID,
+      Interviewers: interviewers,
     });
 
     const savedInterview = await interview.save();
@@ -162,7 +169,7 @@ module.exports.getInterviews = async (req, res) => {
           ),
         ],
       },
-      InterviewerID: {
+      Interviewers: {
         $elemMatch: {
           id: id,
         },
@@ -172,18 +179,13 @@ module.exports.getInterviews = async (req, res) => {
     let interviewList = [];
     await Promise.all(
       interviews.map(async (interview) => {
-        const {
-          _id,
-          candidateID,
-          InterviewDate,
-          InterviewType,
-          InterviewerID,
-        } = interview;
+        const { _id, candidateID, InterviewDate, InterviewType, Interviewers } =
+          interview;
         const candidate = await candidateSchema.findOne({ _id: candidateID });
-        let Interviewers = [];
+        let interviewers = [];
         await Promise.all(
-          InterviewerID.map(async (interviewer) => {
-            Interviewers.push(
+          Interviewers.map(async (interviewer) => {
+            interviewers.push(
               await employeeSchema.findOne({ employeeID: interviewer.id })
             );
           })
@@ -203,7 +205,7 @@ module.exports.getInterviews = async (req, res) => {
             minute: "numeric",
           }),
           InterviewType,
-          Interviewers: Interviewers,
+          Interviewers: interviewers,
         });
       })
     );
@@ -226,12 +228,11 @@ module.exports.getInterviews = async (req, res) => {
 
 module.exports.markedCandidate = async (req, res) => {
   const { id } = req.params;
-  const  marks  = req.body;
-  
+  const marks = req.body;
+
   try {
-    
-    const isEmpty = Object.values(marks).every(x => (x !== null && x !== ''));
-   
+    const isEmpty = Object.values(marks).every((x) => x !== null && x !== "");
+
     if (!isEmpty) {
       return res.status(404).json({
         success: false,
@@ -242,11 +243,11 @@ module.exports.markedCandidate = async (req, res) => {
     const updatedInterview = await InterviewSchema.updateOne(
       { _id: id },
       { $push: { CandidateMarks: marks } },
-      {new: true}
+      { new: true }
     );
-    
+
     if (!updatedInterview) {
-     return res.status(404).json({
+      return res.status(404).json({
         success: false,
         description: "Marks are failed to Update",
       });
@@ -259,6 +260,47 @@ module.exports.markedCandidate = async (req, res) => {
     res.status(404).json({
       success: false,
       description: "Marks are failed to Update",
+      error: error.message,
+    });
+  }
+};
+
+module.exports.getInterviewStats = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const CompletedInterviews = await InterviewSchema.find({
+      Interviewers: {
+        $elemMatch: {
+          id: id,
+          status: "Completed",
+        },
+      },
+    });
+
+    const RemainingInterviews = await InterviewSchema.find({
+      Interviewers: {
+        $elemMatch: {
+          id: id,
+          status: "Not Completed",
+        },
+      },
+    });
+    const NonInterviewedCandidate = await candidateSchema.find({
+      status: {$in: ["Initiated",  "Scheduled"]}
+    });
+
+    res.status(200).json({
+      success: true,
+      InterviewStats: {
+        completedInterviews: CompletedInterviews.length,
+        remainingInterviews: RemainingInterviews.length,
+        candidates: NonInterviewedCandidate.length
+      },
+    });
+  } catch (error) {
+    res.status(404).json({
+      success: false,
+      description: "failed to fetch data",
       error: error.message,
     });
   }

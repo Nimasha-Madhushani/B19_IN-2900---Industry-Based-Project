@@ -13,6 +13,7 @@ const {
   updateInterview,
   getInterviews,
   markedCandidate,
+  getInterviewStats,
 } = require("../../controllers/recruitmentSection/InterviewControllers");
 const verify = require("../../middleware/VerifyJWT");
 const verifyRoles = require("../../middleware/verifyUserRole");
@@ -30,5 +31,7 @@ router.delete("/interview/:id", cancelInterview);
 router.put("/interview/:id", updateInterview);
 router.get("/interview/:id", getInterviews);
 router.put("/interview/start/:id", markedCandidate);
+router.get("/interview/InterviewStats/:id", getInterviewStats);
+
 
 module.exports = router;
