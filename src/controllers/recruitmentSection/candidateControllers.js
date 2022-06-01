@@ -124,3 +124,33 @@ module.exports.getAllCandidates = async (req, res) => {
     });
   }
 };
+
+
+module.exports.getRecentCandidates = async (req, res) => {
+  try {
+    const date = new Date();
+    const candidates = await candidateSchema.find({
+      updatedAt: {
+        $gte: [
+          "$updatedAt",
+          new Date(
+            date.getFullYear(),
+            date.getMonth() ,
+          ),
+        ],
+      },
+    });
+    console.log(candidates);
+    res.status(200).json({
+      success: true,
+      message: "successfully fetched",
+      candidates: candidates,
+    });
+  } catch (error) {
+    res.status(404).json({
+      success: false,
+      message: "failed to fetch candidates",
+      error: error.message,
+    });
+  }
+};
