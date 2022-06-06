@@ -1,5 +1,3 @@
-
-
 const Question = require("../../models/PromotionModule/Question");
 
 //view all questions
@@ -7,11 +5,11 @@ exports.viewAllQuestions = async (req, res) => {
     try {
         const questionList = await Question.find();
         if (questionList == null) {
-            res.status(404).json({ message: "Question list not found" });
+            return res.status(404).json({ message: "Question list not found" });
         }
-        res.status(200).json(questionList);
+        return res.status(200).json(questionList);
     } catch (error) {
-        res.status(400).json({ message: "Error", error: error.message });
+        return res.status(400).json({ message: "Error", error: error.message });
     }
 }
 
