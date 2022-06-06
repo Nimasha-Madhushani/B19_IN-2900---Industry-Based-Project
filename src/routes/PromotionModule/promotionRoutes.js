@@ -42,14 +42,14 @@ const {
     scheduleExam,
     deleteScheduledExam,
     updateExamDetails,
-    viewAllExams
+    viewAllExams,
+    viewOneExam
 } = require("../../controllers/promotionSection/examControllers");
 
 
 // routes for the Questions
 router.get('/Questions', viewAllQuestions); //view all questions
 router.post('/Questions/create', createQuestions);//create new questions
-
 
 
 // routes for the paper
@@ -60,7 +60,6 @@ router.patch('/Paper/updatePaperDetails/:PaperID', updatePaperDetails);
 router.delete('/Paper/delete/:PaperID', deletePaper);
 router.get('/Paper/:EmployeeID', displayPaper);
 router.get('/Paper/display/:PaperID', viewOnePaper);//view one paper with questions
-
 
 
 //routes for promotion paper for employee
@@ -76,7 +75,10 @@ router.patch('/evaluation/evaluatePaper/:TeamLeadID/:EmployeeID/:PaperID', evalu
 
 //routes for scheuling exam
 router.post('/evaluation/exam/scheduleExam/:EmployeeID', scheduleExam);
-router.delete('/evaluation/exam/deleteExam/:ExamID', deleteScheduledExam);
-router.patch('/evaluation/exam/updateExam/:ExamID', updateExamDetails);
+router.delete('/evaluation/exam/deleteExam/:EmployeeID/:ExamID', deleteScheduledExam);
+router.patch('/evaluation/exam/updateExam/:EmployeeID/:ExamID', updateExamDetails);
 router.get('/evaluation/exam/viewExam/:EmployeeID', viewAllExams);
+router.get('/evaluation/exam/viewOneExam/:EmployeeID/:ExamID', viewOneExam)
+
+
 module.exports = router;
