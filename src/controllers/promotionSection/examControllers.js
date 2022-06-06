@@ -8,8 +8,10 @@ exports.scheduleExam = async (req, res) => {
     try {
         const eid = req.params.EmployeeID;
         const { ExamID, ExamName, DateScheduled, JobRole, PaperID } = req.body;
+        //const Date = DateScheduled.toLocaleString('IST', { timeZone: 'Asia/Kolkata' });
+
         const newExam = new Exam({ organizerID: eid, ExamID, ExamName, DateCreated, DateScheduled, PaperID, JobRole });
-        console.log(newExam);
+        console.log(DateScheduled);
         await newExam.save();
         if (!newExam) {
             return res.status(400).json({ message: "New Exam not created.", success: false });
@@ -40,7 +42,7 @@ exports.deleteScheduledExam = async (req, res) => {
 exports.updateExamDetails = async (req, res) => {
     const examId = req.params.ExamID;
     try {
-        const { ExamID, ExamName, DateScheduled, JobRole, PaperID } = req.body;
+        const { ExamName, DateScheduled, JobRole, PaperID } = req.body;
 
         let exam = await Exam.findOneAndUpdate({ ExamID: examId }, {
             ExamID: examId, ExamName: ExamName, DateScheduled: DateScheduled, JobRole: JobRole, PaperID: PaperID
