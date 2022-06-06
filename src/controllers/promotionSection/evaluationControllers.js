@@ -2,7 +2,7 @@ const AnsweredQuestionPaper = require("../../models/PromotionModule/AnsweredQues
 const employeeSchema = require("../../models/ReportersManagementModule/EmployeeModel");
 const teams = require("../../models/ReportersManagementModule/TeamModel");
 const Question = require("../../models/PromotionModule/Question");
-
+const Exam = require("../../models/PromotionModule/Exam");
 
 //view all submissions
 exports.allSubmissions = async (req, res) => {
@@ -195,3 +195,4 @@ exports.displayAnsweredPaperToTeamlead = async (req, res) => {
         res.status(404).json({ message: "Error", error: error.message })
     }
 }
+

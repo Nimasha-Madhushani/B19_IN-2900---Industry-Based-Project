@@ -3,7 +3,10 @@ const router = express.Router();
 
 
 //importing controllers of question
-const { viewAllQuestions, createQuestions } = require("../../controllers/promotionSection/questionControllers");
+const {
+    viewAllQuestions,
+    createQuestions
+} = require("../../controllers/promotionSection/questionControllers");
 
 
 //importing controllers of papper
@@ -31,15 +34,22 @@ const {
     evaluatePaper,
     displayTeamMemberSubmissions,
     displayFeedback,
-    displayAnsweredPaperToTeamlead,
+    displayAnsweredPaperToTeamlead
 } = require("../../controllers/promotionSection/evaluationControllers")
 
+//importing controllers for exam scheduling
+const {
+    scheduleExam,
+    deleteScheduledExam,
+    updateExamDetails,
+    viewAllExams,
+    viewOneExam
+} = require("../../controllers/promotionSection/examControllers");
 
 
 // routes for the Questions
 router.get('/Questions', viewAllQuestions); //view all questions
 router.post('/Questions/create', createQuestions);//create new questions
-
 
 
 // routes for the paper
@@ -52,7 +62,6 @@ router.get('/Paper/:EmployeeID', displayPaper);
 router.get('/Paper/display/:PaperID', viewOnePaper);//view one paper with questions
 
 
-
 //routes for promotion paper for employee
 router.post('/submitPaper/:EmployeeID', submitPaper);
 router.get('/evaluation/mySubmissions/:EmployeeID', displayFeedback);
@@ -63,6 +72,13 @@ router.get('/evaluation/allSubmissions', allSubmissions);
 router.get('/evaluation/allSubmissions/:TeamLeadID', displayTeamMemberSubmissions);
 router.get('/evaluation/allSubmissions/displayOne/:EmployeeID/:PaperID', displayAnsweredPaperToTeamlead);
 router.patch('/evaluation/evaluatePaper/:TeamLeadID/:EmployeeID/:PaperID', evaluatePaper);
+
+//routes for scheuling exam
+router.post('/evaluation/exam/scheduleExam/:EmployeeID', scheduleExam);
+router.delete('/evaluation/exam/deleteExam/:EmployeeID/:ExamID', deleteScheduledExam);
+router.patch('/evaluation/exam/updateExam/:EmployeeID/:ExamID', updateExamDetails);
+router.get('/evaluation/exam/viewExam/:EmployeeID', viewAllExams);
+router.get('/evaluation/exam/viewOneExam/:EmployeeID/:ExamID', viewOneExam)
 
 
 module.exports = router;
