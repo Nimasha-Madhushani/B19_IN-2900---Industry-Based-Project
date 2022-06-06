@@ -3,7 +3,10 @@ const router = express.Router();
 
 
 //importing controllers of question
-const { viewAllQuestions, createQuestions } = require("../../controllers/promotionSection/questionControllers");
+const {
+    viewAllQuestions,
+    createQuestions
+} = require("../../controllers/promotionSection/questionControllers");
 
 
 //importing controllers of papper
@@ -31,9 +34,16 @@ const {
     evaluatePaper,
     displayTeamMemberSubmissions,
     displayFeedback,
-    displayAnsweredPaperToTeamlead,
+    displayAnsweredPaperToTeamlead
 } = require("../../controllers/promotionSection/evaluationControllers")
 
+//importing controllers for exam scheduling
+const {
+    scheduleExam,
+    deleteScheduledExam,
+    updateExamDetails,
+    viewAllExams
+} = require("../../controllers/promotionSection/examControllers");
 
 
 // routes for the Questions
@@ -64,5 +74,9 @@ router.get('/evaluation/allSubmissions/:TeamLeadID', displayTeamMemberSubmission
 router.get('/evaluation/allSubmissions/displayOne/:EmployeeID/:PaperID', displayAnsweredPaperToTeamlead);
 router.patch('/evaluation/evaluatePaper/:TeamLeadID/:EmployeeID/:PaperID', evaluatePaper);
 
-
+//routes for scheuling exam
+router.post('/evaluation/exam/scheduleExam/:EmployeeID', scheduleExam);
+router.delete('/evaluation/exam/deleteExam/:ExamID', deleteScheduledExam);
+router.patch('/evaluation/exam/updateExam/:ExamID', updateExamDetails);
+router.get('/evaluation/exam/viewExam', viewAllExams);
 module.exports = router;
