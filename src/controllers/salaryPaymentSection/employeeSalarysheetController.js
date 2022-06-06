@@ -22,6 +22,7 @@ exports.viewCurrentEmployeeSalarySheet = async (req, res) => {
         }
         //res.status(200).json({ message: "Successfull", currentEmployeeSalarySheets });
         res.status(200).json(currentEmployeeSalarySheets);
+        //console.log(currentEmployeeSalarySheets)
     } catch (error) {
         res.status(404).json({ message: "Error", error })
     }
