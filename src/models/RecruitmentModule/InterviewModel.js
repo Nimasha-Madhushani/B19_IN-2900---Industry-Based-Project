@@ -14,7 +14,7 @@ const interviewSchema = new mongoose.Schema(
       type: Date,
       required: [true, "Please select a date for interview"],
     },
-    InterviewerID: {
+    Interviewers: {
       type: Array,
     },
     CandidateMarks: {
