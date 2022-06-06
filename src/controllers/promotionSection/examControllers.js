@@ -28,12 +28,12 @@ exports.deleteScheduledExam = async (req, res) => {
     try {
         const deleteExam = await Exam.findOneAndDelete({ ExamID: examId });
         if (!deleteExam) {
-            return res.status(400).json({ message: "Scheduled exam not found", error: error.message });
+            return res.status(400).json({ message: "Scheduled exam not found", error: error.message, success: false });
         }
-        return res.status(200).json({ message: "Scheduled exam has deleted successfully" })
+        return res.status(200).json({ message: "Scheduled exam has deleted successfully", success: true });
     }
     catch (error) {
-        return res.status(404).json({ message: "Scheduled exam not deleted", error: error.message });
+        return res.status(404).json({ message: "Scheduled exam not deleted", error: error.message, success: false });
     }
 }
 
@@ -65,6 +65,20 @@ exports.viewAllExams = async (req, res) => {
             return res.status(404).json({ message: "Exam list not found", error: error.message, success: false });
         }
         return res.status(200).json(examList);
+    } catch (error) {
+        return res.status(400).json({ message: "Error", error: error.message });
+    }
+}
+
+//view one exam details
+exports.viewOneExam = async (req, res) => {
+    const examId = req.params.ExamID;
+    try {
+        const examFound = await Exam.findOne({ ExamID: examId });
+        if (!examFound) {
+            return res.status(404).json({ message: "Exam not found", error: error.message, success: false });
+        }
+        return res.status(200).json(examFound);
     } catch (error) {
         return res.status(400).json({ message: "Error", error: error.message });
     }
