@@ -12,7 +12,8 @@ const {
     createPaper,
     addMoreQuestions,
     updatePaperDetails,
-    deletePaper
+    deletePaper,
+    viewOnePaper
 } = require("../../controllers/promotionSection/paperControllers");
 
 
@@ -29,7 +30,8 @@ const {
     allSubmissions,
     evaluatePaper,
     displayTeamMemberSubmissions,
-    displayFeedback
+    displayFeedback,
+    displayAnsweredPaperToTeamlead,
 } = require("../../controllers/promotionSection/evaluationControllers")
 
 
@@ -47,18 +49,20 @@ router.patch('/Paper/addMoreQuestions/:PaperID', addMoreQuestions);
 router.patch('/Paper/updatePaperDetails/:PaperID', updatePaperDetails);
 router.delete('/Paper/delete/:PaperID', deletePaper);
 router.get('/Paper/:EmployeeID', displayPaper);
+router.get('/Paper/display/:PaperID', viewOnePaper);//view one paper with questions
 
 
 
-
-
-//routes for Ratings
+//routes for promotion paper for employee
 router.post('/submitPaper/:EmployeeID', submitPaper);
 router.get('/evaluation/mySubmissions/:EmployeeID', displayFeedback);
 
+
+//routes for evaluation by teamleads, HR and CTO
 router.get('/evaluation/allSubmissions', allSubmissions);
 router.get('/evaluation/allSubmissions/:TeamLeadID', displayTeamMemberSubmissions);
-router.patch('/evaluation/evaluatePaper/:EmployeeID/:PaperID/', evaluatePaper);
+router.get('/evaluation/allSubmissions/displayOne/:EmployeeID/:PaperID', displayAnsweredPaperToTeamlead);
+router.patch('/evaluation/evaluatePaper/:TeamLeadID/:EmployeeID/:PaperID', evaluatePaper);
 
 
 module.exports = router;

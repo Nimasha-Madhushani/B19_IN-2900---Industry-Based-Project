@@ -17,6 +17,7 @@ const AnsweredQuestionPaperSchema = new Schema({
     },
     Questions: [{
         QuestionID: { type: String },
+        QuestionBody : {type: String },
         EmployeeRating: { type: String },
         TeamLeadRating: { type: String }
     }],

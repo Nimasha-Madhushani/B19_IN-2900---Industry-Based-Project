@@ -1,13 +1,13 @@
 const AnsweredQuestionPaper = require("../../models/PromotionModule/AnsweredQuestionPaper");
 const employeeSchema = require("../../models/ReportersManagementModule/EmployeeModel");
 const teams = require("../../models/ReportersManagementModule/TeamModel");
+const Question = require("../../models/PromotionModule/Question");
 
 
 //view all submissions
 exports.allSubmissions = async (req, res) => {
     try {
         const allSubmitions = await AnsweredQuestionPaper.find();
-
         const allPapers = [];
 
         for (let i = 0; i < allSubmitions.length; i++) {
@@ -75,35 +75,35 @@ exports.displayTeamMemberSubmissions = async (req, res) => {
 
 //evaluate a paper 
 exports.evaluatePaper = async (req, res) => {
+    console.log("eval executed");
+    const tlID = req.params.TeamLeadID;
+    const feedback = req.body.Feedback['Feedback'];
+    const pID = req.params.PaperID;
+    const eid = req.params.EmployeeID;
+    const doe = new Date().toLocaleString('IST', { timeZone: 'Asia/Kolkata' });
+    // console.log("here pID: ", pID);
+    // console.log("here eid: ", eid);
+    // console.log("here doe: ", doe);
+    // console.log("here tlID", tlID);
+    // console.log("feed", feedback);
+
     try {
-
-        const tlID = req.body.TeamLeadID;
-        const fb = req.body.Feedback;
-        const pID = req.params.PaperID;
-        const eid = req.params.EmployeeID;
-        const doe = new Date().toLocaleString('IST', { timeZone: 'Asia/Kolkata' });
-
-        const FoundTl = await teams.findOne({ teamLeadID: tlID })
-        if (FoundTl == null) {
-            return res.status(400).send({ message: "Team Lead ID not found" });
-        }
-
-        const Foundeid = await employeeSchema.findOne({ employeeID: eid })
-        if (!Foundeid) {
-            return res.status(400).send({ message: "Employee ID not found" });
-        }
-
         let teamLeadRatings = [];
         let updateQuestion = [];
-        teamLeadRatings = req.body.Questions;//QuestionID,TeamLeadRating,Feedback,TeamLeadID
-        //console.log(teamLeadRatings);
+        console.log("hhhh");
+        teamLeadRatings = req.body.Questions;
+        console.log("here body", req.body);
+        console.log("here teamLeadRatings", req.body.Questions);
+        if (teamLeadRatings == null) {
+            console.log("here teamLeadRatings null");
+            return res.status(404).send({ message: "empty teamLeadRatings" })
+        }
 
         if (teamLeadRatings) {
             const answeredQuestions = await AnsweredQuestionPaper.findOne({ EmployeeID: eid, PaperID: pID });
             if (!answeredQuestions) {
                 return res.status(400).send({ message: "Answered Sheet not found" });
             }
-            //console.log("answeredQuestions:  " + answeredQuestions);
             for (let i = 0; i < teamLeadRatings.length; i++) {
                 let question = [];
                 for (let j = 0; j < answeredQuestions.Questions.length; j++) {
@@ -120,16 +120,16 @@ exports.evaluatePaper = async (req, res) => {
         }
         const updatedPaper = await AnsweredQuestionPaper.findOneAndUpdate({ PaperID: pID, EmployeeID: eid }, {
             TeamLeadID: tlID,
-            Feedback: fb,
+            Feedback: feedback,
             DateOfEvaluation: doe,
             $set: { Questions: updateQuestion }
         });
-        // console.log(updatedPaper);
-
         if (updatedPaper == null) {
             return res.status(400).send({ message: "Team Lead ratings have not added" });
         }
-        res.status(201).json({ message: "Team Lead ratings have added successfully" });
+        console.log(updatedPaper);
+        console.log("Team Lead ratings have added successfully")
+        return res.status(201).json({ message: "Team Lead ratings have added successfully" });
     } catch (err) {
         return res.status(404).json({ message: "Team Lead ratings have not added", err: err.message });
     }
@@ -166,9 +166,32 @@ exports.displayFeedback = async (req, res) => {
             return res.status(404).send({ message: "Submitted papers by employee has not fetched successfully" })
         }
 
-        res.status(200).json({ message: "Submitted papers by employee has fetched successfully", submittedPaperList: allPaperSubmissions });
+        res.status(200).json(allPaperSubmissions);
 
     } catch (error) {
         res.status(404).json({ message: "Submitted papers by employee has not fetched successfully", error: error.message })
+    }
+}
+
+
+exports.displayAnsweredPaperToTeamlead = async (req, res) => {
+    //evaluation/allSubmissions/displayOne/:TeamLeadID/:EmployeeID/:PaperID
+    console.log("display answered paper");
+    try {
+        // const teamLeadId = req.params.TeamLeadID;
+        const eid = req.params.EmployeeID;
+        const pID = req.params.PaperID;
+
+        const PaperAnswered = await AnsweredQuestionPaper.findOne({ EmployeeID: eid, PaperID: pID });
+        console.log("PaperAnswered", PaperAnswered);
+
+
+        if (PaperAnswered == null) {
+            return res.status(400).json({ message: "Paper Answered not found" });
+        }
+        // return res.status(200).json(Array(PaperAnswered));
+        return res.status(200).json(Array(PaperAnswered));
+    } catch (error) {
+        res.status(404).json({ message: "Error", error: error.message })
     }
 }
