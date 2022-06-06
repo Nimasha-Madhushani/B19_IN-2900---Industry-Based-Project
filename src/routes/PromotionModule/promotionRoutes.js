@@ -78,5 +78,5 @@ router.patch('/evaluation/evaluatePaper/:TeamLeadID/:EmployeeID/:PaperID', evalu
 router.post('/evaluation/exam/scheduleExam/:EmployeeID', scheduleExam);
 router.delete('/evaluation/exam/deleteExam/:ExamID', deleteScheduledExam);
 router.patch('/evaluation/exam/updateExam/:ExamID', updateExamDetails);
-router.get('/evaluation/exam/viewExam', viewAllExams);
+router.get('/evaluation/exam/viewExam/:EmployeeID', viewAllExams);
 module.exports = router;
