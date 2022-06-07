@@ -42,10 +42,10 @@ exports.deleteScheduledExam = async (req, res) => {
 exports.updateExamDetails = async (req, res) => {
     const examId = req.params.ExamID;
     try {
-        const { ExamName, DateScheduled, JobRole, PaperID } = req.body;
+        const { ExamName, DateScheduled, JobRole, PaperID, Status } = req.body;
 
         let exam = await Exam.findOneAndUpdate({ ExamID: examId }, {
-            ExamID: examId, ExamName: ExamName, DateScheduled: DateScheduled, JobRole: JobRole, PaperID: PaperID
+            ExamID: examId, ExamName: ExamName, DateScheduled: DateScheduled, JobRole: JobRole, PaperID: PaperID, Status: Status
         });
         if (!exam) {
             return res.status(404).json({ message: "not found exam", success: false, error: error.message });
