@@ -32,6 +32,11 @@ const ExamSchema = new Schema({
         type: String,
         required: true
     },
+    Status: {
+        type: String,
+        required: true,
+        default: 'Pending'
+    },
 });
 
 const Exam = mongoose.model("Exam", ExamSchema);
