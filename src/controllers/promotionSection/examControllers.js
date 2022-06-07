@@ -7,10 +7,10 @@ exports.scheduleExam = async (req, res) => {
 
     try {
         const eid = req.params.EmployeeID;
-        const { ExamID, ExamName, DateScheduled, JobRole, PaperID } = req.body;
+        const { ExamID, ExamName, DateScheduled, JobRole, PaperID, Status } = req.body;
         //const Date = DateScheduled.toLocaleString('IST', { timeZone: 'Asia/Kolkata' });
 
-        const newExam = new Exam({ organizerID: eid, ExamID, ExamName, DateCreated, DateScheduled, PaperID, JobRole });
+        const newExam = new Exam({ organizerID: eid, ExamID, ExamName, DateCreated, DateScheduled, PaperID, JobRole, Status });
         console.log(DateScheduled);
         await newExam.save();
         if (!newExam) {
