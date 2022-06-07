@@ -105,7 +105,7 @@ module.exports.updateCandidate = async (req, res) => {
 
 module.exports.getAllCandidates = async (req, res) => {
   try {
-    const candidates = await candidateSchema.find();
+    const candidates = await candidateSchema.find({status: {$ne: "Recruited"}});
     if (!candidates) {
       return res
         .status(404)
@@ -135,12 +135,11 @@ module.exports.getRecentCandidates = async (req, res) => {
           "$updatedAt",
           new Date(
             date.getFullYear(),
-            date.getMonth() ,
+            date.getMonth() - 1 ,
           ),
         ],
       },
     });
-    console.log(candidates);
     res.status(200).json({
       success: true,
       message: "successfully fetched",

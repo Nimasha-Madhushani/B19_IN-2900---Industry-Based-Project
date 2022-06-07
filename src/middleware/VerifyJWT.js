@@ -4,6 +4,7 @@ const EmployeeSchema = require("../models/ReportersManagementModule/EmployeeMode
 const verify = async (req, res, next) => {
   try {
     let accessToken = req.headers.authorization;
+
     if (!accessToken) {
       return res
         .status(401)
