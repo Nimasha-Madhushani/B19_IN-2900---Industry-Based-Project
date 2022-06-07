@@ -5,7 +5,7 @@ const createAccessToken = (employeeID, jobRole) => {
     { id: employeeID, jobRole: jobRole },
     process.env.ACCESS_TOKEN_SECRET_KEY,
     {
-      expiresIn: "300s",
+      expiresIn: "20s",
     }
   );
 };
