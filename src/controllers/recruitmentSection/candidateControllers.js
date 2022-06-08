@@ -105,7 +105,7 @@ module.exports.updateCandidate = async (req, res) => {
 
 module.exports.getAllCandidates = async (req, res) => {
   try {
-    const candidates = await candidateSchema.find();
+    const candidates = await candidateSchema.find({status: {$ne: "Recruited"}});
     if (!candidates) {
       return res
         .status(404)
@@ -128,12 +128,18 @@ module.exports.getAllCandidates = async (req, res) => {
 
 module.exports.getRecentCandidates = async (req, res) => {
   try {
-    const candidates = await candidateSchema.find();
-    if (!candidates) {
-      return res
-        .status(404)
-        .json({ success: false, message: "failed to fetch candidates" });
-    }
+    const date = new Date();
+    const candidates = await candidateSchema.find({
+      updatedAt: {
+        $gte: [
+          "$updatedAt",
+          new Date(
+            date.getFullYear(),
+            date.getMonth() - 1 ,
+          ),
+        ],
+      },
+    });
     res.status(200).json({
       success: true,
       message: "successfully fetched",

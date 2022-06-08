@@ -48,10 +48,18 @@ exports.loginEmployee = async (req, res) => {
       profilePic
     } = userProfile;
 
-    res.cookie("refreshToken", refreshToken, {
-      httpOnly: true,
-    });
-    res.status(200).json({
+    // res.cookie("refreshToken", refreshToken, {
+    //   httpOnly: true,
+    // });
+
+  //   res.setHeader('Set-Cookie', cookie.serialize("refreshToken", refreshToken, {
+  //     httpOnly: true,
+  //     sameSite: 'strict',
+  //     maxAge: 60 * 60 * 24 * 7,
+  //     path: '/'
+  // }))
+
+    res.status(200).cookie("token" , refreshToken).json({
       message: "User has successfully sign in!",
       user: {
         _id,
@@ -59,9 +67,10 @@ exports.loginEmployee = async (req, res) => {
         employeeFirstName,
         employeeLastName,
         jobRole,
-        profilePic
+        profilePic,
+        accessToken: accessToken,
+        refreshToken: refreshToken
       },
-      accessToken: accessToken,
       success: true,
     });
   } catch (err) {
