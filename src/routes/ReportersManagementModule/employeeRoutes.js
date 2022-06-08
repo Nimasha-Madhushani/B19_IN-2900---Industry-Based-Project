@@ -7,6 +7,7 @@ const {
   filterEmployee,
   updateEmployeeProfile,
   getallEmployees,
+  getUser,
 } = require("../../controllers/ReportersSection/employeeControllers");
 
 const {
@@ -33,6 +34,7 @@ const {
 //----------------employee controller------------------------------------------
 
 // router.get("/filterEmployee/:empId",filterEmployee)
+router.get("/user/:id",getUser)
 
 router.get("/", viewEmployees);
 
