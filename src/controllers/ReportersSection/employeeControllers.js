@@ -26,6 +26,27 @@ const candidateSchema = require("../../models/RecruitmentModule/CandidateModel")
 //   }
 // };
 
+//-------fetch logged employee details-----------------
+exports.getUser = async (req, res) => {
+  const { id } = req.params;
+  console.log("ko")
+  try {
+    const user = await employeeSchema.find({ employeeID: id });
+    const EmployeeWithAcc = await academicQualificaationSchema.find({ employeeID: id });
+    const EmpWithProf = await ProffesionalQualificationSchema.find({ employeeID: id });
+    if (!user || !EmployeeWithAcc|| !EmpWithProf) {
+      return res.status(400).json({
+        message: "user and user details does not exists",
+      });
+    }
+    res.status(200).json({
+      message: "user fetch successfully",
+      userInfo: {user, EmployeeWithAcc: EmployeeWithAcc[0], EmpWithProf:EmpWithProf[0]},
+    });
+  } catch (error) {
+    res.status(400).json({ state: false, err: error.message });
+  }
+};
 //-------View all Employees----------------------------
 exports.getallEmployees = async (req, res) => {
   await employeeSchema
@@ -99,6 +120,8 @@ exports.viewEmployees = async (req, res) => {
         EmployeeWithAcc: EmployeeWithAcc[0],
       });
     });
+
+    console.log(employeesInfo);
     // const{EmployeeWithAcc,EmpWithProf,other}=collectionOne;
     res.status(200).json({ data: employeesInfo });
   } catch (err) {
@@ -210,7 +233,7 @@ exports.updateEmployeeProfile = async (req, res) => {
     companyEmail,
   };
   try {
-    console.log(req);
+    // console.log(req);
 
     const existingEmployee = await employeeSchema.findOne({ employeeID: id }); //???????
     // console.log(existingEmployee);
