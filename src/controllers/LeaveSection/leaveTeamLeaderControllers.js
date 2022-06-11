@@ -27,7 +27,7 @@ module.exports.getRequestedLeave = async (req, res) => {
         });
       }
     }
-    console.log(requestedLeave);
+   
     if (requestedLeave) {
       return res.status(200).json({
         message: "requested leaves are successfully fetched",
@@ -48,6 +48,7 @@ module.exports.getRequestedLeave = async (req, res) => {
 module.exports.responseRequestedLeave = async (req, res) => {
   const { id } = req.params;
   const { reason } = req.body;
+
   try {
     if (!mongoose.Types.ObjectId.isValid(id))
       return res.status(400).send("ID invalid : " + id);
@@ -78,7 +79,7 @@ module.exports.responseRequestedLeave = async (req, res) => {
       await sendEmails(employee, data, teamLeader, condition);
     } else {
       await leaveSchema.findByIdAndUpdate(id, {
-        $set: { status: "approved" },
+        $set: { status: "Approved" },
       });
       const result = await sendEmails(employee, data, teamLeader, condition);
 
@@ -103,7 +104,7 @@ module.exports.responseRequestedLeave = async (req, res) => {
       }
 
       numberOfLeaveDates -= holidays;
-      console.log(numberOfLeaveDates);
+     
 
       switch (leave.leaveType) {
         case "casual":

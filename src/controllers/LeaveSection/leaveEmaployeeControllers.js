@@ -198,3 +198,22 @@ module.exports.getLeaveBalance = async (req, res) => {
     console.log(error);
   }
 };
+
+module.exports.getTeamLead = async(req, res) =>{
+  const employeeID = req.params.id;
+  try {
+    const employee = await employeeSchema.findOne({
+      employeeID : employeeID
+    });
+    const team = await teamSchema.findOne({_id:employee.teamID});
+    const teamLeader = await employeeSchema.findOne({employeeID:team.teamLeadID});
+    res.status(200).json({
+      success:true,
+      teamLeader:teamLeader,
+      
+    });
+  } catch (error) {
+    console.log(error);
+  }
+
+};

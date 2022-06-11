@@ -1,17 +1,21 @@
 const { createAccessToken, createRefreshToken } = require("./JWTCreator");
 const jwt = require("jsonwebtoken");
 const employeeSchema = require("../../models/ReportersManagementModule/EmployeeModel");
+const { loginEmployee } = require("./UserLogInControllers");
 
 exports.refreshToken = async (req, res) => {
   const refreshToken = req.body.token;
 
+  //console.log(refreshToken);
   try {
     if (!refreshToken) {
       return res
         .status(401)
         .json({ message: "You are not authenticated!..Please log In" });
     }
-    if (!(await employeeSchema.findOne({ token: refreshToken }))) {
+    const existsToken = await employeeSchema.findOne({ token: refreshToken });
+    //console.log(existsToken);
+    if (!existsToken) {
       return res.status(403).json({ message: "Refresh token is not valid!" });
     }
     jwt.verify(
@@ -38,10 +42,14 @@ exports.refreshToken = async (req, res) => {
           { $set: { token: newRefreshToken } }
         );
 
+        // res.cookie("refreshToken", refreshToken, {
+        //   httpOnly: true,
+        // });
+
         res.status(200).json({
           accessToken: newAccessToken,
           refreshToken: newRefreshToken,
-          update: update,
+          //update: update,
         });
       }
     );
