@@ -53,7 +53,7 @@ exports.createPaper = async (req, res) => {
             return res.status(404).json({ message: "Paper name already exists" })
         }
 
-        const newPaper = new Paper({ PaperID, PaperName, PaperType, DateCreated, Questions });//create new paper
+        const newPaper = new Paper({ PaperID, PaperName, PaperType, DateCreated, Questions });
 
         await newPaper.save();
         if (!newPaper) {
@@ -120,7 +120,7 @@ exports.addMoreQuestions = async (req, res) => {
 
     const FoundPaper = await Paper.findOne({ PaperID: pID })
     if (FoundPaper == null) {
-        return res.status(500).send({ message: "Paper not found" });
+        return res.status(500).send({ message: "Paper not found", success: false });
     }
     console.log("FoundPaper", FoundPaper);
     // const questions = req.body.Questions;
@@ -141,12 +141,12 @@ exports.addMoreQuestions = async (req, res) => {
             });
 
             if (updatedPaper == null) {
-                return res.status(404).send({ message: "New questions not added" });
+                return res.status(404).send({ message: "New questions not added", success: false });
             }
-            return res.status(200).send({ message: "paper questions have successfully updated" });
+            return res.status(200).send({ message: "paper questions have successfully updated", success: true });
         }
     } catch (error) {
-        return res.status(400).send({ message: "New questions not added" })
+        return res.status(400).send({ message: "New questions not added", success: false })
     }
 };
 
