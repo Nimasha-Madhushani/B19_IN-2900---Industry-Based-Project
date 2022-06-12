@@ -41,28 +41,29 @@ exports.createPaper = async (req, res) => {
     var DateCreated = new Date().toLocaleString('IST', { timeZone: 'Asia/Kolkata' });
 
     try {
-        const { PaperID, PaperName, PaperType, Questions } = req.body;//getting paper details
+        const { paperId, papername, paperType, selectedQuestions } = req.body;//getting paper details
 
-        const existsPaperID = await Paper.findOne({ PaperID: PaperID });
+
+        const existsPaperID = await Paper.findOne({ PaperID: paperId });
         if (existsPaperID) {
-            return res.status(404).json({ message: "Paper ID already exists" })
+            return res.status(404).json({ message: "Paper ID already exists", success: false })
         }
 
-        const existsPaperName = await Paper.findOne({ PaperName: PaperName });
+        const existsPaperName = await Paper.findOne({ PaperName: papername });
         if (existsPaperName) {
-            return res.status(404).json({ message: "Paper name already exists" })
+            return res.status(404).json({ message: "Paper name already exists", success: false })
         }
 
-        const newPaper = new Paper({ PaperID, PaperName, PaperType, DateCreated, Questions });
-
+        const newPaper = new Paper({ PaperID: paperId, PaperName: papername, PaperType: paperType, DateCreated, Questions: selectedQuestions });
+        // console.log("newPaper", newPaper)
         await newPaper.save();
         if (!newPaper) {
-            return res.status(404).json({ message: "New Paper not created successfully" });
+            return res.status(404).json({ message: "New Paper not created successfully", success: false });
         }
-        res.status(200).json({ message: "New Paper created succesfully", newPaper });
+        return res.status(200).json({ message: "New Paper created succesfully", newPaper, success: true });
 
     } catch (error) {
-        res.status(404).json({ message: "New Paper not created successfully", error: error.message })
+        return res.status(404).json({ message: "New Paper not created successfully", error: error.message, success: false })
     }
 }
 
