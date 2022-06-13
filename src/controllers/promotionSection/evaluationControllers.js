@@ -163,13 +163,13 @@ exports.displayFeedback = async (req, res) => {
         }
 
         if (allPaperSubmissions.length == null) {
-            return res.status(404).send({ message: "Submitted papers by employee has not fetched successfully" })
+            return res.status(404).send({ message: "Submitted papers by employee has not fetched successfully", success: false })
         }
 
-        res.status(200).json(allPaperSubmissions);
+        return res.status(200).json(allPaperSubmissions);
 
     } catch (error) {
-        res.status(404).json({ message: "Submitted papers by employee has not fetched successfully", error: error.message })
+        return res.status(404).json({ message: "Submitted papers by employee has not fetched successfully", error: error.message, success: false })
     }
 }
 

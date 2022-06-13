@@ -220,17 +220,16 @@ exports.isAssigned = async(req,res)=>{
         const lenderAsset =  await Asset_Lending.findOne({"employeeID":empID,"reassignDate":null},{"employeeID":1,"assetID":1}).sort({_id:-1})
         if(lenderAsset)
         {
-            res.status(200).send({assetID:lenderAsset.assetID,message:"You cannot change the status to resign"})
+            res.status(200).send({assetID:lenderAsset.assetID,message:"You cannot change the status to resign without give the lendered asset back to the company"})
         }else
         {
-            //res.status(200).send({assetID:"Nothing has assigned!",message:"You can change the status to resign"})
             const updateEmpStatus = await Employee.updateOne(
                 {employeeID : empID},
                 {
                     $set:{status:"Resign"}
                 }
             ).then(()=>{
-                    res.status(200).send({message:"Change the employee status to the resign!"})
+                    res.status(200).send({message:"Changed the employee status to the resign!"})
             }).catch((err)=>{
                     res.status(500).send({message:"Cannot change the status!",error:err.message})
             })
