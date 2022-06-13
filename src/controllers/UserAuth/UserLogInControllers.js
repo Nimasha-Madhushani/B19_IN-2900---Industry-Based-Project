@@ -48,9 +48,7 @@ exports.loginEmployee = async (req, res) => {
       profilePic
     } = userProfile;
 
-    // res.cookie("refreshToken", refreshToken, {
-    //   httpOnly: true,
-    // });
+    // res.cookie("refreshToken", refreshToken);
 
   //   res.setHeader('Set-Cookie', cookie.serialize("refreshToken", refreshToken, {
   //     httpOnly: true,
@@ -59,7 +57,7 @@ exports.loginEmployee = async (req, res) => {
   //     path: '/'
   // }))
 
-    res.status(200).cookie("token" , refreshToken).json({
+    res.status(200).json({
       message: "User has successfully sign in!",
       user: {
         _id,
@@ -68,9 +66,9 @@ exports.loginEmployee = async (req, res) => {
         employeeLastName,
         jobRole,
         profilePic,
-        accessToken: accessToken,
-        refreshToken: refreshToken
       },
+      accessToken: accessToken,
+        refreshToken: refreshToken,
       success: true,
     });
   } catch (err) {
@@ -80,10 +78,10 @@ exports.loginEmployee = async (req, res) => {
 
 //-------LogOut Employee--------------------
 exports.logOutEmployee = async (req, res) => {
-  const { refreshToken } = req.body;
+  const { id } = req.params;
   try {
     await employeeSchema.updateOne(
-      { token: refreshToken },
+      { employeeID: id },
       { $set: { token: "", lastSeen: new Date() } }
     );
     res.status(201).json({ message: "Successfully log out..!", success: true });

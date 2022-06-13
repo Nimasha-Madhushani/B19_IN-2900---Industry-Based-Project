@@ -1,5 +1,5 @@
 const userRoles = {
-  HR: "HR",
+  HR: "HR Manager",
   TeamLeader : "TeamLeader",
   IT : "IT",
   CTO : "CTO",
