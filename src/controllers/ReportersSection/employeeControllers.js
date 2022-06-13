@@ -29,19 +29,27 @@ const candidateSchema = require("../../models/RecruitmentModule/CandidateModel")
 //-------fetch logged employee details-----------------
 exports.getUser = async (req, res) => {
   const { id } = req.params;
-  console.log("ko")
+
   try {
     const user = await employeeSchema.find({ employeeID: id });
-    const EmployeeWithAcc = await academicQualificaationSchema.find({ employeeID: id });
-    const EmpWithProf = await ProffesionalQualificationSchema.find({ employeeID: id });
-    if (!user || !EmployeeWithAcc|| !EmpWithProf) {
+    const EmployeeWithAcc = await academicQualificaationSchema.find({
+      employeeID: id,
+    });
+    const EmpWithProf = await ProffesionalQualificationSchema.find({
+      employeeID: id,
+    });
+    if (!user || !EmployeeWithAcc || !EmpWithProf) {
       return res.status(400).json({
         message: "user and user details does not exists",
       });
     }
     res.status(200).json({
       message: "user fetch successfully",
-      userInfo: {user, EmployeeWithAcc: EmployeeWithAcc[0], EmpWithProf:EmpWithProf[0]},
+      userInfo: {
+        user,
+        EmployeeWithAcc: EmployeeWithAcc[0],
+        EmpWithProf: EmpWithProf[0],
+      },
     });
   } catch (error) {
     res.status(400).json({ state: false, err: error.message });
@@ -114,15 +122,14 @@ exports.viewEmployees = async (req, res) => {
     let employeesInfo = [];
     collectionOne.map((userInfo) => {
       const { EmployeeWithAcc, EmpWithProf, ...other } = userInfo;
+
       employeesInfo.push({
         user: other,
-        EmpWithProf: EmpWithProf[0],
-        EmployeeWithAcc: EmployeeWithAcc[0],
+        EmpWithProf: EmpWithProf ? EmpWithProf[0] : {},
+        EmployeeWithAcc: EmployeeWithAcc ? EmployeeWithAcc[0] : {},
       });
     });
 
-    console.log(employeesInfo);
-    // const{EmployeeWithAcc,EmpWithProf,other}=collectionOne;
     res.status(200).json({ data: employeesInfo });
   } catch (err) {
     return res.status(404).json({ err: err.message });
@@ -139,8 +146,8 @@ exports.createEmployee = async (req, res) => {
     jobRole,
     NIC,
     companyEmail,
-    status,
-    jobType,
+    // status,
+    // jobType,
   } = req.body;
 
   try {
@@ -169,8 +176,8 @@ exports.createEmployee = async (req, res) => {
         jobRole,
         NIC,
         companyEmail,
-        status,
-        jobType,
+        // status,
+        // jobType,
         candidateID: candidate._id,
       });
 
@@ -184,7 +191,18 @@ exports.createEmployee = async (req, res) => {
       const savedSensitiveDetail = await sensitiveDetails.save();
 
       if (savedEmployee && savedSensitiveDetail) {
-        res.status(200).json("Employee and Sensitive Details are Added!");
+        res.status(200).json({
+          success: true,
+          message: "Employee created",
+          employeeCredentials: { username, password },
+        });
+       
+        await candidateSchema.updateOne(
+          { _id: candidate._id },
+          {
+            $set: { status: "recruited" },
+          }
+        );
       }
     } else {
       res.status(400).json({
@@ -236,12 +254,11 @@ exports.updateEmployeeProfile = async (req, res) => {
     // console.log(req);
 
     const existingEmployee = await employeeSchema.findOne({ employeeID: id }); //???????
-    // console.log(existingEmployee);
 
     const candidate = await candidateSchema.findOne({
       _id: existingEmployee.candidateID,
     });
-    //console.log(candidate);
+
     let changeNIC = false;
     if (candidate.NIC != NIC) {
       await candidateSchema.updateOne(
@@ -330,6 +347,101 @@ exports.updateEmployeeProfile = async (req, res) => {
   }
 };
 
-//------------create organization structure------
+//------------filter employees according to job roles - create organization structure------
+exports.getEmployeesForJobRoles = async (req, res) => {
+  try {
+    let levelOne = [],
+      levelTwo = [],
+      levelThree = [],
+      levelFour = [],
+      organizationStructure = [];
+    const allEmployees = await employeeSchema.find();
+    await Promise.all(
+      allEmployees.map(async (employee) => {
+        const {
+          employeeID,
+          employeeFirstName,
+          employeeLastName,
+          profilePic,
+          jobRole,
+        } = employee;
+        if (employee.jobRole === "CTO") {
+          levelOne.push({
+            employeeID,
+            Name: employeeFirstName + " " + employeeLastName,
+            profilePic,
+            jobRole,
+          });
+        }
+        if (
+          employee.jobRole === "Senior Software Engineer" ||
+          employee.jobRole === "Software Architect" ||
+          employee.jobRole === "Tech Lead"
+        ) {
+          levelTwo.push({
+            employeeID,
+            Name: employeeFirstName + " " + employeeLastName,
+            profilePic,
+            jobRole,
+          });
+        }
+        if (
+          employee.jobRole === "HR Manager" ||
+          employee.jobRole === "Software Engineer" ||
+          employee.jobRole === "Product Manager" ||
+          employee.jobRole === "IT Employee" ||
+          employee.jobRole === "UI/UX Designer" ||
+          employee.jobRole === "Business Analyst"
+        ) {
+          levelThree.push({
+            employeeID,
+            Name: employeeFirstName + " " + employeeLastName,
+            profilePic,
+            jobRole,
+          });
+        }
+        if (
+          employee.jobRole === "Intern" ||
+          employee.jobRole === "Associate Software Engineer"
+        ) {
+          levelFour.push({
+            employeeID,
+            Name: employeeFirstName + " " + employeeLastName,
+            profilePic,
+            jobRole,
+          });
+        }
+      })
+    );
 
-//-----------employee profile progress----------
+    res.status(200).json({
+      state: true,
+      organizationStructure: { levelOne, levelTwo, levelThree, levelFour },
+    });
+  } catch (err) {
+    res.status(400).json({ state: false, err: err.message });
+  }
+};
+
+//-----------fetch new candidates without employee profile----------
+exports.candidatesWithoutProfile = async (req, res) => {
+  try {
+    let candidateInfo = [];
+    const filterCandidates = await candidateSchema.find({
+      status: "Selected",
+    });
+    await Promise.all(
+      filterCandidates.map(async (candidates) => {
+        const { candidateName, NIC, appliedPosition } = candidates;
+        candidateInfo.push({ candidateName, NIC, appliedPosition });
+      })
+    );
+
+    res.status(200).json({
+      state: true,
+      candidateData: candidateInfo,
+    });
+  } catch (err) {
+    res.status(400).json({ state: false, err: err.message });
+  }
+};
