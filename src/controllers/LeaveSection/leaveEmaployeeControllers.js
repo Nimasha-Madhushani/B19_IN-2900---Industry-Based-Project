@@ -174,30 +174,33 @@ module.exports.getLeaveBalance = async (req, res) => {
     const leaveBalance = await leaveBalanceSchema.findOne({
       employeeId: id,
     });
+    let remainingLeaves;
 
     if (!leaveBalance) {
-      return res.status(404).json({
-        success: false,
-        msg: "Leave balance is not found",
-      });
+      remainingLeaves = {
+        remainingAnnual: 14,
+        remainingCasual: 7,
+        remainingMedical: 7,
+        employeeId: id,
+      };
+    } else {
+      const {
+        entitledAnnualLeave,
+        entitledCasualLeave,
+        entitledMedicalLeave,
+        approvedAnnualLeave,
+        approvedCasualLeave,
+        approvedMedicalLeave,
+        employeeId,
+      } = leaveBalance;
+
+      remainingLeaves = {
+        remainingAnnual: entitledAnnualLeave - approvedAnnualLeave,
+        remainingCasual: entitledCasualLeave - approvedCasualLeave,
+        remainingMedical: entitledMedicalLeave - approvedMedicalLeave,
+        employeeId: employeeId,
+      };
     }
-
-    const {
-      entitledAnnualLeave,
-      entitledCasualLeave,
-      entitledMedicalLeave,
-      approvedAnnualLeave,
-      approvedCasualLeave,
-      approvedMedicalLeave,
-      employeeId,
-    } = leaveBalance;
-
-    const remainingLeaves = {
-      remainingAnnual: entitledAnnualLeave - approvedAnnualLeave,
-      remainingCasual: entitledCasualLeave - approvedCasualLeave,
-      remainingMedical: entitledMedicalLeave - approvedMedicalLeave,
-      employeeId: employeeId,
-    };
 
     res.status(200).json({
       success: true,
