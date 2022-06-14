@@ -196,17 +196,18 @@ exports.createEmployee = async (req, res) => {
           message: "Employee created",
           employeeCredentials: { username, password },
         });
-       
+
         await candidateSchema.updateOne(
           { _id: candidate._id },
           {
-            $set: { status: "recruited" },
+            $set: { status: "Recruited" },
           }
         );
       }
     } else {
-      res.status(400).json({
+      res.status(200).json({
         message: "Employee or sensitive details is Duplicated!",
+        success: false,
       });
     }
   } catch (err) {
@@ -334,15 +335,19 @@ exports.updateEmployeeProfile = async (req, res) => {
         message: changeNIC
           ? "employee profile,academic qulification, proffesional qualification candidate NIC are  updated successfully"
           : "employee profile,academic qulification, proffesional qualification  are  updated successfully",
+        success: true,
       });
     } else {
-      res.status(400).json("Employee is not existing");
+      res
+        .status(400)
+        .json({ message: "Employee is not existing", success: "false1" });
     }
   } catch (err) {
-    res.status(400).json({
+    res.status(200).json({
       message:
         "employee profile,academic qulification, proffesional qualification are not updated",
       err: err.message,
+      success: false,
     });
   }
 };
