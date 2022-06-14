@@ -24,7 +24,7 @@ const verifyRoles = (allowedRoles) => {
             });
           }
           switch (decodeData.jobRole) {
-            case "HR":
+            case "HR Manager":
             case "IT":
             case "CTO":
               await Promise.all(
