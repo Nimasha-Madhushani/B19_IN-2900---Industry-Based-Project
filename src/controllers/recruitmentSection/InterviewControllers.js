@@ -38,6 +38,10 @@ module.exports.createInterview = async (req, res) => {
     });
 
     const savedInterview = await interview.save();
+    await candidateSchema.updateOne(
+      { _id: candidateID },
+      { $set: { status: "Scheduled" } }
+    );
 
     res.status(200).json({
       success: true,
@@ -172,10 +176,10 @@ module.exports.getInterviews = async (req, res) => {
       Interviewers: {
         $elemMatch: {
           id: id,
+          status: {$ne: "Completed"}
         },
       },
     });
-
     let interviewList = [];
     await Promise.all(
       interviews.map(async (interview) => {
@@ -245,6 +249,18 @@ module.exports.markedCandidate = async (req, res) => {
       { $push: { CandidateMarks: marks } },
       { new: true }
     );
+    await InterviewSchema.updateOne(
+      { _id: id, "Interviewers.id": marks.interviewer },
+      { $set: { "Interviewers.$.status": "Completed" } }
+      );
+      const interview = await InterviewSchema.findOne({_id: id});
+
+    console.log(interview)
+
+    await candidateSchema.updateOne(
+      { _id: interview.candidateID },
+      { $set: { status: marks.recommendation } }
+    );
 
     if (!updatedInterview) {
       return res.status(404).json({
@@ -286,7 +302,7 @@ module.exports.getInterviewStats = async (req, res) => {
       },
     });
     const NonInterviewedCandidate = await candidateSchema.find({
-      status: {$in: ["Initiated",  "Scheduled"]}
+      status: { $in: ["Initiated", "Scheduled"] },
     });
 
     res.status(200).json({
@@ -294,7 +310,7 @@ module.exports.getInterviewStats = async (req, res) => {
       InterviewStats: {
         completedInterviews: CompletedInterviews.length,
         remainingInterviews: RemainingInterviews.length,
-        candidates: NonInterviewedCandidate.length
+        candidates: NonInterviewedCandidate.length,
       },
     });
   } catch (error) {
@@ -305,3 +321,35 @@ module.exports.getInterviewStats = async (req, res) => {
     });
   }
 };
+
+
+module.exports.getInterviewResult = async (req, res) => {
+  
+  const  interview  = req.body;
+  try {
+    const Interview = await InterviewSchema.findOne({
+      candidateID : interview.candidateID,
+      InterviewType : interview.interviewType
+    });
+    console.log("hu")
+    console.log(Interview)
+
+    if(!interview) {
+     return res.status(400).json({
+        success: false,
+        message: "failed to fetch data",
+      });
+    }
+ 
+    res.status(200).json({
+      success: true,
+      InterviewResult: Interview
+    });
+  } catch (error) {
+    res.status(404).json({
+      success: false,
+      description: "failed to fetch data",
+      error: error.message,
+    });
+  }
+}

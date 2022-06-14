@@ -35,18 +35,17 @@ const {
 
 //----------------employee controller------------------------------------------
 
-// router.get("/filterEmployee/:empId",filterEmployee)
-router.get("/user/:id",getUser)
+router.get("/user/:id", getUser);
 
-router.get("/organization",getEmployeesForJobRoles)
+router.get("/organization", getEmployeesForJobRoles);
 
-router.get("/candidateData",candidatesWithoutProfile)
+router.get("/candidateData", candidatesWithoutProfile);
 
 router.get("/", viewEmployees);
 
-router.get("/getall",getallEmployees)
+router.get("/getall", getallEmployees);
 
-router.get("/get",getEmployees)
+router.get("/get", getEmployees);
 
 router.post("/add", createEmployee);
 
@@ -58,7 +57,7 @@ router.put("/update/employee/:id", updateEmployeeProfile); //only HR can access
 
 router.get("/viewTeam", viewTeam);
 
-router.get("/getTeam",getTeam)
+router.get("/getTeam", getTeam);
 
 router.post("/teamAdd", addTeam);
 

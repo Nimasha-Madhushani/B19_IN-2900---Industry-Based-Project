@@ -34,7 +34,7 @@ const candidateSchema = new mongoose.Schema(
     status: {
       type: String,
       default: "Initiated"
-    }            // recruited/ Rejected/ Initiated/ Scheduled/ hold
+    }            // Recruited/ Rejected/ Initiated/ Scheduled/ Hold / Passed 1st / Selected
   },
   { timestamps: true }
 );
