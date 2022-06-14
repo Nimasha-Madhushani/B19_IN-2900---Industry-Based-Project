@@ -12,7 +12,7 @@ exports.viewCurrentSalarySheet = async (req, res) => {
     try {
         const currentSalarySheet = await CurrentSheet.find();
         if (!currentSalarySheet) {
-            res.status(404).json({ message: "Current salary sheets not foundmmm", error: err.message })
+            res.status(404).json({ message: "Current salary sheets not found", error: err.message })
         }
         res.status(200).json(currentSalarySheet);
         // console.log("view current salary sheet executed")
@@ -29,7 +29,10 @@ exports.createCurrentSalarySheet = async (req, res) => {
     if (req.body.EmployeeID == null || req.body.BasicSalary === null || req.body.VehicleAllowance == null || req.body.InternetAllowance == null) {
         return res.status(200).json({ message: "please fill all fields", success: false });
     }
-
+    const duplicateEmployeeID = await CurrentSheet.findOne({ EmployeeID: EmployeeID });
+    if (duplicateEmployeeID) {
+        return res.status(400).json({ message: "duplicateEmployeeID", success: false });
+    }
     const ETF = (req.body.BasicSalary + req.body.InternetAllowance + req.body.VehicleAllowance) * 0.03;
     const CompanyEPF = (req.body.BasicSalary + req.body.InternetAllowance + req.body.VehicleAllowance) * 0.12;
     const EmoloyeeEpf = (req.body.BasicSalary + req.body.InternetAllowance + req.body.VehicleAllowance) * 0.08;
@@ -39,17 +42,11 @@ exports.createCurrentSalarySheet = async (req, res) => {
         EmployeeID, BasicSalary, VehicleAllowance, InternetAllowance, EmoloyeeEpf, NetSalary, CompanyEPF, ETF
     });
     try {
-        const duplicateEmployeeID = await CurrentSheet.findOne({ EmployeeID });
-
-        if (duplicateEmployeeID) {
-            return res.status(200).json({ message: "Salary sheet for this EmployeeID already exists. You have to edit it", success: false });
-        }
-
-        const existsEmployeeId = await Employee.findOne({ employeeID: EmployeeID });
+        // const existsEmployeeId = await Employee.findOne({ employeeID: EmployeeID });
         await newCurrentSalarySheet.save();
-        res.status(200).json({ message: "Salary details has successfully added!", success: true });
+        return res.status(200).json({ message: "Salary details has successfully added!", success: true });
     } catch (error) {
-        res.status(400).json({ message: "Salary details not inserted!", success: false });
+        return res.status(400).json({ message: "Salary details not inserted!", success: false });
     }
 }
 
@@ -135,7 +132,7 @@ exports.deleteCurrentSalarySheet = async (req, res) => {
 
 // send data to summary salary sheet
 const job = schedule.scheduleJob('0 0 26 * * ', async function (req, res) {
-
+    //minute,hour,day of month,month, day of week
     const requestBody = await CurrentSheet.find();
 
     const date = new Date();
@@ -144,7 +141,6 @@ const job = schedule.scheduleJob('0 0 26 * * ', async function (req, res) {
     let Month = date.toLocaleString('en-us', { month: 'long' });
 
     try {
-
         if (!requestBody) {
             console.log("no body");
         }

@@ -47,21 +47,26 @@ module.exports.requestLeave = async (req, res) => {
       teamLeader,
       condition
     );
+    console.log(sentMail);
 
-    if (!sentMail) {
+    if (sentMail.response.status == 400) {
       return res.status(404).json({
-        message: "mail has not send",
+        success: false,
+        message:
+          "Your leave request is not completed. Email has not been sent.",
+      });
+    } else {
+      await newLeave.save();
+      res.status(200).json({
+        success: true,
+        message: "Your leave request is successfully completed",
+        sentMail: sentMail,
       });
     }
-    await newLeave.save();
-    res.status(200).json({
-      success: true,
-      message: "Your leave request is successfully completed",
-      sentMail: sentMail,
-    });
   } catch (error) {
     res.status(400).json({
-      message: "Leave Request is not completed",
+      success: false,
+      message: " Your leave Request is not completed",
       error: error.message,
     });
   }
@@ -92,7 +97,8 @@ module.exports.getLeaveList = async (req, res) => {
       numberOfLeaveDates -= holidays;
       const singleLeave = {
         leaveHistory: leave,
-        numberOfLeaveDates: numberOfLeaveDates,
+        numberOfLeaveDates:
+          leave.leaveMethod == "half Day" ? 0.5 : numberOfLeaveDates,
       };
       leaveHistoryArray.push(singleLeave);
     });
@@ -119,7 +125,7 @@ module.exports.getLeaveList = async (req, res) => {
 
 module.exports.cancelLeave = async (req, res) => {
   const { id } = req.params;
- 
+
   const { reason, employeeId } = req.body;
   try {
     if (!mongoose.Types.ObjectId.isValid(id))
@@ -139,6 +145,9 @@ module.exports.cancelLeave = async (req, res) => {
     const data = {
       reason: reason,
       leaveType: leave.leaveType,
+      leaveStartDate: leave.startDate,
+      leaveEndDate: leave.endDate,
+      prevReason: leave.reason,
     };
     const sentMail = await sendEmails(employee, data, teamLeader, condition);
 
@@ -199,21 +208,23 @@ module.exports.getLeaveBalance = async (req, res) => {
   }
 };
 
-module.exports.getTeamLead = async(req, res) =>{
+module.exports.getTeamLead = async (req, res) => {
   const employeeID = req.params.id;
   try {
     const employee = await employeeSchema.findOne({
-      employeeID : employeeID
+      employeeID: employeeID,
     });
-    const team = await teamSchema.findOne({_id:employee.teamID});
-    const teamLeader = await employeeSchema.findOne({employeeID:team.teamLeadID});
+    const team = await teamSchema.findOne({ _id: employee.teamID });
+    const teamLeader = await employeeSchema.findOne({
+      employeeID: team.teamLeadID,
+    });
+    //const  teamLeader = Object.assign(teamLead,team);
     res.status(200).json({
-      success:true,
-      teamLeader:teamLeader,
-      
+      success: true,
+      teamLeader: teamLeader,
+      teamName: team.teamName,
     });
   } catch (error) {
     console.log(error);
   }
-
 };
