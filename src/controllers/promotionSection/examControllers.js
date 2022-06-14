@@ -4,13 +4,13 @@ const Exam = require("../../models/PromotionModule/Exam");
 exports.scheduleExam = async (req, res) => {
 
     const DateCreated = new Date().toLocaleString('IST', { timeZone: 'Asia/Kolkata' });
-
+    console.log("DateCreated", DateCreated)
     try {
         const eid = req.params.EmployeeID;
         const { ExamID, ExamName, DateScheduled, JobRole, PaperID } = req.body;
-        //const Date = DateScheduled.toLocaleString('IST', { timeZone: 'Asia/Kolkata' });
+        const Date = DateScheduled.toLocaleString('IST', { timeZone: 'Asia/Kolkata' });
 
-        const newExam = new Exam({ organizerID: eid, ExamID, ExamName, DateCreated, DateScheduled, PaperID, JobRole, Status: "Pending" });
+        const newExam = new Exam({ organizerID: eid, ExamID, ExamName, DateCreated, DateScheduled: Date, PaperID, JobRole, Status: "Pending" });
         console.log(newExam);
         await newExam.save();
         if (!newExam) {
