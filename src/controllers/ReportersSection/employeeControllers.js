@@ -9,52 +9,6 @@ const {
 const sensitiveDetailsSchema = require("../../models/ReportersManagementModule/SensitiveDetailsModel");
 const candidateSchema = require("../../models/RecruitmentModule/CandidateModel");
 
-//-------SearchEmployee to update------------------
-
-// exports.filterEmployee = async (req, res) => {
-//   const id = req.params.empId;
-//   let employee;
-//   try {
-//     employee = await employeeSchema.findById(id);
-//   } catch (err) {
-//     console.log(err);
-//   }
-//   if (!employee) {
-//     return res.status(400).json({ message: "Employee is not existing" });
-//   } else {
-//     return res.status(200).json({ employee: employee });
-//   }
-// };
-
-//-------fetch logged employee details-----------------
-exports.getUser = async (req, res) => {
-  const { id } = req.params;
-
-  try {
-    const user = await employeeSchema.find({ employeeID: id });
-    const EmployeeWithAcc = await academicQualificaationSchema.find({
-      employeeID: id,
-    });
-    const EmpWithProf = await ProffesionalQualificationSchema.find({
-      employeeID: id,
-    });
-    if (!user || !EmployeeWithAcc || !EmpWithProf) {
-      return res.status(400).json({
-        message: "user and user details does not exists",
-      });
-    }
-    res.status(200).json({
-      message: "user fetch successfully",
-      userInfo: {
-        user,
-        EmployeeWithAcc: EmployeeWithAcc[0],
-        EmpWithProf: EmpWithProf[0],
-      },
-    });
-  } catch (error) {
-    res.status(400).json({ state: false, err: error.message });
-  }
-};
 //-------View all Employees----------------------------
 exports.getallEmployees = async (req, res) => {
   await employeeSchema
@@ -205,7 +159,7 @@ exports.createEmployee = async (req, res) => {
         );
       }
     } else {
-      res.status(200).json({
+      res.status(400).json({
         message: "Employee or sensitive details is Duplicated!",
         success: false,
       });
@@ -237,6 +191,9 @@ exports.updateEmployeeProfile = async (req, res) => {
     degree,
     language,
     course,
+    jobRole,
+    status,
+    jobType,
   } = req.body;
 
   const employee = {
@@ -250,6 +207,9 @@ exports.updateEmployeeProfile = async (req, res) => {
     profilePic,
     NIC,
     companyEmail,
+    jobRole,
+    status,
+    jobType,
   };
   try {
     // console.log(req);
@@ -448,5 +408,36 @@ exports.candidatesWithoutProfile = async (req, res) => {
     });
   } catch (err) {
     res.status(400).json({ state: false, err: err.message });
+  }
+};
+
+
+//-------fetch logged employee details-----------------
+exports.getUser = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const user = await employeeSchema.find({ employeeID: id });
+    const EmployeeWithAcc = await academicQualificaationSchema.find({
+      employeeID: id,
+    });
+    const EmpWithProf = await ProffesionalQualificationSchema.find({
+      employeeID: id,
+    });
+    if (!user || !EmployeeWithAcc || !EmpWithProf) {
+      return res.status(400).json({
+        message: "user and user details does not exists",
+      });
+    }
+    res.status(200).json({
+      message: "user fetch successfully",
+      userInfo: {
+        user,
+        EmployeeWithAcc: EmployeeWithAcc[0],
+        EmpWithProf: EmpWithProf[0],
+      },
+    });
+  } catch (error) {
+    res.status(400).json({ state: false, err: error.message });
   }
 };
