@@ -23,14 +23,14 @@ exports.createQuestions = async (req, res) => {
 
     const duplicateQuestionID = await Question.findOne({ QuestionID });
     if (duplicateQuestionID) {
-        return res.status(400).json({ message: "QuestionID already exists" });
+        return res.status(400).json({ message: "QuestionID already exists", success: false });
     }
 
     await newQuestion.save().then(() => {
-        return res.json({ message: "New Question created", success: true });
+        return res.status(200).json({ message: "New Question created", success: true });
 
     }).catch((err) => {
-        res.status(400).json({ message: "Question not created", error: err.message, success: false });
+        return res.status(400).json({ message: "Question not created", error: err.message, success: false });
     })
 }
 
