@@ -129,9 +129,9 @@ exports.evaluatePaper = async (req, res) => {
         }
         console.log(updatedPaper);
         console.log("Team Lead ratings have added successfully")
-        return res.status(201).json({ message: "Team Lead ratings have added successfully", success: true });
+        return res.status(200).json({ success: true });
     } catch (err) {
-        return res.status(404).json({ message: "Team Lead ratings have not added", err: err.message, success: false });
+        return res.status(400).json({ message: "Team Lead ratings have not added", err: err.message, success: false });
     }
 }
 
@@ -176,14 +176,14 @@ exports.displayFeedback = async (req, res) => {
 
 exports.displayAnsweredPaperToTeamlead = async (req, res) => {
     //evaluation/allSubmissions/displayOne/:TeamLeadID/:EmployeeID/:PaperID
-    console.log("display answered paper");
+    // console.log("display answered paper");
     try {
         // const teamLeadId = req.params.TeamLeadID;
         const eid = req.params.EmployeeID;
         const pID = req.params.PaperID;
 
         const PaperAnswered = await AnsweredQuestionPaper.findOne({ EmployeeID: eid, PaperID: pID });
-        console.log("PaperAnswered", PaperAnswered);
+        // console.log("PaperAnswered", PaperAnswered);
 
 
         if (PaperAnswered == null) {
