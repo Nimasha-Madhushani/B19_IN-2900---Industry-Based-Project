@@ -10,7 +10,7 @@ const teamSchema = require("../../models/ReportersManagementModule/TeamModel");
 
 exports.addTeam = async (req, res) => {
   const { teamName, teamLeadID, teamMembers } = req.body; //?teamMembers
-console.log(req.body);
+  console.log(req.body);
   const newTeam = new teamSchema({
     teamName,
     teamLeadID,
@@ -20,7 +20,9 @@ console.log(req.body);
     const existingTeam = await teamSchema.findOne({ teamName: teamName });
 
     if (existingTeam) {
-      return res.status(400).json({ message: "This Team Name already exists" });
+      return res
+        .status(200)
+        .json({ status: "This Team Name already exists", success: false });
     }
 
     //front end
@@ -110,15 +112,18 @@ console.log(req.body);
         })
       );
     }
-    if (savedTeam && !updateEmployeeCount && teamLeadUpdate ) {
+    if (savedTeam && !updateEmployeeCount && teamLeadUpdate) {
       return res
         .status(200)
-        .json({ message: "Team added successfully and employee updated" });
+        .json({
+          status: "Team added successfully and employee updated",
+          success: true,
+        });
     }
 
-    res.status(200).json({ message: "Team is  added!" });
+    res.status(200).json({ status: "Team is  added!", success: true });
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    res.status(500).json({ message: err.message, success: false });
   }
 };
 
@@ -159,7 +164,7 @@ exports.updateTeam = async (req, res) => {
 
     if (team && existingTeamLdEmp) {
       const filterTeams = await teamSchema.find({ _id: { $ne: id } });
-      //console.log(filterTeams);
+      
       let chekFalg = false;
       await Promise.all(
         filterTeams.map(async (filtervalue) => {
@@ -185,7 +190,7 @@ exports.updateTeam = async (req, res) => {
       const duplicateTeamLd = await teamSchema.findOne({
         teamLeadID: teamLeadID,
       });
-      //console.log(chekFalg);
+     
       if (!chekFalg) {
         await teamSchema.findByIdAndUpdate(id, newTeamUpdate, {
           new: true,
@@ -233,12 +238,12 @@ exports.updateTeam = async (req, res) => {
 
         res
           .status(201)
-          .json({ message: "Team and employee have updated successfully" });
+          .json({ message: "Team and employee have updated successfully",success:true });
       } else {
-        res.json("cannot update");
+        res.json({message:"cannot update",success:false});//du
       }
     } else {
-      res.json("team is not updated"); //?
+      res.json("team is not updated"); //?have?
     }
   } catch (error) {
     res.status(404).json({
@@ -260,7 +265,7 @@ exports.getTeam = async (req, res) => {
     });
 };
 
-//view all team details 
+//view all team details
 
 exports.viewTeam = async (req, res) => {
   try {
@@ -298,4 +303,3 @@ exports.viewTeam = async (req, res) => {
     return res.status(404).json({ err: err.message });
   }
 };
-
