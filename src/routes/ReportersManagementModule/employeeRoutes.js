@@ -8,6 +8,8 @@ const {
   updateEmployeeProfile,
   getallEmployees,
   getUser,
+  getEmployeesForJobRoles,
+  candidatesWithoutProfile,
 } = require("../../controllers/ReportersSection/employeeControllers");
 
 const {
@@ -35,6 +37,10 @@ const {
 
 // router.get("/filterEmployee/:empId",filterEmployee)
 router.get("/user/:id",getUser)
+
+router.get("/organization",getEmployeesForJobRoles)
+
+router.get("/candidateData",candidatesWithoutProfile)
 
 router.get("/", viewEmployees);
 

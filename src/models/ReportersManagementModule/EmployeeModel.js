@@ -56,6 +56,7 @@ const employeeSchema = new mongoose.Schema(
     jobType: {
       type: String,
       required: true,
+      default:"White Collar"
     },
     candidateID: {
       type: String,
