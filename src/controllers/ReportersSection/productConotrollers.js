@@ -26,28 +26,39 @@ exports.addProduct = async (req, res) => {
   });
 
   const existingProduct = await productSchema.findOne({ productID: productID });
+ 
   const existingProductName = await productSchema.findOne({
     productName: productName,
   });
-
+  if(existingProduct ||existingProductName){
+    return res.status(200).json({
+      status: "productID or productName is existing, cannot be added!",
+      success: false,
+    });
+  }
   //const teamProduct = await productSchema.findOne({ teamID: findTeam._id });
 
   if (!existingProduct && !existingProductName) {
     const savedProduct = await newProduct
       .save()
       .then(() => {
-        res.json("product is added successfully!");
+        return res.status(200).json({
+          status: "product is added successfully!",
+          success: true,
+        });
       })
       .catch((err) => {
-        res
-          .status(400)
-          .json({ message: "product is not added !", err: err.message });
+        return res
+          .status(200)
+          .json({ status: "product is not added !", err: err.message ,success:"false1"});
       });
-  } else {
-    res
-      .status(500)
-      .send({ message: "product is existing or team has a prouct" });
-  }
+  } 
+  // else {
+  //   return res.status(500).send({
+  //     status: "product is existing or team has a prouct",
+  //     success: false,
+  //   });
+  // }
 };
 
 //-----------update product------------------------
@@ -67,7 +78,7 @@ exports.updateProduct = async (req, res) => {
   try {
     const existingProduct = await productSchema.findOne({ _id: id });
     const filterProducts = await productSchema.find({
-      _id: { $ne: id},
+      _id: { $ne: id },
     }); //except the product which is going to update
 
     let chekFalg = false;
@@ -89,9 +100,9 @@ exports.updateProduct = async (req, res) => {
         { new: true }
       );
 
-      return res.status(200).json("product is updated successfully!");
+      return res.status(200).json({status:"product is updated successfully!",success:true});
     } else {
-      return res.status(400).json("product is not updated!");
+      return res.status(200).json({status:"product is not updated!",success:false});
     }
   } catch (err) {
     res
@@ -111,7 +122,7 @@ exports.viewProducts = async (req, res) => {
       products.map(async (product) => {
         const { _id, productID, productName, description, teamID } = product;
         const team = await teamSchema.findOne({ _id: teamID });
-  
+
         allProduct.push({
           _id,
           productID,
