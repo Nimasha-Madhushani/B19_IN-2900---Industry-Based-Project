@@ -125,13 +125,13 @@ exports.evaluatePaper = async (req, res) => {
             $set: { Questions: updateQuestion }
         });
         if (updatedPaper == null) {
-            return res.status(400).send({ message: "Team Lead ratings have not added" });
+            return res.status(400).send({ message: "Team Lead ratings have not added", success: false });
         }
         console.log(updatedPaper);
         console.log("Team Lead ratings have added successfully")
-        return res.status(201).json({ message: "Team Lead ratings have added successfully" });
+        return res.status(201).json({ message: "Team Lead ratings have added successfully", success: true });
     } catch (err) {
-        return res.status(404).json({ message: "Team Lead ratings have not added", err: err.message });
+        return res.status(404).json({ message: "Team Lead ratings have not added", err: err.message, success: false });
     }
 }
 

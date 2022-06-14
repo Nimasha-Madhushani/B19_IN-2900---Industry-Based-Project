@@ -7,17 +7,18 @@ exports.scheduleExam = async (req, res) => {
 
     try {
         const eid = req.params.EmployeeID;
-        const { ExamID, ExamName, DateScheduled, JobRole, PaperID, Status } = req.body;
+        const { ExamID, ExamName, DateScheduled, JobRole, PaperID } = req.body;
         //const Date = DateScheduled.toLocaleString('IST', { timeZone: 'Asia/Kolkata' });
 
-        const newExam = new Exam({ organizerID: eid, ExamID, ExamName, DateCreated, DateScheduled, PaperID, JobRole, Status });
-        console.log(DateScheduled);
+        const newExam = new Exam({ organizerID: eid, ExamID, ExamName, DateCreated, DateScheduled, PaperID, JobRole, Status: "Pending" });
+        console.log(newExam);
         await newExam.save();
         if (!newExam) {
             return res.status(400).json({ message: "New Exam not created.", success: false });
         }
         return res.status(200).json({ message: "successfully created new Exam.", success: true });
     } catch (error) {
+        console.log(error);
         return res.status(400).json({ error: error.message, success: false })
     }
 }
