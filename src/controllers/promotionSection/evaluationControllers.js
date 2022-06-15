@@ -149,8 +149,11 @@ exports.displayFeedback = async (req, res) => {
         }
 
         const employeeSubmitions = await AnsweredQuestionPaper.find({ EmployeeID: eid });
-        if (employeeSubmitions.length < 1) {
-            return res.status(400).send({ message: "You have not submitted any paper yet" });
+        // if (employeeSubmitions.length < 1) {
+        //     return res.status(400).send({ message: "You have not submitted any paper yet" });
+        // }
+        if (!employeeSubmitions) {
+            return res.status(400).send({ message: "Data has not fetched successfully" });
         }
 
         const allPaperSubmissions = [];
@@ -162,9 +165,9 @@ exports.displayFeedback = async (req, res) => {
             allPaperSubmissions.push(submition);
         }
 
-        if (allPaperSubmissions.length == null) {
-            return res.status(404).send({ message: "Submitted papers by employee has not fetched successfully", success: false })
-        }
+        // if (allPaperSubmissions.length == null) {
+        //     return res.status(404).send({ message: "Submitted papers by employee has not fetched successfully", success: false })
+        // }
 
         return res.status(200).json(allPaperSubmissions);
 
