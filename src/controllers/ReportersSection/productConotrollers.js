@@ -22,7 +22,7 @@ exports.addProduct = async (req, res) => {
     productID,
     productName,
     description,
-    teamID: findTeam._id, //frontend
+    teamID: findTeam._id, 
   });
 
   const existingProduct = await productSchema.findOne({ productID: productID });
@@ -31,12 +31,12 @@ exports.addProduct = async (req, res) => {
     productName: productName,
   });
   if(existingProduct ||existingProductName){
-    return res.status(200).json({
+    return res.status(400).json({
       status: "productID or productName is existing, cannot be added!",
       success: false,
     });
   }
-  //const teamProduct = await productSchema.findOne({ teamID: findTeam._id });
+  
 
   if (!existingProduct && !existingProductName) {
     const savedProduct = await newProduct
@@ -49,7 +49,7 @@ exports.addProduct = async (req, res) => {
       })
       .catch((err) => {
         return res
-          .status(200)
+          .status(400)
           .json({ status: "product is not added !", err: err.message ,success:"false1"});
       });
   } 
