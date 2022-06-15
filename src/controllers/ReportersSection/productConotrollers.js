@@ -22,21 +22,20 @@ exports.addProduct = async (req, res) => {
     productID,
     productName,
     description,
-    teamID: findTeam._id, 
+    teamID: findTeam._id,
   });
 
   const existingProduct = await productSchema.findOne({ productID: productID });
- 
+
   const existingProductName = await productSchema.findOne({
     productName: productName,
   });
-  if(existingProduct ||existingProductName){
+  if (existingProduct || existingProductName) {
     return res.status(400).json({
       status: "productID or productName is existing, cannot be added!",
       success: false,
     });
   }
-  
 
   if (!existingProduct && !existingProductName) {
     const savedProduct = await newProduct
@@ -50,15 +49,13 @@ exports.addProduct = async (req, res) => {
       .catch((err) => {
         return res
           .status(400)
-          .json({ status: "product is not added !", err: err.message ,success:"false1"});
+          .json({
+            status: "product is not added !",
+            err: err.message,
+            success: "false1",
+          });
       });
-  } 
-  // else {
-  //   return res.status(500).send({
-  //     status: "product is existing or team has a prouct",
-  //     success: false,
-  //   });
-  // }
+  }
 };
 
 //-----------update product------------------------
@@ -72,7 +69,6 @@ exports.updateProduct = async (req, res) => {
     productID,
     productName,
     description,
-    // teamID,
   };
 
   try {
@@ -100,9 +96,13 @@ exports.updateProduct = async (req, res) => {
         { new: true }
       );
 
-      return res.status(200).json({status:"product is updated successfully!",success:true});
+      return res
+        .status(200)
+        .json({ status: "product is updated successfully!", success: true });
     } else {
-      return res.status(200).json({status:"product is not updated!",success:false});
+      return res
+        .status(200)
+        .json({ status: "product is not updated!", success: false });
     }
   } catch (err) {
     res
@@ -133,9 +133,8 @@ exports.viewProducts = async (req, res) => {
         });
       })
     );
-    // .then((product) => {
+
     res.json({ state: true, data: allProduct });
-    // })
   } catch (err) {
     res.json({ state: false, err: err.message });
   }

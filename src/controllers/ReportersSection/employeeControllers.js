@@ -212,9 +212,7 @@ exports.updateEmployeeProfile = async (req, res) => {
     jobType,
   };
   try {
-    // console.log(req);
-
-    const existingEmployee = await employeeSchema.findOne({ employeeID: id }); //???????
+    const existingEmployee = await employeeSchema.findOne({ employeeID: id });
 
     const candidate = await candidateSchema.findOne({
       _id: existingEmployee.candidateID,
@@ -410,7 +408,6 @@ exports.candidatesWithoutProfile = async (req, res) => {
     res.status(400).json({ state: false, err: err.message });
   }
 };
-
 
 //-------fetch logged employee details-----------------
 exports.getUser = async (req, res) => {
