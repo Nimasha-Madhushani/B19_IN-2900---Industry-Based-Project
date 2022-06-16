@@ -5,7 +5,7 @@ const schedule = require('node-schedule');
 const CurrentSheet = require("../../models/SalaryPaymentModule/CurrentSalary");
 const SummarySalarySchema = require("../../models/SalaryPaymentModule/SummarySalary");
 const Employee = require("../../models/ReportersManagementModule/EmployeeModel");
-
+const Rates = require("../../models/SalaryPaymentModule/SalaryRates");
 
 //view all current salary sheets
 exports.viewCurrentSalarySheet = async (req, res) => {
@@ -18,6 +18,29 @@ exports.viewCurrentSalarySheet = async (req, res) => {
         // console.log("view current salary sheet executed")
     } catch (err) {
         res.status(404).json({ message: "Current salary sheets not found", error: err.message })
+    }
+}
+
+//salary rates
+exports.createSalaryPercentages = async (req, res) => {
+
+    const { EmoloyeeEpfRate, CompanyEPFRate, ETFRate } = req.body;
+    const eid = req.params.EmployeeID;
+    const ChangedDate = new Date().toLocaleString('IST', { timeZone: 'Asia/Kolkata' });
+    console.log("changed by employee", eid);
+    console.log("changeddate", ChangedDate);
+    console.log("body", req.body);
+
+    if (!req.body) {
+        return res.status(400).json({ message: "Data not fetched" });
+    }
+    const newRates = new Rates({ ChangedDate, ChangedBY: eid, EmoloyeeEpfRate, CompanyEPFRate, ETFRate });
+    console.log("new rates", newRates);
+    try {
+        await newRates.save();
+        return res.status(200).json({ message: "Salary rates has successfully added!", success: true });
+    } catch (error) {
+        return res.status(400).json({ message: "Salary rates not inserted!", success: false });
     }
 }
 
@@ -75,6 +98,7 @@ exports.findCurrentSalarySheet = async (req, res) => {
     }
 }
 
+//update current salary by hard-coded rates
 exports.updateCurrentSalarySheet = async (req, res) => {
     var empID = req.params.EmployeeID;
 
@@ -110,7 +134,6 @@ exports.updateCurrentSalarySheet = async (req, res) => {
     }
 };
 
-
 //delete current salary record 
 exports.deleteCurrentSalarySheet = async (req, res) => {
     // console.log("1");
@@ -128,7 +151,6 @@ exports.deleteCurrentSalarySheet = async (req, res) => {
         res.status(404).send({ error: err.message });
     }
 };
-
 
 // send data to summary salary sheet
 const job = schedule.scheduleJob('0 0 26 * * ', async function (req, res) {
