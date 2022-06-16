@@ -45,21 +45,61 @@ exports.createSalaryPercentages = async (req, res) => {
 }
 
 //create a new current salary sheet
+// exports.createCurrentSalarySheet = async (req, res) => {
+
+//     const { EmployeeID, BasicSalary, VehicleAllowance, InternetAllowance } = req.body;
+
+//     if (req.body.EmployeeID == null || req.body.BasicSalary === null || req.body.VehicleAllowance == null || req.body.InternetAllowance == null) {
+//         return res.status(200).json({ message: "please fill all fields", success: false });
+//     }
+//     const duplicateEmployeeID = await CurrentSheet.findOne({ EmployeeID: EmployeeID });
+//     if (duplicateEmployeeID) {
+//         return res.status(400).json({ message: "duplicateEmployeeID", success: false });
+//     }
+//     const ETF = (req.body.BasicSalary + req.body.InternetAllowance + req.body.VehicleAllowance) * 0.03;
+//     const CompanyEPF = (req.body.BasicSalary + req.body.InternetAllowance + req.body.VehicleAllowance) * 0.12;
+//     const EmoloyeeEpf = (req.body.BasicSalary + req.body.InternetAllowance + req.body.VehicleAllowance) * 0.08;
+//     const NetSalary = (req.body.BasicSalary + req.body.InternetAllowance + req.body.VehicleAllowance) - ETF - CompanyEPF - EmoloyeeEpf;
+
+//     const newCurrentSalarySheet = new CurrentSheet({
+//         EmployeeID, BasicSalary, VehicleAllowance, InternetAllowance, EmoloyeeEpf, NetSalary, CompanyEPF, ETF
+//     });
+//     try {
+//         // const existsEmployeeId = await Employee.findOne({ employeeID: EmployeeID });
+//         await newCurrentSalarySheet.save();
+//         return res.status(200).json({ message: "Salary details has successfully added!", success: true });
+//     } catch (error) {
+//         return res.status(400).json({ message: "Salary details not inserted!", success: false });
+//     }
+// }
+//create using rates collection
 exports.createCurrentSalarySheet = async (req, res) => {
 
     const { EmployeeID, BasicSalary, VehicleAllowance, InternetAllowance } = req.body;
 
-    if (req.body.EmployeeID == null || req.body.BasicSalary === null || req.body.VehicleAllowance == null || req.body.InternetAllowance == null) {
-        return res.status(200).json({ message: "please fill all fields", success: false });
+    if (!req.body) {
+        return res.status(404).json({ message: "Data not fetched", success: false });
     }
+    const ratesToCal = await Rates.findOne().sort({ "ChangedDate": -1 }).limit(1);
+    console.log("ratesToCal", ratesToCal);
+
+    if (!ratesToCal) {
+        return res.status(404).json({ message: "Rates not found", success: false });
+    }
+
     const duplicateEmployeeID = await CurrentSheet.findOne({ EmployeeID: EmployeeID });
     if (duplicateEmployeeID) {
-        return res.status(400).json({ message: "duplicateEmployeeID", success: false });
+        return res.status(400).json({ message: "duplicate Employee ID", success: false });
     }
-    const ETF = (req.body.BasicSalary + req.body.InternetAllowance + req.body.VehicleAllowance) * 0.03;
-    const CompanyEPF = (req.body.BasicSalary + req.body.InternetAllowance + req.body.VehicleAllowance) * 0.12;
-    const EmoloyeeEpf = (req.body.BasicSalary + req.body.InternetAllowance + req.body.VehicleAllowance) * 0.08;
+
+    const ETF = (req.body.BasicSalary + req.body.InternetAllowance + req.body.VehicleAllowance) * ratesToCal.ETFRate;
+    console.log("etf", ratesToCal.ETFRate)
+    const CompanyEPF = (req.body.BasicSalary + req.body.InternetAllowance + req.body.VehicleAllowance) * ratesToCal.CompanyEPFRate;
+    console.log("epf", CompanyEPF);
+    const EmoloyeeEpf = (req.body.BasicSalary + req.body.InternetAllowance + req.body.VehicleAllowance) * ratesToCal.EmoloyeeEpfRate;
+    console.log("EmoloyeeEpf", EmoloyeeEpf);
     const NetSalary = (req.body.BasicSalary + req.body.InternetAllowance + req.body.VehicleAllowance) - ETF - CompanyEPF - EmoloyeeEpf;
+    console.log("NetSalary", NetSalary);
 
     const newCurrentSalarySheet = new CurrentSheet({
         EmployeeID, BasicSalary, VehicleAllowance, InternetAllowance, EmoloyeeEpf, NetSalary, CompanyEPF, ETF
@@ -67,11 +107,14 @@ exports.createCurrentSalarySheet = async (req, res) => {
     try {
         // const existsEmployeeId = await Employee.findOne({ employeeID: EmployeeID });
         await newCurrentSalarySheet.save();
+        console.log("new", newCurrentSalarySheet);
         return res.status(200).json({ message: "Salary details has successfully added!", success: true });
     } catch (error) {
-        return res.status(400).json({ message: "Salary details not inserted!", success: false });
+        return res.status(400).json({ message: "Salary details not inserted!", error: error.message, success: false });
     }
 }
+
+
 
 
 //find Current Salary Sheet by employee id
