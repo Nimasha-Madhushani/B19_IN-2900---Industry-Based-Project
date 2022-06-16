@@ -10,7 +10,8 @@ const {
     updateCurrentSalarySheet,
     deleteCurrentSalarySheet,
     // sendToSummarySalarySheet
-    createSalaryPercentages
+    createSalaryPercentages,
+    viewSalaryRates
 } = require("../../controllers/salaryPaymentSection/currentSalarySheetControllers");
 
 
@@ -38,7 +39,8 @@ router.get('/currentSalary/:EmployeeID', findCurrentSalarySheet);
 router.patch('/currentSalary/update/:EmployeeID', updateCurrentSalarySheet);
 router.delete('/currentSalary/delete/:EmployeeID', deleteCurrentSalarySheet);
 //router.post('/currentSalary/sendToSummary', sendToSummarySalarySheet);
-router.post('/currentSalary/salaryPercentages/create/:EmployeeID', createSalaryPercentages)
+router.post('/salaryPercentages/create/:EmployeeID', createSalaryPercentages);
+router.get('/salaryPercentages/', viewSalaryRates);
 
 
 
