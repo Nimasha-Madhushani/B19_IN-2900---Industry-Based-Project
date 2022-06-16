@@ -141,23 +141,64 @@ exports.findCurrentSalarySheet = async (req, res) => {
     }
 }
 
-//update current salary by hard-coded rates
+// //update current salary by hard-coded rates
+// exports.updateCurrentSalarySheet = async (req, res) => {
+//     var empID = req.params.EmployeeID;
+
+//     const employeeToBeUpdated = await CurrentSheet.findOne({ EmployeeID: empID });
+
+//     if (employeeToBeUpdated === null) {
+//         return res.status(404).json({ success: false });
+//     }
+//     try {
+//         const filter = { EmployeeID: empID };
+//         const update = req.body;
+
+//         const ETF = (req.body.BasicSalary + req.body.InternetAllowance + req.body.VehicleAllowance) * 0.03;
+//         const CompanyEPF = (req.body.BasicSalary + req.body.InternetAllowance + req.body.VehicleAllowance) * 0.12;
+//         const EmoloyeeEpf = (req.body.BasicSalary + req.body.InternetAllowance + req.body.VehicleAllowance) * 0.08;
+//         const NetSalary = (req.body.BasicSalary + req.body.InternetAllowance + req.body.VehicleAllowance) - ETF - CompanyEPF - EmoloyeeEpf;
+
+//         const newData = {
+//             BasicSalary: req.body.BasicSalary,
+//             InternetAllowance: req.body.InternetAllowance,
+//             VehicleAllowance: req.body.VehicleAllowance,
+//             ETF: ETF,
+//             CompanyEPF: CompanyEPF,
+//             EmoloyeeEpf: EmoloyeeEpf,
+//             NetSalary: NetSalary
+//         }
+//         // let updateData = await CurrentSheet.findOneAndUpdate(filter, update);
+//         let updateData = await CurrentSheet.findOneAndUpdate(filter, newData);
+//         //console.log("updateData", updateData);
+//         return res.status(200).json({ message: "SUccessfully updated current salary sheet", success: true });
+//     } catch (error) {
+//         return res.status(400).json({ message: "Fail to update", success: false });
+//     }
+// };
+
 exports.updateCurrentSalarySheet = async (req, res) => {
     var empID = req.params.EmployeeID;
 
     const employeeToBeUpdated = await CurrentSheet.findOne({ EmployeeID: empID });
 
-    if (employeeToBeUpdated === null) {
-        return res.status(404).json({ success: false });
+    if (!employeeToBeUpdated) {
+        return res.status(404).json({ message: "Employee not found", success: false });
     }
+    const ratesToCal = await Rates.findOne().sort({ "ChangedDate": -1 }).limit(1);
+    console.log("ratesToCal", ratesToCal);
     try {
         const filter = { EmployeeID: empID };
         const update = req.body;
 
-        const ETF = (req.body.BasicSalary + req.body.InternetAllowance + req.body.VehicleAllowance) * 0.03;
-        const CompanyEPF = (req.body.BasicSalary + req.body.InternetAllowance + req.body.VehicleAllowance) * 0.12;
-        const EmoloyeeEpf = (req.body.BasicSalary + req.body.InternetAllowance + req.body.VehicleAllowance) * 0.08;
+        const ETF = (req.body.BasicSalary + req.body.InternetAllowance + req.body.VehicleAllowance) * ratesToCal.ETFRate;
+        console.log("etf", ratesToCal.ETFRate)
+        const CompanyEPF = (req.body.BasicSalary + req.body.InternetAllowance + req.body.VehicleAllowance) * ratesToCal.CompanyEPFRate;
+        console.log("epf", CompanyEPF);
+        const EmoloyeeEpf = (req.body.BasicSalary + req.body.InternetAllowance + req.body.VehicleAllowance) * ratesToCal.EmoloyeeEpfRate;
+        console.log("EmoloyeeEpf", EmoloyeeEpf);
         const NetSalary = (req.body.BasicSalary + req.body.InternetAllowance + req.body.VehicleAllowance) - ETF - CompanyEPF - EmoloyeeEpf;
+        console.log("NetSalary", NetSalary);
 
         const newData = {
             BasicSalary: req.body.BasicSalary,
@@ -168,9 +209,9 @@ exports.updateCurrentSalarySheet = async (req, res) => {
             EmoloyeeEpf: EmoloyeeEpf,
             NetSalary: NetSalary
         }
-        // let updateData = await CurrentSheet.findOneAndUpdate(filter, update);
+
         let updateData = await CurrentSheet.findOneAndUpdate(filter, newData);
-        //console.log("updateData", updateData);
+        console.log("updateData", updateData);
         return res.status(200).json({ message: "SUccessfully updated current salary sheet", success: true });
     } catch (error) {
         return res.status(400).json({ message: "Fail to update", success: false });
