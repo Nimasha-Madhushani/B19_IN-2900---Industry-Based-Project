@@ -21,6 +21,20 @@ exports.viewCurrentSalarySheet = async (req, res) => {
     }
 }
 
+//view allsalary rates
+exports.viewSalaryRates = async (req, res) => {
+    try {
+        const salaryRates = await Rates.find();
+        if (!salaryRates) {
+            return res.status(404).json({ message: "salary rates not found", error: err.message })
+        }
+        return res.status(200).json(salaryRates);
+    } catch (err) {
+        return res.status(404).json({ message: "ee", error: err.message })
+    }
+}
+
+
 //salary rates
 exports.createSalaryPercentages = async (req, res) => {
 
