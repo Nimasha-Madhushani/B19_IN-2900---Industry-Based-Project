@@ -77,7 +77,7 @@ exports.getOrganizationStructure = async (req, res) => {
             allEmployees.push(employee);
           }
         });
-        console.log(allEmployees)
+  
         // allEmployees.push({
         //  filterEmployees
         // });
