@@ -101,7 +101,7 @@ exports.updateProduct = async (req, res) => {
         .json({ status: "product is updated successfully!", success: true });
     } else {
       return res
-        .status(200)
+        .status(400)
         .json({ status: "product is not updated!", success: false });
     }
   } catch (err) {
