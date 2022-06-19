@@ -8,7 +8,7 @@ const {
 } = require("../../models/ReportersManagementModule/EmployeeModel");
 const sensitiveDetailsSchema = require("../../models/ReportersManagementModule/SensitiveDetailsModel");
 const candidateSchema = require("../../models/RecruitmentModule/CandidateModel");
-
+const sendEmails = require("./credentialMailHandler");
 //-------View all Employees----------------------------
 exports.getallEmployees = async (req, res) => {
   await employeeSchema
@@ -158,11 +158,21 @@ exports.createEmployee = async (req, res) => {
           }
         );
       }
+      //-------------
+      const sentMail = await sendEmails(savedSensitiveDetail, savedEmployee);
+    
+      //-------------
     } else {
       res.status(400).json({
         message: "Employee or sensitive details is Duplicated!",
         success: false,
       });
+      if (sentMail.response.status == 400) {
+      return  res.status(404).json({
+          success: false,
+          message: "Credentials are not sent.",
+        });
+      }
     }
   } catch (err) {
     res.status(400).json({
@@ -301,7 +311,7 @@ exports.updateEmployeeProfile = async (req, res) => {
         .json({ message: "Employee is not existing", success: "false1" });
     }
   } catch (err) {
-    res.status(200).json({
+    res.status(400).json({
       message:
         "employee profile,academic qulification, proffesional qualification are not updated",
       err: err.message,
