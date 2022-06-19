@@ -49,7 +49,7 @@ router.get("/assignPerson/:id", assignPerson);
 router.get("/category/:assetCategory", assetsByCategory);
 
 //find whether an employee has assigned for an asset current time or given it back
-router.get("/isAssigned",isAssigned)
+router.get("/isAssigned/:empID",isAssigned)
 
 router.patch("/update/:id",updateAsset)
 
