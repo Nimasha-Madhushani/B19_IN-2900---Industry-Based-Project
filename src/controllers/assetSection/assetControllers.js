@@ -341,3 +341,26 @@ exports.updateAsset = async (req, res) => {
       });
     });
 };
+
+exports.availableAssetsCategory = async(req,res) =>{
+    const CATEGORY = req.params.assetCategories;
+    if(CATEGORY == "All")
+    {
+       await Asset.find({status:'Available'}).then((assets)=>{
+            res.json({data:assets,success:true})
+        }).catch((err)=>{
+            //console.log(err)
+            res.status(500).send({message:"No assets like that category!",error:err.message,success:false})
+        })
+    }else{
+        await Asset.find({status:'Available',"assetCategory" :{$regex: new RegExp([CATEGORY?.toLowerCase()], "i") }}).then((assets)=>{
+            res.json({data:assets,success:true})
+        }).catch((err)=>{
+            //console.log(err)
+            res.status(500).send({message:"No assets like that category!",error:err.message,success:false})
+        })
+    }
+    
+}
+
+

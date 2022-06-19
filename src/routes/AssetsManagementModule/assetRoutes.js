@@ -12,7 +12,8 @@ const {
   releaseFault,
   assetsByCategory,
   isAssigned,
-  updateAsset
+  updateAsset,
+  availableAssetsCategory
 } = require("../../controllers/assetSection/assetControllers");
 //create assets
 router.post("/add", createAsset);
@@ -51,5 +52,7 @@ router.get("/category/:assetCategory", assetsByCategory);
 router.get("/isAssigned/:empID",isAssigned)
 
 router.patch("/update/:id",updateAsset)
+
+router.get("/availableAssets/category/:assetCategories",availableAssetsCategory)
 
 module.exports = router;
