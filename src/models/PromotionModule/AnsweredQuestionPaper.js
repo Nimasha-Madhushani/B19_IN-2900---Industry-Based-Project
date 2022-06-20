@@ -27,6 +27,10 @@ const AnsweredQuestionPaperSchema = new Schema({
     DateOfEvaluation: {
         type: String
     },
+    isPromoted: {
+        type: Boolean,
+        default: false
+    },
 });
 
 const AnsweredQuestionPaper = mongoose.model("AnsweredQuestionPaper", AnsweredQuestionPaperSchema);
