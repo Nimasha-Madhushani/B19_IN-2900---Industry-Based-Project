@@ -4,13 +4,10 @@ const EmployeeSchema = require("../models/ReportersManagementModule/EmployeeMode
 const verify = async (req, res, next) => {
   try {
     let accessToken = req.headers.authorization;
-
-    if (!accessToken) {
-      return res
-        .status(401)
-        .json({ message: "You are not authenticated..Please log In" });
-    }
     accessToken = accessToken.split(" ")[1];
+    if (accessToken === "null") {
+      return res.status(401).json({ message: "Unauthenticated" });
+    }
     await jwt.verify(
       accessToken,
       process.env.ACCESS_TOKEN_SECRET_KEY,
@@ -36,7 +33,7 @@ const verify = async (req, res, next) => {
         } else {
           return res
             .status(403)
-            .json({ message: "You are not authorized for this...!" });
+            .json({ success: false, message: "Unauthorized" });
         }
       }
     );

@@ -6,26 +6,27 @@ const verifyRoles = (allowedRoles) => {
     try {
       let accessToken = req.headers.authorization;
       let authorized = false;
-      if (!accessToken) {
+      accessToken = accessToken.split(" ")[1];
+      if (accessToken === "null") {
         return res
           .status(401)
-          .json({ message: "You are not authenticated..Please log In" });
+          .json({success: false,  message: "Unauthenticated" });
       }
 
-      accessToken = accessToken.split(" ")[1];
       await jwt.verify(
         accessToken,
         process.env.ACCESS_TOKEN_SECRET_KEY,
         async (error, decodeData) => {
           if (error) {
             return res.status(403).json({
+              success: false,
               message: "access token is not valid",
               error: error.message,
             });
           }
           switch (decodeData.jobRole) {
             case "HR Manager":
-            case "IT":
+            case "IT Employee":
             case "CTO":
               await Promise.all(
                 allowedRoles.map((role) => {
@@ -55,7 +56,8 @@ const verifyRoles = (allowedRoles) => {
             next();
           } else {
             return res.status(403).json({
-              message: "You are not authorized for this action.",
+              success: false,
+              message: "Unauthorized",
             });
           }
         }
