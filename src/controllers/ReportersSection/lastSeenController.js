@@ -1,8 +1,6 @@
 const mongoose = require("mongoose");
 const employeeSchema = require("../../models/ReportersManagementModule/EmployeeModel");
 
-//------------update last seen of employees-----------------------
-
 //-------------view last seen of employees------------------------
 exports.displayLastSeen = async (req, res) => {
   try {
@@ -32,7 +30,6 @@ exports.displayLastSeen = async (req, res) => {
             ...others
           } = filterEmployees.toObject();
           lastSeenArr.push(others);
-          // console.log(others);
         }
       })
     );

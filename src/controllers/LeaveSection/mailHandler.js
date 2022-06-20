@@ -15,13 +15,13 @@ const sendEmails = async (employee, data, teamLeader, condition) => {
     const emailTemplateSourceCancel = fs.readFileSync(
       path.join(__dirname, "/cancel.handlebars"),
       "utf8"
-    );
-
+    ); 
+ 
     const emailTemplateSourceApprove = fs.readFileSync(
       path.join(__dirname, "/approve.handlebars"),
-      "utf8"
+      "utf8" 
     );
-
+ 
     const emailTemplateSourceReject = fs.readFileSync(
       path.join(__dirname, "/reject.handlebars"),
       "utf8"
@@ -51,7 +51,7 @@ const sendEmails = async (employee, data, teamLeader, condition) => {
       startDate: new Date(data.leaveStartDate).toDateString(),
       appliedReason: data.prevReason, 
       endDate: new Date(data.leaveEndDate).toDateString(),
-      teamLeader: teamLeader.employeeFirstName,
+      teamLeader: teamLeader.employeeFirstName, 
     });
     const htmlToSendApprove = templateApprove({
       employee: employee.employeeFirstName,
@@ -83,13 +83,13 @@ const sendEmails = async (employee, data, teamLeader, condition) => {
 
     
 
-    const mailOptions = {
+    const mailOptions = { 
       to: condition.teamLeaderBoolean
         ? employee.companyEmail
         : teamLeader.companyEmail,
       subject: condition.teamLeaderBoolean
         ? condition.task
-        : condition.task + " " + data.leaveType + " " + "leave",
+        : condition.task + " " + data.leaveType + " " + "leave", 
 
       text: data.reason,
 
@@ -104,7 +104,7 @@ const sendEmails = async (employee, data, teamLeader, condition) => {
       
     };
 
-    const result = await transporter.sendMail(mailOptions);
+    const result = await transporter.sendMail(mailOptions); 
     return result;
   } catch (error) {
     console.log(error);

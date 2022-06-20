@@ -255,6 +255,8 @@
             text-transform: uppercase;
             letter-spacing: 2px;
             color: rgba(255, 255, 255, .4);
+           
+           
         }
 
 
@@ -288,33 +290,34 @@
                 </tr><!-- end tr -->
                 <tr>
                     <td valign="middle" class="hero bg_white"
-                        style="background-image: url('https://www.1zoom.me/prev/303/302250.jpg'); background-size: cover; height: 400px;">
+                        style="background-image: url('https://www.violinschool.com/wp-content/uploads/2020/04/Second-Nature-600px-400px-4.jpg'); background-size: cover; height: 200px;">
                         <div class="overlay"></div>
                         <table>
                             <tr>
                                 <td>
-                                    <div class="text" style="padding: 0 4em; text-align: center;">
-                                        <h2>Leave Request</h2>
+                                    <div class="text" style="padding: 2px ; text-align: center; ">
+                                        <div>
+                                            <h2 style="text-transform: uppercase; font-weight:bold;">
+                                                {{task}} {{ leaveType}} leave
+                                            </h2>
+                                        </div>
                                         <p>please take an action</p>
                                         <p><a href="#" class="btn btn-primary">View Details</a>
                                         </p>
+                                       
                                     </div>
+                                     
                                 </td>
                             </tr>
                         </table>
                     </td>
                 </tr><!-- end tr -->
                 <tr>
-                    <td class="bg_dark email-section" style="text-align:center;">
+                    <td class="bg_dark email-section" style="text-align:left;">
                         <div class="heading-section heading-section-white">
-                            {{!-- <span class="subheading">{{reason}}</span> --}}
-                            {{!-- <span class="subheading">{{ employee}}</span> --}}
-                            <span class="subheading">{{task}}</span>
-                            <span class="subheading">{{ leaveType}} leave</span>
-                            {{!-- <span class="subheading">{{teamLeader}}</span> --}}
+                            
 
-
-                            <div>
+                            <div style="color: white;">
                                 <p> Dear {{employee}} ,</p>
 
                                 <p>I am writing this to inform you to approval of your leave from {{startDate}} to
