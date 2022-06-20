@@ -2,8 +2,8 @@ const EmployeeModel = require("../../models/ReportersManagementModule/EmployeeMo
 const organizationStructureSchema = require("../../models/ReportersManagementModule/OrganizationStructureModel");
 exports.createOragnizationStructure = async (req, res) => {
   const { level, jobRole } = req.body;
-  console.log(jobRole)
-  console.log(level)
+  console.log(jobRole);
+  console.log(level);
   try {
     const filterLevel = await organizationStructureSchema.findOne({
       level: level,
@@ -33,27 +33,46 @@ exports.createOragnizationStructure = async (req, res) => {
 };
 
 exports.updateOragnizationStructure = async (req, res) => {
+  console.log(req.params.id);
+  // console.log(req.body);
+
   const { id } = req.params;
-  const { jobRole } = req.body;
+  const jobRole  = req.body;
+  console.log(jobRole)
   try {
     const findLevel = await organizationStructureSchema.findOne({ _id: id });
-    // const updatedLevel = { jobRole };
 
     if (!findLevel) {
       return res
         .status(400)
         .json({ success: false, message: "Level is not existing" });
     }
-    await organizationStructureSchema.findByIdAndUpdate(
-      findLevel._id,
-      { $set: { jobRole: jobRole } },
-      {
-        new: true,
-      }
-    );
-    res
-      .status(200)
-      .json({ success: true, message: "Level is updated  successfully" });
+    await organizationStructureSchema
+      .findByIdAndUpdate(
+        findLevel._id,
+        { $set: { jobRole: jobRole } },
+        {
+          new: true,
+        }
+      )
+      .then((level) => {
+        res
+          .status(200)
+          .json({
+            success: true,
+            message: "Level is updated  successfully",
+            levels: level,
+          });
+      })
+      .catch((err) => {
+        res
+          .status(400)
+          .json({
+            success: true,
+            message: "Level is not updated ",
+            err: err.message,
+          });
+      });
   } catch (err) {
     res.status(500).json({
       success: false,
@@ -68,7 +87,7 @@ exports.getOrganizationStructure = async (req, res) => {
     const findLevels = await organizationStructureSchema.find();
     let levels = [];
     findLevels.map(async (level) => {
-     // console.log(level);
+      // console.log(level);
       let allEmployees = [];
       level.jobRole.map(async (job) => {
         const filterEmployees = await EmployeeModel.find();
@@ -77,7 +96,7 @@ exports.getOrganizationStructure = async (req, res) => {
             allEmployees.push(employee);
           }
         });
-  
+
         // allEmployees.push({
         //  filterEmployees
         // });
@@ -124,7 +143,7 @@ exports.getOrganizationStructure = async (req, res) => {
 //   await organizationStructureSchema
 //     .find()
 //     .then((levels) => {
-     
+
 //       res.status(200).json({ state: true, data: levels });
 //     })
 //     .catch((err) => {
@@ -142,3 +161,15 @@ exports.getLevels = async (req, res) => {
       res.status(400).json({ state: false, err: err });
     });
 };
+
+//-----------filter jobs not having a level--------------
+
+// exports.filterJobRoles = async (req, res) => {
+//   let jobroles=[]
+//   const filterJobRoles = await organizationStructureSchema.find();
+//   await Promise.all(filterJobRoles.map(async(job)=>{
+// jobroles.push()
+
+//   }))
+  
+// };

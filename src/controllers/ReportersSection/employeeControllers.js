@@ -34,11 +34,13 @@ exports.getEmployees = async (req, res) => {
             employeeFirstName,
             employeeLastName,
             profilePic,
+            jobRole
           } = employee;
           employees.push({
             employeeID,
             employeeName: employeeFirstName + " " + employeeLastName,
             profilePic,
+            jobRole
           });
         }
       })
@@ -105,6 +107,8 @@ exports.createEmployee = async (req, res) => {
   } = req.body;
 
   try {
+    //create employeeID
+    // const ID="DFN"+await employeeSchema.count()+1;
     //cerate username and password
     const username = employeeFirstName + "." + employeeID;
     const password = NIC;
@@ -160,7 +164,7 @@ exports.createEmployee = async (req, res) => {
       }
       //-------------
       const sentMail = await sendEmails(savedSensitiveDetail, savedEmployee);
-    
+
       //-------------
     } else {
       res.status(400).json({
@@ -168,7 +172,7 @@ exports.createEmployee = async (req, res) => {
         success: false,
       });
       if (sentMail.response.status == 400) {
-      return  res.status(404).json({
+        return res.status(404).json({
           success: false,
           message: "Credentials are not sent.",
         });
@@ -446,5 +450,18 @@ exports.getUser = async (req, res) => {
     });
   } catch (error) {
     res.status(400).json({ state: false, err: error.message });
+  }
+};
+
+//count employees
+
+exports.countEmployees = async (req, res) => {
+  try {
+    let employeeCount = await employeeSchema.count();
+employeeCount=employeeCount+1;
+
+    res.status(200).json({ state: true, count: "DF00".concat(employeeCount) });
+  } catch (err) {
+    res.status(400).json({ state: false, err: err.message });
   }
 };
