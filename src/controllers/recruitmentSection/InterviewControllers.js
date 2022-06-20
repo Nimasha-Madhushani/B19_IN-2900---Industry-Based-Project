@@ -67,7 +67,7 @@ module.exports.cancelInterview = async (req, res) => {
     if (interview) {
       if (new Date() < interview.InterviewDate) {
         await InterviewSchema.findByIdAndDelete(id);
-        res.status(201).json({
+        res.status(200).json({
           success: true,
           message: "Interview successfully canceled",
         });
@@ -303,7 +303,7 @@ module.exports.getInterviewStats = async (req, res) => {
     });
     const NonInterviewedCandidate = await candidateSchema.find({
       status: { $in: ["Initiated", "Scheduled"] },
-    });
+    }); 
 
     res.status(200).json({
       success: true,
@@ -331,8 +331,6 @@ module.exports.getInterviewResult = async (req, res) => {
       candidateID : interview.candidateID,
       InterviewType : interview.interviewType
     });
-    console.log("hu")
-    console.log(Interview)
 
     if(!interview) {
      return res.status(400).json({
