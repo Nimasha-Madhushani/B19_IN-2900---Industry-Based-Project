@@ -10,6 +10,7 @@ const {
   getUser,
   getEmployeesForJobRoles,
   candidatesWithoutProfile,
+  countEmployees,
 } = require("../../controllers/ReportersSection/employeeControllers");
 
 const {
@@ -41,6 +42,8 @@ const {
  
 
 //----------------employee controller------------------------------------------
+
+router.get("/count",countEmployees)
 
 router.get("/user/:id", getUser);
 
