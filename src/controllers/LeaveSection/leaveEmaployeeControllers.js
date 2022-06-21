@@ -181,6 +181,9 @@ module.exports.getLeaveBalance = async (req, res) => {
         remainingAnnual: 14,
         remainingCasual: 7,
         remainingMedical: 7,
+        entitledAnnualLeave: 14,
+        entitledCasualLeave: 07,
+        entitledMedicalLeave: 07,
         employeeId: id,
       };
     } else {
@@ -198,6 +201,9 @@ module.exports.getLeaveBalance = async (req, res) => {
         remainingAnnual: entitledAnnualLeave - approvedAnnualLeave,
         remainingCasual: entitledCasualLeave - approvedCasualLeave,
         remainingMedical: entitledMedicalLeave - approvedMedicalLeave,
+        entitledAnnualLeave: entitledAnnualLeave,
+        entitledCasualLeave: entitledCasualLeave,
+        entitledMedicalLeave: entitledMedicalLeave,
         employeeId: employeeId,
       };
     }
@@ -229,5 +235,69 @@ module.exports.getTeamLead = async (req, res) => {
     });
   } catch (error) {
     console.log(error);
+  }
+};
+
+module.exports.increaseLeaves = async (req, res) => {
+  
+
+  const employeeID = req.params.id;
+  const { leaveType, data } = req.body;
+ 
+  try {
+    const leaveBalance = await leaveBalanceSchema.findOne({
+      employeeId: employeeID,
+    });
+    switch (leaveType) {
+      case "Annual":
+        await leaveBalanceSchema.findOneAndUpdate(
+          { employeeId: employeeID },
+          {
+            $set: {
+              entitledAnnualLeave:
+                leaveBalance.entitledAnnualLeave + parseInt(data.increasedDates),
+            },
+          }
+        );
+        break;
+      case "Medical":
+        await leaveBalanceSchema.findOneAndUpdate(
+          { employeeId: employeeID },
+          {
+            $set: {
+              entitledCasualLeave:
+                leaveBalance.entitledCasualLeave + parseInt(data.increasedDates),
+            },
+          }
+        );
+        break;
+      case "Casual":
+        await leaveBalanceSchema.findOneAndUpdate(
+          { employeeId: employeeID },
+          {
+            $set: {
+              entitledMedicalLeave:
+                leaveBalance.entitledMedicalLeave
+                 + parseInt(data.increasedDates),
+            },
+          }
+        );
+        break;
+
+      default:
+        break;
+    }
+
+    res.status(200).json({
+      success: true,
+      description: "Leave is failed to delete",
+     
+    });
+  } catch (error) {
+    res.status(404).json({
+      success: false,
+      description: "Leave is failed to delete",
+      error: error.message,
+    });
   }
 };
