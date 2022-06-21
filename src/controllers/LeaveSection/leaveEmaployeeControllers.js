@@ -290,13 +290,13 @@ module.exports.increaseLeaves = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      description: "Leave is failed to delete",
+      description: "Entitled Leave Count is successfully updated ",
      
     });
   } catch (error) {
     res.status(404).json({
       success: false,
-      description: "Leave is failed to delete",
+      description: "Failed to increase entitled leaves",
       error: error.message,
     });
   }
