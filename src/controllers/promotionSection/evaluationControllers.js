@@ -110,6 +110,7 @@ exports.evaluatePaper = async (req, res) => {
                     if (teamLeadRatings[i].QuestionID == answeredQuestions.Questions[j].QuestionID) {
                         question = {
                             QuestionID: answeredQuestions.Questions[j].QuestionID,
+                            QuestionBody: answeredQuestions.Questions[j].QuestionBody,
                             EmployeeRating: answeredQuestions.Questions[j].EmployeeRating,
                             TeamLeadRating: teamLeadRatings[i].TeamLeadRating
                         }
