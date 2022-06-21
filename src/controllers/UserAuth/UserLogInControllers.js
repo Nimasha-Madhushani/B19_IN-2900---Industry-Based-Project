@@ -2,6 +2,7 @@ const sensitiveDetailsSchema = require("../../models/ReportersManagementModule/S
 const employeeSchema = require("../../models/ReportersManagementModule/EmployeeModel");
 const bcrypt = require("bcrypt");
 const { createAccessToken, createRefreshToken } = require("./JWTCreator");
+const TeamModel = require("../../models/ReportersManagementModule/TeamModel");
 
 //-------Login Employee--------------------
 exports.loginEmployee = async (req, res) => {
@@ -25,6 +26,9 @@ exports.loginEmployee = async (req, res) => {
     const userProfile = await employeeSchema.findOne({
       employeeID: oldUser.employeeID,
     });
+    const isTeamLead = await TeamModel.findOne({
+      teamLeadID: oldUser.employeeID,
+    });
     const accessToken = createAccessToken(
       userProfile.employeeID,
       userProfile.jobRole
@@ -45,17 +49,17 @@ exports.loginEmployee = async (req, res) => {
       employeeFirstName,
       employeeLastName,
       jobRole,
-      profilePic
+      profilePic,
     } = userProfile;
 
     // res.cookie("refreshToken", refreshToken);
 
-  //   res.setHeader('Set-Cookie', cookie.serialize("refreshToken", refreshToken, {
-  //     httpOnly: true,
-  //     sameSite: 'strict',
-  //     maxAge: 60 * 60 * 24 * 7,
-  //     path: '/'
-  // }))
+    //   res.setHeader('Set-Cookie', cookie.serialize("refreshToken", refreshToken, {
+    //     httpOnly: true,
+    //     sameSite: 'strict',
+    //     maxAge: 60 * 60 * 24 * 7,
+    //     path: '/'
+    // }))
 
     res.status(200).json({
       message: "User has successfully sign in!",
@@ -66,9 +70,10 @@ exports.loginEmployee = async (req, res) => {
         employeeLastName,
         jobRole,
         profilePic,
+        teamLead: isTeamLead? true: false
       },
       accessToken: accessToken,
-        refreshToken: refreshToken,
+      refreshToken: refreshToken,
       success: true,
     });
   } catch (err) {

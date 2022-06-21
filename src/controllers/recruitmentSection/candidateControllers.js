@@ -108,7 +108,7 @@ module.exports.getAllCandidates = async (req, res) => {
     const candidates = await candidateSchema.find({status: {$ne: "Recruited"}});
     if (!candidates) {
       return res
-        .status(404)
+        .status(400)
         .json({ success: false, description: "failed to fetch candidates" });
     }
     res.status(200).json({

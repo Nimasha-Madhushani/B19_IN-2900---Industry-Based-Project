@@ -8,7 +8,7 @@ const {
 } = require("../../models/ReportersManagementModule/EmployeeModel");
 const sensitiveDetailsSchema = require("../../models/ReportersManagementModule/SensitiveDetailsModel");
 const candidateSchema = require("../../models/RecruitmentModule/CandidateModel");
-
+const sendEmails = require("./credentialMailHandler");
 //-------View all Employees----------------------------
 exports.getallEmployees = async (req, res) => {
   await employeeSchema
@@ -34,11 +34,13 @@ exports.getEmployees = async (req, res) => {
             employeeFirstName,
             employeeLastName,
             profilePic,
+            jobRole
           } = employee;
           employees.push({
             employeeID,
             employeeName: employeeFirstName + " " + employeeLastName,
             profilePic,
+            jobRole
           });
         }
       })
@@ -105,6 +107,8 @@ exports.createEmployee = async (req, res) => {
   } = req.body;
 
   try {
+    //create employeeID
+    // const ID="DFN"+await employeeSchema.count()+1;
     //cerate username and password
     const username = employeeFirstName + "." + employeeID;
     const password = NIC;
@@ -158,11 +162,21 @@ exports.createEmployee = async (req, res) => {
           }
         );
       }
+      //-------------
+      const sentMail = await sendEmails(savedSensitiveDetail, savedEmployee);
+
+      //-------------
     } else {
       res.status(400).json({
         message: "Employee or sensitive details is Duplicated!",
         success: false,
       });
+      if (sentMail.response.status == 400) {
+        return res.status(404).json({
+          success: false,
+          message: "Credentials are not sent.",
+        });
+      }
     }
   } catch (err) {
     res.status(400).json({
@@ -212,9 +226,7 @@ exports.updateEmployeeProfile = async (req, res) => {
     jobType,
   };
   try {
-    // console.log(req);
-
-    const existingEmployee = await employeeSchema.findOne({ employeeID: id }); //???????
+    const existingEmployee = await employeeSchema.findOne({ employeeID: id });
 
     const candidate = await candidateSchema.findOne({
       _id: existingEmployee.candidateID,
@@ -303,7 +315,7 @@ exports.updateEmployeeProfile = async (req, res) => {
         .json({ message: "Employee is not existing", success: "false1" });
     }
   } catch (err) {
-    res.status(200).json({
+    res.status(400).json({
       message:
         "employee profile,academic qulification, proffesional qualification are not updated",
       err: err.message,
@@ -411,7 +423,6 @@ exports.candidatesWithoutProfile = async (req, res) => {
   }
 };
 
-
 //-------fetch logged employee details-----------------
 exports.getUser = async (req, res) => {
   const { id } = req.params;
@@ -439,5 +450,18 @@ exports.getUser = async (req, res) => {
     });
   } catch (error) {
     res.status(400).json({ state: false, err: error.message });
+  }
+};
+
+//count employees
+
+exports.countEmployees = async (req, res) => {
+  try {
+    let employeeCount = await employeeSchema.count();
+employeeCount=employeeCount+1;
+
+    res.status(200).json({ state: true, count: "DF00".concat(employeeCount) });
+  } catch (err) {
+    res.status(400).json({ state: false, err: err.message });
   }
 };

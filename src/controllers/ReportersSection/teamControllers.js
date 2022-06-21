@@ -9,8 +9,8 @@ const teamSchema = require("../../models/ReportersManagementModule/TeamModel");
 //---------------create team-------------------
 
 exports.addTeam = async (req, res) => {
-  const { teamName, teamLeadID, teamMembers } = req.body; //?teamMembers
-  console.log(req.body);
+  const { teamName, teamLeadID, teamMembers } = req.body;
+  // console.log(req.body);
   const newTeam = new teamSchema({
     teamName,
     teamLeadID,
@@ -21,16 +21,11 @@ exports.addTeam = async (req, res) => {
 
     if (existingTeam) {
       return res
-        .status(200)
+        .status(400)
         .json({ status: "This Team Name already exists", success: false });
     }
 
-    //front end
-    /*
-  const existingEmp = await employeeSchema.findOne({ employeeID: teamLeadID });
-  if (!existingEmp) {
-    return res.status(200).json({ message: "TeamLead is not existing" });
-  }*/
+    
     const existingTeamLead = await teamSchema.findOne({
       teamLeadID: teamLeadID,
     });
@@ -71,26 +66,14 @@ exports.addTeam = async (req, res) => {
     //update teamLead profile
     const teamLeadUpdate = await employeeSchema.findOneAndUpdate(
       { employeeID: teamLeadID },
-      { $set: { teamID: savedTeam._id } } //?
+      { $set: { teamID: savedTeam._id } } 
     );
 
-    // const findEmp = await employeeSchema.findOne({ employeeID: teamLeadID });
-
-    // //update team lead name in team
-    // const addLeadName = await teamSchema.findOneAndUpdate(
-    //   { teamLeadID: findEmp.employeeID },
-    //   {
-    //     $set: {
-    //       leadFirstName: findEmp.employeeFirstName,
-    //       leadLastName: findEmp.employeeLastName,
-    //       leaderProfPic: findEmp.profilePic,
-    //     },
-    //   }
-    // );
+    
 
     let updateEmployeeCount = 0;
     if (teamMembers) {
-      updateEmployeeCount = teamMembers.length; //?
+      updateEmployeeCount = teamMembers.length; 
 
       await Promise.all(
         teamMembers.map(async (member) => {
@@ -101,7 +84,7 @@ exports.addTeam = async (req, res) => {
           if (!existingEmp.teamID) {
             await employeeSchema.findOneAndUpdate(
               { employeeID: member },
-              { $set: { teamID: savedTeam._id } } //?
+              { $set: { teamID: savedTeam._id } } 
             );
             updateEmployeeCount--;
           } else {
@@ -240,10 +223,10 @@ exports.updateTeam = async (req, res) => {
           .status(201)
           .json({ message: "Team and employee have updated successfully",success:true });
       } else {
-        res.json({message:"cannot update",success:false});//du
+        res.json({message:"cannot update",success:false});
       }
     } else {
-      res.json("team is not updated"); //?have?
+      res.json("team is not updated");
     }
   } catch (error) {
     res.status(404).json({

@@ -10,6 +10,7 @@ const {
   getUser,
   getEmployeesForJobRoles,
   candidatesWithoutProfile,
+  countEmployees,
 } = require("../../controllers/ReportersSection/employeeControllers");
 
 const {
@@ -32,8 +33,17 @@ const {
 const {
   displayLastSeen,
 } = require("../../controllers/ReportersSection/lastSeenController");
+const {
+  createOragnizationStructure,
+  updateOragnizationStructure,
+  getOrganizationStructure,
+  getLevels
+} = require("../../controllers/ReportersSection/organizationStructureContollers");
+ 
 
 //----------------employee controller------------------------------------------
+
+router.get("/count",countEmployees)
 
 router.get("/user/:id", getUser);
 
@@ -78,5 +88,15 @@ router.get("/recentSection", recentSection);
 //----------last seen----------------------------------------------------------
 
 router.get("/lastSeen", displayLastSeen);
+
+//----------organization strucutre----------------------------------------------
+
+router.post("/organization/create", createOragnizationStructure);
+
+router.put("/updateOrganization/:id", updateOragnizationStructure);
+
+router.get("/levels",getOrganizationStructure)
+
+router.get("/getLevels",getLevels)
 
 module.exports = router;
