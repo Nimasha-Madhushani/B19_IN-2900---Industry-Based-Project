@@ -1,4 +1,5 @@
 const express = require("express");
+const userRoles = require("../../Config/UserRoles");
 const { getEmployees } = require("../../controllers/LeaveSection/emloyees");
 const {
   getLeaveList,
@@ -12,21 +13,23 @@ const {
   getRequestedLeave,
   responseRequestedLeave,
 } = require("../../controllers/LeaveSection/leaveTeamLeaderControllers");
+const verify = require("../../middleware/VerifyJWT");
+const verifyRoles = require("../../middleware/verifyUserRole");
 
 const router = express.Router();
 
-router.get("/:id", getLeaveList);
+router.get("/:id",verify, getLeaveList);
 router.post("/request", requestLeave);
 router.post("/cancel/:id", cancelLeave); 
 
 
-router.get("/requestedLeave/:id", getRequestedLeave);
-router.post("/requestedLeave/response/:id", responseRequestedLeave);
-router.get("/LeaveBalance/:id", getLeaveBalance);
-router.get("/request/teamLead/:id", getTeamLead);
-router.get("/increaseLeaves/employees", getEmployees);
+router.get("/requestedLeave/:id",verify,verifyRoles([userRoles.TeamLeader]), getRequestedLeave);
+router.post("/requestedLeave/response/:id",verifyRoles([userRoles.TeamLeader]), responseRequestedLeave);
+router.get("/LeaveBalance/:id",verify, getLeaveBalance);
+router.get("/request/teamLead/:id",verify, getTeamLead);
+router.get("/increaseLeaves/employees", verifyRoles([userRoles.HR]), getEmployees);
 
-router.post("/entitledLeaves/increaseLeaves/:id", increaseLeaves); 
+router.post("/entitledLeaves/increaseLeaves/:id",verifyRoles([userRoles.HR]), increaseLeaves); 
 
 
 
