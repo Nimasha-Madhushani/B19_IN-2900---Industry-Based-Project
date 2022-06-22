@@ -45,7 +45,7 @@ const {
     viewAllExams,
     viewOneExam
 } = require("../../controllers/promotionSection/examControllers");
-const { getEvaluationDetails, promoteEmployee, getPromotionHistory } = require("../../controllers/promotionSection/promotionController");
+const { getEvaluationDetails, promoteEmployee, getPromotionHistory, getJobRoleStats } = require("../../controllers/promotionSection/promotionController");
 
 
 // routes for the Questions
@@ -84,6 +84,8 @@ router.get('/evaluation/exam/viewOneExam/:EmployeeID/:ExamID', viewOneExam)
 // routes for promotion
 router.get('/evaluation/details', getEvaluationDetails)
 router.post('/evaluation/promote/:id', promoteEmployee)
-router.get('/history', getPromotionHistory)
+router.get('/history', getPromotionHistory);
+router.get('/jobRole/stats', getJobRoleStats);
+
 
 module.exports = router;
