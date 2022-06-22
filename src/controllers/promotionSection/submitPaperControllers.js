@@ -15,29 +15,46 @@ exports.displayPaper = async (req, res) => {
         const emp = await employeeSchema.findOne({ employeeID: eid });
         const empJobRole = emp.jobRole;
 
-        const examScheduled = await Exam.findOne({ JobRole: empJobRole, Status: "Pending" })
-        // console.log("examScheduled", examScheduled);
+        const date = new Date();
+        const day = date.getDate();
+        const month = date.getMonth() + 1; // getMonth() returns month from 0 to 11
+        const year = date.getFullYear();
 
-        const paper = await Paper.findOne({ PaperID: examScheduled.PaperID });
-        // console.log("paper", paper);
+        const datetoday = `${month}/${day}/${year}`;
+        console.log('datetoday', datetoday);
 
-        const questions = [];
-        const fullDetailedPaper = [];
+        const examScheduled = await Exam.findOne({ JobRole: empJobRole, Status: "Pending" });
 
-        for (let i = 0; i < paper.Questions.length; i++) {
-            questions.push(await Question.findOne({ QuestionID: paper.Questions[i] }));
+        const dateScheduled = examScheduled.DateScheduled;
+        console.log("DateScheduled", dateScheduled);
+
+        let text1 = datetoday;
+        let text2 = dateScheduled;
+
+        console.log(text1 === text2);
+        if (text1 === text2) {
+            const paper = await Paper.findOne({ PaperID: examScheduled.PaperID });
+            const questions = [];
+            const fullDetailedPaper = [];
+
+            for (let i = 0; i < paper.Questions.length; i++) {
+                questions.push(await Question.findOne({ QuestionID: paper.Questions[i] }));
+            }
+
+            const { PaperID, PaperName, PaperType, DateCreated } = paper;
+            const fullPaper = {
+                PaperID, PaperName, PaperType, DateCreated,
+                questions: questions
+            }
+            fullDetailedPaper.push(fullPaper);
+            if (paper == null) {
+                return res.status(404).json({ message: "Paper not found", error: err.message })
+            }
+            return res.status(200).json(fullDetailedPaper);
         }
-
-        const { PaperID, PaperName, PaperType, DateCreated } = paper;
-        const fullPaper = {
-            PaperID, PaperName, PaperType, DateCreated,
-            questions: questions
+        else {
+            return res.status(404).json({ message: "Paper not found", error: err.message, success: false })
         }
-        fullDetailedPaper.push(fullPaper);
-        if (paper == null) {
-            return res.status(404).json({ message: "Paper not found", error: err.message })
-        }
-        return res.status(200).json(fullDetailedPaper);
     } catch (err) {
         // console.log("error")
         return res.status(404).json({ message: "Paper not found", error: err.message, success: false })
