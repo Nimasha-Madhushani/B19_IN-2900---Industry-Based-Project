@@ -105,7 +105,9 @@ const sendEmails = async (employee, data, teamLeader, condition) => {
     };
 
     const result = await transporter.sendMail(mailOptions); 
+    console.log(result);
     return result;
+    
   } catch (error) {
     console.log(error);
     return error;
