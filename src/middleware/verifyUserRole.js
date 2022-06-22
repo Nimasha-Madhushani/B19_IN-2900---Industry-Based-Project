@@ -10,6 +10,7 @@ const verifyRoles = (allowedRoles) => {
       accessToken = accessToken.split(" ")[1];
 
       let authorized = false;
+      accessToken = accessToken.split(" ")[1];
       if (accessToken === "null" || !accessToken) {
         return res
           .status(401)

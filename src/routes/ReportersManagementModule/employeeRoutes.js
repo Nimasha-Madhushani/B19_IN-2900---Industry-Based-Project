@@ -47,7 +47,7 @@ const verifyRoles = require("../../middleware/verifyUserRole");
 
 // router.get("/count", verifyRoles([userRoles.HR]), countEmployees);
 
-// router.get("/user/:id", verify, getUser);
+// router.get("/user/:id",  getUser);
 
 // router.get("/organization", getEmployeesForJobRoles);
 
@@ -59,7 +59,11 @@ const verifyRoles = require("../../middleware/verifyUserRole");
 //   candidatesWithoutProfile
 // );
 
-// router.get("/", viewEmployees);
+// router.get(
+//   "/",
+//   verifyRoles([userRoles.HR, userRoles.CTO, userRoles.IT, userRoles.Employee]),
+//   viewEmployees
+// );
 
 // router.get("/getall", getallEmployees);
 
@@ -67,7 +71,7 @@ const verifyRoles = require("../../middleware/verifyUserRole");
 
 // router.post("/add", verifyRoles([userRoles.HR]), createEmployee);
 
-// router.put("/update/:id", verify, updateEmployeeProfile); //update own profile(NIC disable)
+// router.put("/update/:id", updateEmployeeProfile); //update own profile(NIC disable)
 
 // router.put("/update/employee/:id", updateEmployeeProfile); //only HR can access
 
@@ -110,10 +114,6 @@ const verifyRoles = require("../../middleware/verifyUserRole");
 // router.get("/levels", getOrganizationStructure);
 
 // router.get("/getLevels", getLevels);
-
-
-
-
 
 
 //----------------employee controller------------------------------------------
