@@ -78,4 +78,5 @@ router.get(
   getInterviewStats
 );
 
+router.post("/interview/scheduled/result", getInterviewResult);
 module.exports = router;
