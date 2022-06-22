@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 const InterviewSchema = require("../../models/RecruitmentModule/InterviewModel");
 const candidateSchema = require("../../models/RecruitmentModule/CandidateModel");
 const employeeSchema = require("../../models/ReportersManagementModule/EmployeeModel");
+const TeamModel = require("../../models/ReportersManagementModule/TeamModel");
 
 module.exports.createInterview = async (req, res) => {
   const {
@@ -255,7 +256,6 @@ module.exports.markedCandidate = async (req, res) => {
     );
     const interview = await InterviewSchema.findOne({ _id: id });
 
-
     await candidateSchema.updateOne(
       { _id: interview.candidateID },
       { $set: { status: marks.recommendation } }
@@ -328,7 +328,7 @@ module.exports.getInterviewResult = async (req, res) => {
       candidateID: interview.candidateID,
       InterviewType: interview.interviewType,
     });
-    if(Interview) {
+    if (Interview) {
       const {
         candidateID,
         InterviewType,
@@ -354,10 +354,10 @@ module.exports.getInterviewResult = async (req, res) => {
           marks.push({ Interviewer, marks: mark });
         })
       );
-    
+
       return res.status(200).json({
         success: true,
-        InterviewResult:{
+        InterviewResult: {
           candidateID,
           InterviewType,
           InterviewDate,
@@ -368,12 +368,38 @@ module.exports.getInterviewResult = async (req, res) => {
     }
     res.status(200).json({
       success: true,
-      InterviewResult: null
+      InterviewResult: null,
     });
-  
-    
   } catch (error) {
     res.status(404).json({
+      success: false,
+      description: "failed to fetch data",
+      error: error.message,
+    });
+  }
+};
+
+exports.getInterviewers = async (req, res) => {
+  try {
+    let interviewers = await employeeSchema.find({
+      jobRole: { $in: ["HR Manager", "CTO"] },
+    });
+
+    const teams = await TeamModel.find();
+    await Promise.all(
+      teams.map(async (leader) => {
+        interviewers.push(
+          await employeeSchema.findOne({ employeeID: leader.teamLeadID })
+        );
+      })
+    );
+    res.status(200).json({
+      success: true,
+      description: "successfully fetch data",
+      data: interviewers,
+    });
+  } catch (error) {
+    res.status(400).json({
       success: false,
       description: "failed to fetch data",
       error: error.message,
