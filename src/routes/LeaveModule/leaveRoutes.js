@@ -8,6 +8,7 @@ const {
   getLeaveBalance,
   getTeamLead,
   increaseLeaves,
+  getLeaveBalanceOfEmployees,
 } = require("../../controllers/LeaveSection/leaveEmaployeeControllers");
 const {
   getRequestedLeave,
@@ -26,6 +27,7 @@ router.post("/cancel/:id", cancelLeave);
 router.get("/requestedLeave/:id",verify,verifyRoles([userRoles.TeamLeader]), getRequestedLeave);
 router.post("/requestedLeave/response/:id",verifyRoles([userRoles.TeamLeader]), responseRequestedLeave);
 router.get("/LeaveBalance/:id",verify, getLeaveBalance);
+router.get("/LeaveBalance/teamMember/remaining",verifyRoles([userRoles.HR]), getLeaveBalanceOfEmployees);
 router.get("/request/teamLead/:id",verify, getTeamLead);
 router.get("/increaseLeaves/employees", verifyRoles([userRoles.HR]), getEmployees);
 
