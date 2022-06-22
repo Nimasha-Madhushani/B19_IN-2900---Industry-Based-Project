@@ -10,7 +10,7 @@ module.exports.requestLeave = async (req, res) => {
   const { leaveType, reason, startDate, endDate, leaveMethod, employeeId } =
     req.body;
   try {
-    //console.log("hi");
+ 
     const newLeave = new LeaveSchema({
       leaveType,
       reason,
@@ -47,7 +47,7 @@ module.exports.requestLeave = async (req, res) => {
       teamLeader,
       condition
     );
-    console.log(sentMail);
+    // console.log(sentMail);
 
     if (sentMail.response.status == 400) {
       return res.status(404).json({
@@ -76,7 +76,7 @@ module.exports.getLeaveList = async (req, res) => {
   console.log("hi");
   const { id } = req.params;
   try {
-    const leaveHistory = await LeaveSchema.find({ employeeId: id });
+    const leaveHistory = await LeaveSchema.find({ employeeId: id }).sort({_id:-1});
 
     let leaveHistoryArray = [];
     leaveHistory.forEach((leave) => {
@@ -220,11 +220,13 @@ module.exports.getLeaveBalance = async (req, res) => {
 
 
 module.exports.getLeaveBalanceOfEmployees = async (req, res) => {
-  const {employeeID} = req.body;
-console.log("loiu");
+  const {id} = req.body;
+
+
+
   try {
     const leaveBalance = await leaveBalanceSchema.findOne({
-      employeeId: employeeID,
+      employeeId: id,
     });
     let remainingLeaves;
 
@@ -236,14 +238,14 @@ console.log("loiu");
         entitledAnnualLeave: 14,
         entitledCasualLeave: 07,
         entitledMedicalLeave: 07,
-        employeeId: employeeID,
+        employeeId: id,
       };
     } else {
       const {
         entitledAnnualLeave,
         entitledCasualLeave,
         entitledMedicalLeave,
-        approvedAnnualLeave,
+        approvedAnnualLeave, 
         approvedCasualLeave,
         approvedMedicalLeave,
         employeeId,
@@ -312,7 +314,7 @@ module.exports.increaseLeaves = async (req, res) => {
           }
         );
         break;
-      case "Medical":
+      case "Casual":
         await leaveBalanceSchema.findOneAndUpdate(
           { employeeId: employeeID },
           {
@@ -323,7 +325,7 @@ module.exports.increaseLeaves = async (req, res) => {
           }
         );
         break;
-      case "Casual":
+      case "Medical":
         await leaveBalanceSchema.findOneAndUpdate(
           { employeeId: employeeID },
           {

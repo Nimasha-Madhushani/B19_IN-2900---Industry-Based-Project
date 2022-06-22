@@ -15,6 +15,7 @@ const {
   markedCandidate,
   getInterviewStats,
   getInterviewResult,
+  getInterviewers,
 } = require("../../controllers/recruitmentSection/InterviewControllers");
 const verify = require("../../middleware/VerifyJWT");
 const verifyRoles = require("../../middleware/verifyUserRole");
@@ -79,4 +80,5 @@ router.get(
 );
 
 router.post("/interview/scheduled/result", getInterviewResult);
+router.get("/interviewer/get", getInterviewers);
 module.exports = router;
