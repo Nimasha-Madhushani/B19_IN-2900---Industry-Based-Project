@@ -144,3 +144,66 @@ exports.getPromotionHistory = async (req, res) => {
     });
   }
 };
+
+exports.getJobRoleStats = async (req, res) => {
+  try {
+    const employees = await EmployeeModel.find();
+    
+    let HRManager = 0,
+      SoftwareEngineer = 0,
+      SeniorSoftwareEngineer = 0,
+      SoftwareArchitect = 0,
+      AssociateSoftwareEngineer = 0,
+      UIUXDesigner = 0;
+    await Promise.all(
+      employees.map((employee) => {
+        switch (employee.jobRole) {
+          case "HR Manager":
+            HRManager++;
+            break;
+
+          case "Software Engineer":
+            SoftwareEngineer++;
+            break;
+
+          case "Senior Software Engineer":
+            SeniorSoftwareEngineer++;
+            break;
+
+          case "Software Architect":
+            SoftwareArchitect++;
+            break;
+          case "Associate Software Engineer":
+            AssociateSoftwareEngineer++;
+            break;
+          case "UI/UX Designer":
+            UIUXDesigner++;
+            break;
+
+          default:
+            break;
+        }
+      })
+    );
+    const jobRoleStats = {
+      totalEmployees: employees.length,
+      HRManager,
+      SoftwareEngineer,
+      SeniorSoftwareEngineer,
+      SoftwareArchitect,
+      AssociateSoftwareEngineer,
+      UIUXDesigner,
+    };
+    res.status(200).json({
+      success: true,
+      jobRoleStats: jobRoleStats,
+      message: "data is fetch successfully",
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      error: error.message,
+      message: "can not fetch data",
+    });
+  }
+};
