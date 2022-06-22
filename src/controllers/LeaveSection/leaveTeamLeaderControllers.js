@@ -18,7 +18,7 @@ module.exports.getRequestedLeave = async (req, res) => {
     for (let index = 0; index < employee.length; index++) {
       const leave = await leaveSchema.find({
         employeeId: employee[index].employeeID,
-      });
+      }).sort({_id:-1});
 
       for (let index2 = 0; index2 < leave.length; index2++) {
         requestedLeave.push({
@@ -31,7 +31,7 @@ module.exports.getRequestedLeave = async (req, res) => {
     if (requestedLeave) {
       return res.status(200).json({
         message: "requested leaves are successfully fetched",
-        requestedLeave: requestedLeave,
+        requestedLeave:requestedLeave,
       });
     }
     return res.status(404).json({

@@ -122,7 +122,7 @@
             font-weight: 400;
             font-size: 15px;
             line-height: 1.8;
-            color: rgba(0, 0, 0, .5);
+            color: #ffffff;
         }
 
         a {
@@ -195,11 +195,11 @@
         }
 
         .intro .text {
-            color: rgba(0, 0, 0, .3);
+            color: #fff;
         }
 
         .intro .text h2 {
-            color: #000;
+            color:#fff;
             font-size: 34px;
             margin-bottom: 0;
             font-weight: 300;
@@ -207,19 +207,19 @@
 
         .intro .text h2 span {
             font-weight: 600;
-            color: #ff8b00;
+            color: #fff;
         }
 
 
 
         /*HEADING SECTION*/
         .heading-section .subheading {
-            margin-bottom: 20px !important;
+            margin-bottom: 20px ;
             display: inline-block;
             font-size: 13px;
             text-transform: uppercase;
             letter-spacing: 2px;
-            color: rgba(0, 0, 0, .4);
+            color: #fff;
             position: relative;
         }
 
@@ -292,19 +292,19 @@
                 </tr><!-- end tr -->
                 <tr>
                     <td valign="middle" class="hero bg_white"
-                        style="background-image: url('https://www.violinschool.com/wp-content/uploads/2020/04/Second-Nature-600px-400px-4.jpg'); background-size: cover; height: 200px;">
+                        style="background-image: url('https://us.123rf.com/450wm/ipopba/ipopba1606/ipopba160600074/60274316-cloud-computing-futuristic-display-technology-connectivity-concept.jpg?ver=6'); background-size: cover; height: 300px; ">
                         <div class="overlay"></div>
                         <table>
                             <tr>
                                 <td>
                                     <div class="text" style="padding: 0 4em; text-align: center;">
                                         <div>
-                                            <h2 style="text-transform: uppercase; font-weight:bold;">
+                                            <h2 style="text-transform: uppercase; font-weight:bold;  color: #ff8b00; margin-bottom:30px !important ; display: flex; flex-direction: row;">
                                                 {{task}} {{ leaveType}} leave
                                             </h2>
                                         </div>
-                                        <p>please take an action</p>
-                                        <p><a href="#" class="btn btn-primary">View Details</a>
+                                        {{!-- <p>please take an action</p> --}}
+                                        
                                         </p>
                                     </div>
                                 </td>
@@ -313,7 +313,7 @@
                     </td>
                 </tr><!-- end tr -->
                 <tr>
-                    <td class="bg_dark email-section" style="text-align:left;">
+                    <td class="bg_dark email-section" style="text-align:left; color:#ffffff">
                         <div class="heading-section heading-section-white">
                             
 
@@ -321,18 +321,18 @@
                             <div style="color: white;">
                                 <p> Dear {{teamLeader}} ,</p>
 
-                                <p>I am sending this to inform you to cancellation of my leave from {{startDate}} to
+                                <p style="color: white;">I am sending this to inform you to cancellation of my leave from {{startDate}} to
                                     {{endDate}}. I have applied for leave due to {{appliedReason}}, but {{reason}}.</p>
 
-                                <p>Therefore, I can continue my work.</p>
-                                <p>Sorry for the inconvenience.</p>
+                                <p style="color: white;">Therefore, I can continue my work.</p>
+                                <p style="color: white;">Sorry for the inconvenience.</p>
 
-                                <p>Thanking you.</p>
+                                <p style="color: white;">Thanking you.</p>
 
 
-                                <p>Sincerely,</p>
-                                <p>{{employeeID}},</p>
-                                <p>{{employeeName}}.</p>
+                                <p style="color: white;">Sincerely,</p>
+                                <p style="color: white;">{{employeeID}},</p>
+                                <p style="color: white;">{{employeeName}}.</p>
 
 
 
