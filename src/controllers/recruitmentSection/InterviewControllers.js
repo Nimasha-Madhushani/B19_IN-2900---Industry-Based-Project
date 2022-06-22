@@ -176,7 +176,7 @@ module.exports.getInterviews = async (req, res) => {
       Interviewers: {
         $elemMatch: {
           id: id,
-          status: {$ne: "Completed"}
+          status: { $ne: "Completed" },
         },
       },
     });
@@ -252,10 +252,9 @@ module.exports.markedCandidate = async (req, res) => {
     await InterviewSchema.updateOne(
       { _id: id, "Interviewers.id": marks.interviewer },
       { $set: { "Interviewers.$.status": "Completed" } }
-      );
-      const interview = await InterviewSchema.findOne({_id: id});
+    );
+    const interview = await InterviewSchema.findOne({ _id: id });
 
-    console.log(interview)
 
     await candidateSchema.updateOne(
       { _id: interview.candidateID },
@@ -303,7 +302,7 @@ module.exports.getInterviewStats = async (req, res) => {
     });
     const NonInterviewedCandidate = await candidateSchema.find({
       status: { $in: ["Initiated", "Scheduled"] },
-    }); 
+    });
 
     res.status(200).json({
       success: true,
@@ -322,27 +321,57 @@ module.exports.getInterviewStats = async (req, res) => {
   }
 };
 
-
 module.exports.getInterviewResult = async (req, res) => {
-  
-  const  interview  = req.body;
+  const interview = req.body;
   try {
     const Interview = await InterviewSchema.findOne({
-      candidateID : interview.candidateID,
-      InterviewType : interview.interviewType
+      candidateID: interview.candidateID,
+      InterviewType: interview.interviewType,
     });
-
-    if(!interview) {
-     return res.status(400).json({
-        success: false,
-        message: "failed to fetch data",
+    if(Interview) {
+      const {
+        candidateID,
+        InterviewType,
+        InterviewDate,
+        Interviewers,
+        CandidateMarks,
+      } = Interview;
+      let interviewers = [];
+      await Promise.all(
+        Interviewers.map(async (interviewer) => {
+          const Interviewer = await employeeSchema.findOne({
+            employeeID: interviewer.id,
+          });
+          interviewers.push({ Interviewer, status: interviewer.status });
+        })
+      );
+      let marks = [];
+      await Promise.all(
+        CandidateMarks.map(async (mark) => {
+          const Interviewer = await employeeSchema.findOne({
+            employeeID: mark.interviewer,
+          });
+          marks.push({ Interviewer, marks: mark });
+        })
+      );
+    
+      return res.status(200).json({
+        success: true,
+        InterviewResult:{
+          candidateID,
+          InterviewType,
+          InterviewDate,
+          Interviewers: interviewers,
+          CandidateMarks: marks,
+        },
       });
     }
- 
     res.status(200).json({
       success: true,
-      InterviewResult: Interview
+      InterviewResult: null
     });
+  
+    
   } catch (error) {
     res.status(404).json({
       success: false,
@@ -350,4 +379,4 @@ module.exports.getInterviewResult = async (req, res) => {
       error: error.message,
     });
   }
-}
+};

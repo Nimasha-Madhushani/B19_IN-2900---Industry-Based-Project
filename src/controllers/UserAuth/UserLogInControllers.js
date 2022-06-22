@@ -50,16 +50,8 @@ exports.loginEmployee = async (req, res) => {
       employeeLastName,
       jobRole,
       profilePic,
+      teamID
     } = userProfile;
-
-    // res.cookie("refreshToken", refreshToken);
-
-    //   res.setHeader('Set-Cookie', cookie.serialize("refreshToken", refreshToken, {
-    //     httpOnly: true,
-    //     sameSite: 'strict',
-    //     maxAge: 60 * 60 * 24 * 7,
-    //     path: '/'
-    // }))
 
     res.status(200).json({
       message: "User has successfully sign in!",
@@ -70,6 +62,7 @@ exports.loginEmployee = async (req, res) => {
         employeeLastName,
         jobRole,
         profilePic,
+        teamID: teamID ? teamID: null,
         teamLead: isTeamLead? true: false
       },
       accessToken: accessToken,
@@ -94,3 +87,14 @@ exports.logOutEmployee = async (req, res) => {
     res.status(500).json({ message: error.message, success: false });
   }
 };
+
+
+//-------controller for find number of employees which have accounts in this system
+exports.countofEmployees = async (req, res) => {
+  try{
+   const count = await employeeSchema.countDocuments();
+   res.status(201).json({ message: "Successfully counted!",counts:count , success: true });
+  }catch(error) {
+    res.status(500).json({ message: error.message, success: false });
+  }
+}
