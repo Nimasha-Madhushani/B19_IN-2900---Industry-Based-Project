@@ -10,7 +10,7 @@ module.exports.requestLeave = async (req, res) => {
   const { leaveType, reason, startDate, endDate, leaveMethod, employeeId } =
     req.body;
   try {
-    //console.log("hi");
+ 
     const newLeave = new LeaveSchema({
       leaveType,
       reason,
@@ -47,7 +47,7 @@ module.exports.requestLeave = async (req, res) => {
       teamLeader,
       condition
     );
-    console.log(sentMail);
+    // console.log(sentMail);
 
     if (sentMail.response.status == 400) {
       return res.status(404).json({
@@ -75,7 +75,7 @@ module.exports.requestLeave = async (req, res) => {
 module.exports.getLeaveList = async (req, res) => {
   const { id } = req.params;
   try {
-    const leaveHistory = await LeaveSchema.find({ employeeId: id });
+    const leaveHistory = await LeaveSchema.find({ employeeId: id }).sort({_id:-1});
 
     let leaveHistoryArray = [];
     leaveHistory.forEach((leave) => {
