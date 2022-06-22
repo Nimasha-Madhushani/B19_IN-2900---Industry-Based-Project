@@ -1,5 +1,9 @@
 const express = require("express");
 const router = express.Router();
+// const verify = require("../../middleware/VerifyJWT");
+// const verifyRoles = require("../../middleware/verifyUserRole");
+// const userRoles = require("../../Config/UserRoles");
+
 
 //importing controllers of question
 const {
@@ -78,7 +82,7 @@ router.post('/evaluation/exam/scheduleExam/:EmployeeID', scheduleExam);
 router.delete('/evaluation/exam/deleteExam/:EmployeeID/:ExamID', deleteScheduledExam);
 router.patch('/evaluation/exam/updateExam/:EmployeeID/:ExamID', updateExamDetails);
 router.get('/evaluation/exam/viewExam/:EmployeeID', viewAllExams);
-router.get('/evaluation/exam/viewOneExam/:EmployeeID/:ExamID', viewOneExam)
+router.get('/evaluation/exam/viewOneExam/:EmployeeID/:ExamID', viewOneExam);//
 
 // routes for promotion
 router.get('/evaluation/details', getEvaluationDetails)

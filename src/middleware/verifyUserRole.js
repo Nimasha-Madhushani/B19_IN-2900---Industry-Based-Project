@@ -5,7 +5,7 @@ const verifyRoles = (allowedRoles) => {
   return async (req, res, next) => {
     try {
 
-
+      console.log("object");
       let accessToken = req.headers.authorization;
       accessToken = accessToken.split(" ")[1];
 
