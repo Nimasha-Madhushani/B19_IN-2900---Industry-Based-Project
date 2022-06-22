@@ -4,14 +4,17 @@ const jwt = require("jsonwebtoken");
 const verifyRoles = (allowedRoles) => {
   return async (req, res, next) => {
     try {
-      
+
+      console.log("object");
       let accessToken = req.headers.authorization;
+      accessToken = accessToken.split(" ")[1];
+
       let authorized = false;
       accessToken = accessToken.split(" ")[1];
       if (accessToken === "null" || !accessToken) {
         return res
           .status(401)
-          .json({success: false,  message: "Unauthenticated" });
+          .json({ success: false, message: "Unauthenticated" });
       }
       await jwt.verify(
         accessToken,
