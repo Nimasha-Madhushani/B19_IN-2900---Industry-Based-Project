@@ -7,7 +7,7 @@ const EMAIL = process.env.EMAIL;
 const APP_PASSWORD = process.env.PASSWORD;
 const sendEmails = async (savedSensitiveDetail, savedEmployee) => {
   try {
-    const emailTemplateCredentials= fs.readFileSync(
+    const emailTemplateCredentials = fs.readFileSync(
       path.join(__dirname, "/SendCredentials.handlebars"),
       "utf8"
     );
@@ -39,6 +39,7 @@ const sendEmails = async (savedSensitiveDetail, savedEmployee) => {
     };
 
     const result = await transporter.sendMail(mailOptions);
+
     console.log(result);
     return result;
   } catch (error) {
