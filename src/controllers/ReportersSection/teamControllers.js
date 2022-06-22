@@ -25,7 +25,6 @@ exports.addTeam = async (req, res) => {
         .json({ status: "This Team Name already exists", success: false });
     }
 
-    
     const existingTeamLead = await teamSchema.findOne({
       teamLeadID: teamLeadID,
     });
@@ -66,14 +65,12 @@ exports.addTeam = async (req, res) => {
     //update teamLead profile
     const teamLeadUpdate = await employeeSchema.findOneAndUpdate(
       { employeeID: teamLeadID },
-      { $set: { teamID: savedTeam._id } } 
+      { $set: { teamID: savedTeam._id } }
     );
-
-    
 
     let updateEmployeeCount = 0;
     if (teamMembers) {
-      updateEmployeeCount = teamMembers.length; 
+      updateEmployeeCount = teamMembers.length;
 
       await Promise.all(
         teamMembers.map(async (member) => {
@@ -84,7 +81,7 @@ exports.addTeam = async (req, res) => {
           if (!existingEmp.teamID) {
             await employeeSchema.findOneAndUpdate(
               { employeeID: member },
-              { $set: { teamID: savedTeam._id } } 
+              { $set: { teamID: savedTeam._id } }
             );
             updateEmployeeCount--;
           } else {
@@ -96,12 +93,10 @@ exports.addTeam = async (req, res) => {
       );
     }
     if (savedTeam && !updateEmployeeCount && teamLeadUpdate) {
-      return res
-        .status(200)
-        .json({
-          status: "Team added successfully and employee updated",
-          success: true,
-        });
+      return res.status(200).json({
+        status: "Team added successfully and employee updated",
+        success: true,
+      });
     }
 
     res.status(200).json({ status: "Team is  added!", success: true });
@@ -147,7 +142,7 @@ exports.updateTeam = async (req, res) => {
 
     if (team && existingTeamLdEmp) {
       const filterTeams = await teamSchema.find({ _id: { $ne: id } });
-      
+
       let chekFalg = false;
       await Promise.all(
         filterTeams.map(async (filtervalue) => {
@@ -173,27 +168,38 @@ exports.updateTeam = async (req, res) => {
       const duplicateTeamLd = await teamSchema.findOne({
         teamLeadID: teamLeadID,
       });
-     
+
       if (!chekFalg) {
         await teamSchema.findByIdAndUpdate(id, newTeamUpdate, {
           new: true,
         });
 
         // update old team members profile : remove their Team ID
-        await Promise.all(
-          oldMembers.map(async (oldmember) => {
-            await Promise.all(
-              teamMembers.map(async (teammember) => {
-                if (oldmember.employeeID != teammember) {
-                  await employeeSchema.findOneAndUpdate(
-                    { employeeID: oldmember.employeeID },
-                    { $set: { teamID: "" } }
-                  );
-                }
-              })
-            );
-          })
-        );
+        if (teamMembers.length === 0) {
+          await Promise.all(
+            oldMembers.map(async (oldmember) => {
+              await employeeSchema.findOneAndUpdate(
+                { employeeID: oldmember.employeeID },
+                { $set: { teamID: "" } }
+              );
+            })
+          );
+        } else {
+          await Promise.all(
+            oldMembers.map(async (oldmember) => {
+              await Promise.all(
+                teamMembers.map(async (teammember) => {
+                  if (oldmember.employeeID != teammember) {
+                    await employeeSchema.findOneAndUpdate(
+                      { employeeID: oldmember.employeeID },
+                      { $set: { teamID: "" } }
+                    );
+                  }
+                })
+              );
+            })
+          );
+        }
 
         if (teamLeadID != team.teamLeadID) {
           // updateOldTeamLead
@@ -221,9 +227,12 @@ exports.updateTeam = async (req, res) => {
 
         res
           .status(201)
-          .json({ message: "Team and employee have updated successfully",success:true });
+          .json({
+            message: "Team and employee have updated successfully",
+            success: true,
+          });
       } else {
-        res.json({message:"cannot update",success:false});
+        res.json({ message: "cannot update", success: false });
       }
     } else {
       res.json("team is not updated");
