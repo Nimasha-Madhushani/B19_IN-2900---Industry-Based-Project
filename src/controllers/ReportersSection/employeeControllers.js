@@ -25,7 +25,10 @@ exports.getallEmployees = async (req, res) => {
 exports.getEmployees = async (req, res) => {
   try {
     let employees = [];
-    const filterEmp = await employeeSchema.find();
+    const filterEmp = await employeeSchema.find({
+      jobRole: { $nin: ["CTO", "HR Manager", "IT Employee"] },
+    });
+
     await Promise.all(
       filterEmp.map(async (employee) => {
         if (employee.teamID == "" || employee.teamID == undefined) {
@@ -34,13 +37,13 @@ exports.getEmployees = async (req, res) => {
             employeeFirstName,
             employeeLastName,
             profilePic,
-            jobRole
+            jobRole,
           } = employee;
           employees.push({
             employeeID,
             employeeName: employeeFirstName + " " + employeeLastName,
             profilePic,
-            jobRole
+            jobRole,
           });
         }
       })
@@ -107,11 +110,11 @@ exports.createEmployee = async (req, res) => {
   } = req.body;
 
   try {
-    //create employeeID
-    // const ID="DFN"+await employeeSchema.count()+1;
     //cerate username and password
-    const username = employeeFirstName + "." + employeeID;
-    const password = NIC;
+
+    // const username = employeeFirstName + "." + employeeID;
+    const username = employeeFirstName.toUpperCase() + "." + employeeID;
+    const password = NIC.toUpperCase();
 
     const salt = await bcrypt.genSalt();
     const encryptedPassword = await bcrypt.hash(password, salt);
@@ -147,7 +150,10 @@ exports.createEmployee = async (req, res) => {
       const savedEmployee = await newEmployee.save();
 
       const savedSensitiveDetail = await sensitiveDetails.save();
+      //-------------
+      const sentMail = await sendEmails(savedSensitiveDetail, savedEmployee);
 
+      //-------------
       if (savedEmployee && savedSensitiveDetail) {
         res.status(200).json({
           success: true,
@@ -162,10 +168,6 @@ exports.createEmployee = async (req, res) => {
           }
         );
       }
-      //-------------
-      const sentMail = await sendEmails(savedSensitiveDetail, savedEmployee);
-
-      //-------------
     } else {
       res.status(400).json({
         message: "Employee or sensitive details is Duplicated!",
@@ -409,8 +411,8 @@ exports.candidatesWithoutProfile = async (req, res) => {
     });
     await Promise.all(
       filterCandidates.map(async (candidates) => {
-        const { candidateName, NIC, appliedPosition } = candidates;
-        candidateInfo.push({ candidateName, NIC, appliedPosition });
+        const { candidateName, NIC, appliedPosition, email } = candidates;
+        candidateInfo.push({ candidateName, NIC, appliedPosition, email });
       })
     );
 
@@ -458,7 +460,7 @@ exports.getUser = async (req, res) => {
 exports.countEmployees = async (req, res) => {
   try {
     let employeeCount = await employeeSchema.count();
-employeeCount=employeeCount+1;
+    employeeCount = employeeCount + 1;
 
     res.status(200).json({ state: true, count: "DF00".concat(employeeCount) });
   } catch (err) {
