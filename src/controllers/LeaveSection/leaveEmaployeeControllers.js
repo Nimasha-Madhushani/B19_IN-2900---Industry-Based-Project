@@ -73,6 +73,7 @@ module.exports.requestLeave = async (req, res) => {
 };
 
 module.exports.getLeaveList = async (req, res) => {
+  console.log("hi");
   const { id } = req.params;
   try {
     const leaveHistory = await LeaveSchema.find({ employeeId: id });
@@ -185,6 +186,57 @@ module.exports.getLeaveBalance = async (req, res) => {
         entitledCasualLeave: 07,
         entitledMedicalLeave: 07,
         employeeId: id,
+      };
+    } else {
+      const {
+        entitledAnnualLeave,
+        entitledCasualLeave,
+        entitledMedicalLeave,
+        approvedAnnualLeave,
+        approvedCasualLeave,
+        approvedMedicalLeave,
+        employeeId,
+      } = leaveBalance;
+
+      remainingLeaves = {
+        remainingAnnual: entitledAnnualLeave - approvedAnnualLeave,
+        remainingCasual: entitledCasualLeave - approvedCasualLeave,
+        remainingMedical: entitledMedicalLeave - approvedMedicalLeave,
+        entitledAnnualLeave: entitledAnnualLeave,
+        entitledCasualLeave: entitledCasualLeave,
+        entitledMedicalLeave: entitledMedicalLeave,
+        employeeId: employeeId,
+      };
+    }
+
+    res.status(200).json({
+      success: true,
+      remainingLeaves: remainingLeaves,
+    });
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+
+module.exports.getLeaveBalanceOfEmployees = async (req, res) => {
+  const {employeeID} = req.body;
+console.log("loiu");
+  try {
+    const leaveBalance = await leaveBalanceSchema.findOne({
+      employeeId: employeeID,
+    });
+    let remainingLeaves;
+
+    if (!leaveBalance) {
+      remainingLeaves = {
+        remainingAnnual: 14,
+        remainingCasual: 7,
+        remainingMedical: 7,
+        entitledAnnualLeave: 14,
+        entitledCasualLeave: 07,
+        entitledMedicalLeave: 07,
+        employeeId: employeeID,
       };
     } else {
       const {
