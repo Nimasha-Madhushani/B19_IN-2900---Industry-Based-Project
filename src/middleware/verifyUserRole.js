@@ -7,12 +7,12 @@ const verifyRoles = (allowedRoles) => {
       
       let accessToken = req.headers.authorization;
       let authorized = false;
+      accessToken = accessToken.split(" ")[1];
       if (accessToken === "null" || !accessToken) {
         return res
           .status(401)
           .json({success: false,  message: "Unauthenticated" });
       }
-      accessToken = accessToken.split(" ")[1];
       await jwt.verify(
         accessToken,
         process.env.ACCESS_TOKEN_SECRET_KEY,
