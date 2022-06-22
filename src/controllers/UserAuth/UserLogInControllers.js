@@ -50,16 +50,8 @@ exports.loginEmployee = async (req, res) => {
       employeeLastName,
       jobRole,
       profilePic,
+      teamID
     } = userProfile;
-
-    // res.cookie("refreshToken", refreshToken);
-
-    //   res.setHeader('Set-Cookie', cookie.serialize("refreshToken", refreshToken, {
-    //     httpOnly: true,
-    //     sameSite: 'strict',
-    //     maxAge: 60 * 60 * 24 * 7,
-    //     path: '/'
-    // }))
 
     res.status(200).json({
       message: "User has successfully sign in!",
@@ -70,6 +62,7 @@ exports.loginEmployee = async (req, res) => {
         employeeLastName,
         jobRole,
         profilePic,
+        teamID: teamID ? teamID: null,
         teamLead: isTeamLead? true: false
       },
       accessToken: accessToken,
@@ -105,3 +98,95 @@ exports.countofEmployees = async (req, res) => {
     res.status(500).json({ message: error.message, success: false });
   }
 }
+
+//-----controller for creating first user to the database as HR manager
+exports.createFirstEmployee = async (req, res) => {
+  const {
+    employeeID,
+    employeeFirstName,
+    employeeLastName,
+    jobRole,
+    NIC,
+    companyEmail,
+    candidateID,
+  } = req.body;
+
+  try {
+    const username = employeeFirstName.toUpperCase() + "." + employeeID;
+    const password = NIC.toUpperCase();
+
+    const salt = await bcrypt.genSalt();
+    const encryptedPassword = await bcrypt.hash(password, salt);
+
+    const existingSensitiveDetails = await sensitiveDetailsSchema.findOne({
+      employeeID,
+    });
+    const existingEmpID = await employeeSchema.findOne({ employeeID });
+
+    if (!existingEmpID && !existingSensitiveDetails) {
+      const newEmployee = new employeeSchema({
+        employeeID,
+        employeeFirstName,
+        employeeLastName,
+        jobRole,
+        NIC,
+        companyEmail,
+        candidateID: candidateID,
+      });
+
+      const sensitiveDetails = new sensitiveDetailsSchema({
+        userName: username,
+        password: encryptedPassword,
+        employeeID,
+      });
+      const savedEmployee = await newEmployee.save();
+
+      const savedSensitiveDetail = await sensitiveDetails.save();
+      //-------------
+
+      //-------------
+      if (savedEmployee && savedSensitiveDetail) {
+        
+        const accessToken = createAccessToken(
+          employeeID,
+          jobRole
+        );
+        const refreshToken = createRefreshToken(
+          employeeID,
+          jobRole
+        );
+    
+        await employeeSchema.updateOne(
+          { employeeID: employeeID },
+          { $set: { token: refreshToken } }
+        );
+    
+    
+        res.status(200).json({
+          message: "User has successfully sign up!",
+          user: {
+            employeeID,
+            employeeFirstName,
+            employeeLastName,
+            jobRole,
+          },
+          accessToken: accessToken,
+          refreshToken: refreshToken,
+          success: true,
+        });
+
+      }
+    } else {
+      res.status(400).json({
+        message: "Employee or sensitive details is Duplicated!",
+        success: false,
+      });
+      
+    }
+  } catch (err) {
+    res.status(400).json({
+      message: "Employee and Sensitive Details are not Added!",
+      error: err.message,
+    });
+  }
+};

@@ -33,12 +33,9 @@ exports.createOragnizationStructure = async (req, res) => {
 };
 
 exports.updateOragnizationStructure = async (req, res) => {
-  console.log(req.params.id);
-  // console.log(req.body);
-
   const { id } = req.params;
-  const jobRole  = req.body;
-  console.log(jobRole)
+  const jobRole = req.body;
+  console.log(jobRole);
   try {
     const findLevel = await organizationStructureSchema.findOne({ _id: id });
 
@@ -47,6 +44,19 @@ exports.updateOragnizationStructure = async (req, res) => {
         .status(400)
         .json({ success: false, message: "Level is not existing" });
     }
+    // let ttt = false;
+    // console.log(ttt)
+    // findLevel.jobRole.map((JobRole)=> {
+    //   jobRole.map((job)=> {
+    //     if(JobRole === job) {
+    //       ttt = true;
+    //       return res
+    //       .status(200)
+    //       .json({ success: false, message: "Level is not updated" });
+    //     }
+
+    //   })
+    // })
     await organizationStructureSchema
       .findByIdAndUpdate(
         findLevel._id,
@@ -56,22 +66,18 @@ exports.updateOragnizationStructure = async (req, res) => {
         }
       )
       .then((level) => {
-        res
-          .status(200)
-          .json({
-            success: true,
-            message: "Level is updated  successfully",
-            levels: level,
-          });
+        res.status(200).json({
+          success: true,
+          message: "Level is updated  successfully",
+          levels: level,
+        });
       })
       .catch((err) => {
-        res
-          .status(400)
-          .json({
-            success: true,
-            message: "Level is not updated ",
-            err: err.message,
-          });
+        res.status(400).json({
+          success: true,
+          message: "Level is not updated ",
+          err: err.message,
+        });
       });
   } catch (err) {
     res.status(500).json({
@@ -86,24 +92,20 @@ exports.getOrganizationStructure = async (req, res) => {
   try {
     const findLevels = await organizationStructureSchema.find();
     let levels = [];
-    findLevels.map(async (level) => {
-      // console.log(level);
-      let allEmployees = [];
-      level.jobRole.map(async (job) => {
-        const filterEmployees = await EmployeeModel.find();
-        filterEmployees.map((employee) => {
-          if (employee.jobRole === job) {
-            allEmployees.push(employee);
-          }
-        });
+    await Promise.all(
+      findLevels.map(async (level) => {
+        let allEmployees = [];
+        await Promise.all(
+          level.jobRole.map(async (job) => {
+            const filterEmployees = await EmployeeModel.find({ jobRole: job });
+            allEmployees = allEmployees.concat(filterEmployees);
+          })
+        );
 
-        // allEmployees.push({
-        //  filterEmployees
-        // });
-      });
+        levels.push({ level: level, employees: allEmployees });
+      })
+    );
 
-      levels.push({ level: level, employees: allEmployees });
-    });
     res.status(200).json({ state: true, levels: levels });
   } catch (err) {
     res.status(400).json({ state: false, err: err });
@@ -171,5 +173,5 @@ exports.getLevels = async (req, res) => {
 // jobroles.push()
 
 //   }))
-  
+
 // };

@@ -5,14 +5,16 @@ const verifyRoles = (allowedRoles) => {
   return async (req, res, next) => {
     try {
       
+      
       let accessToken = req.headers.authorization;
+      accessToken = accessToken.split(" ")[1];
+     
       let authorized = false;
       if (accessToken === "null" || !accessToken) {
         return res
           .status(401)
           .json({success: false,  message: "Unauthenticated" });
       }
-      accessToken = accessToken.split(" ")[1];
       await jwt.verify(
         accessToken,
         process.env.ACCESS_TOKEN_SECRET_KEY,
