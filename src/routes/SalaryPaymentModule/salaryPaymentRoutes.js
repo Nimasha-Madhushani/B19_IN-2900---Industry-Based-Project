@@ -36,7 +36,7 @@ const {
 
 
 // routes for the currunt salary payment
-router.get('/currentSalary', viewCurrentSalarySheet); //view all current payment
+router.get('/currentSalary',  verifyRoles([userRoles.HR]),viewCurrentSalarySheet); //view all current payment
 router.post('/currentSalary/create', createCurrentSalarySheet);
 router.get('/currentSalary/:EmployeeID', findCurrentSalarySheet);
 router.patch('/currentSalary/update/:EmployeeID', updateCurrentSalarySheet);
